@@ -1,0 +1,221 @@
+.toplayer {
+  z-index: 999;
+}
+
+.frost {
+  min-height: 100vh;
+  padding: 10vh 0 0 0;
+  overflow: hidden;
+  box-shadow: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(255,255,255,0.7);
+  /*start: for Chrome and Edge*/
+  -webkit-backdrop-filter: blur(20px) saturate(168%);
+  backdrop-filter: blur(20px) saturate(168%);
+  /*end*/
+  right: 0;
+  position: absolute;
+}
+
+@-moz-document url-prefix() { /*for Firefox*/
+  .frost {
+      min-height: 100vh;
+      padding: 10vh 0 0 0;
+      overflow: hidden;
+      box-shadow: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      right: 0;
+      position: absolute;
+      background: inherit !important;
+  }
+
+      .frost::before {
+          width: inherit;
+          min-height: inherit;
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: #fff;
+      }
+
+      .frost::after {
+          width: inherit;
+          min-height: inherit;
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: inherit;
+          filter: blur(20px) saturate(168%) opacity(30%) brightness(100%);
+      }
+}
+
+.bgslider {
+  min-height: 100vh;
+  background: url('../images/placeholderlogin.png') center center / cover no-repeat fixed;
+}
+
+.landing{
+  width:100%;
+  border-radius: 0;
+  margin-top: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* for ctmeupage */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  height: 100px;
+  background-color: #ffffff;
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: right;
+  justify-content: right;
+  margin-left: auto;
+  height: 100px;
+  margin-right:5px;
+}
+
+.logo {
+  margin-right: 20px;
+}
+
+.logo img {
+  height: 70px;
+  width: 70px;
+}
+
+.navbar-text {
+  text-align: left;
+}
+
+.navbar-text h1 {
+  font-size: 30px;
+  margin: 0;
+  padding: 0;
+  color: black;
+}
+
+.navbar-text h2 {
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  color: maroon;
+}
+
+.navbar-right {
+  align-items: center;
+  margin-top:10px;
+}
+
+.navbar-right h3 {
+  margin-right: 10px;
+}
+
+.navbar-right a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+.navbar-right a:hover {
+  text-decoration: underline;
+}
+
+a.link{
+  font-size: 20px;
+  color: #243489;
+  margin-left:10px;
+}
+
+body{
+  background: #243489; /* fallback for old browsers */
+}
+
+/* table */
+.table-container {
+  margin: 0 auto;
+  max-width: 1200px;
+  min-width: 800px;
+  margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden; /* Ensures that rounded corners are applied */
+}
+
+th {
+  background-color: maroon;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: gray;
+}
+
+tr:nth-child(odd) {
+  background-color: white;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.pagination {
+  display: inline-block;
+  margin: auto;
+  text-align: right;
+}
+
+.pagination button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
+}
+
+.pagination button.disabled {
+  background-color: #ddd;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.table-info {
+  text-align: center;
+  margin-bottom: 10px;
+  color: white;
+}
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+}
+
+.seek{
+  border-radius: 10px;
+  background-color: red;
+}
+
+/* account create */
+.error {
+  color: red;
+}
