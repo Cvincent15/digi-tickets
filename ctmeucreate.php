@@ -91,14 +91,14 @@ include 'php/database_connect.php';
     <a href="#" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
     <?php if ($_SESSION['status'] == 'Super Admin') {?>
-    <a href="ctmeucreate.php" class="link">Create Accounts</a>
+    <a href="ctmeucreate.php" class="link"><b>Create Accounts</b></a>
     <?php }?>
   </div>
   </div>
 </nav>
 <div class="container">
     <div class="form-container">
-  <form id="create-account-form" method="POST" action="php/createaccount.php">
+  <form method="POST" action="php/createaccount.php">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" onkeyup="validateName();" required><br>
     <div id="name-error" class="error" style="display: none;"></div>
@@ -121,43 +121,13 @@ include 'php/database_connect.php';
 
     <button id="submit-button" type="submit">Submit</button>
     <button type="reset">Clear</button>
+    <button id="delete-button" type="button" style="display: none;">Delete</button>
   </form>
   </div>
   <div class="table-container">
-  <?php
   
-// Retrieve the user accounts from the database
-$sql = "SELECT * FROM users";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    echo "<table id='user-table'>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>";
-
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>
-                <td>".$row["name"]."</td>
-                <td>".$row["username"]."</td>
-                <td>".$row["password"]."</td>
-                <td>".$row["status"]."</td>
-              </tr>";
-    }
-
-    echo "</tbody>
-        </table>";
-} else {
-    echo "No user accounts found.";
-}
-
-  ?>
+  <?php include 'php/fetchaccounts.php'; ?>
+  
   </div>
   </div>
   <script>
@@ -221,15 +191,40 @@ if ($result->num_rows > 0) {
     }
 
     document.getElementById("user-table").addEventListener("click", function(event) {
-      var row = event.target.parentElement;
-      if (selectedRow !== row) {
-        populateFormFields(row);
-        selectedRow = row;
-        document.getElementById("submit-button").textContent = "Update";
-      } else {
-        clearFormFields();
-      }
-    });
+  var row = event.target.parentElement;
+  if (selectedRow !== row) {
+    populateFormFields(row);
+    selectedRow = row;
+    document.getElementById("submit-button").textContent = "Update";
+    document.getElementById("delete-button").style.display = "inline-block";
+  } else {
+    clearFormFields();
+    document.getElementById("delete-button").style.display = "none";
+  }
+});
+
+document.getElementById("delete-button").addEventListener("click", function(event) {
+  if (selectedRow) {
+    var username = selectedRow.cells[1].innerHTML;
+    if (confirm("Are you sure you want to delete the account for username: " + username + "?")) {
+      // Send an AJAX request to delete the account
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "php/deleteaccount.php", true);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          alert(this.responseText);
+          clearFormFields();
+          document.getElementById("delete-button").style.display = "none";
+          location.reload(); // Refresh the page
+        }
+      };
+      xhttp.send("username=" + username);
+    }
+  }
+});
+
+
 
     document.getElementById("create-account-form").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent form submission

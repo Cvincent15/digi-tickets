@@ -9,6 +9,8 @@ include 'php/database_connect.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src= "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -63,114 +65,74 @@ include 'php/database_connect.php';
         <tbody id="tableBody">
             <!-- Replace the sample data below with the data fetched from your database -->
             <tr>
-                <td>Data 1</td>
-                <td>Data 2</td>
-                <td>Data 3</td>
-                <td>Data 4</td>
-                <td>Data 5</td>
-                <td>Data 6</td>
-                <td>Data 7</td>
-                <td>Data 8</td>
+                <td>1</td>
+                <td>1234560</td>
+                <td>Zsyra Almendral</td>
+                <td>11345</td>
+                <td>illegal parking</td>
+                <td>Motorcycle Mio</td>
+                <td>MMM-111</td>
+                <td>2023/04/10, 11:11 AM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>2</td>
+                <td>1234561</td>
+                <td>Jeon Jungkook</td>
+                <td>12345</td>
+                <td>No License</td>
+                <td>Tesla</td>
+                <td>TSL-003</td>
+                <td>2023/04/11, 4:50 PM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>3</td>
+                <td>1234562</td>
+                <td>Vincent Cosio</td>
+                <td>54321</td>
+                <td>no helmet</td>
+                <td>Motorcycle Mio</td>
+                <td>DDD-111</td>
+                <td>2023/04/12, 1:21 PM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>4</td>
+                <td>1234563</td>
+                <td>Lorenz Artillagas</td>
+                <td>32154</td>
+                <td>illegal parking</td>
+                <td>Motorcycle Mio</td>
+                <td>EEE-111</td>
+                <td>2023/04/13, 9:50 AM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>5</td>
+                <td>1234564</td>
+                <td>Kristine Casindac</td>
+                <td>53241</td>
+                <td>no helmet</td>
+                <td>Motorcycle Mio</td>
+                <td>FFF-555</td>
+                <td>2023/04/14, 6:01 PM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>6</td>
+                <td>1234565</td>
+                <td>Jazzlyn Aquino</td>
+                <td>24351</td>
+                <td>illegal parking</td>
+                <td>Motorcycle Mio</td>
+                <td>GGG-333</td>
+                <td>2023/04/15, 8:12 AM</td>
             </tr>
             <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
+                <td>7</td>
+                <td>1234566</td>
+                <td>Dan Carlo Ramirez</td>
+                <td>52132</td>
+                <td>no helmet</td>
+                <td>Motorcycle Mio</td>
+                <td>HHH-444</td>
+                <td>2023/04/16, 3:24 AM</td>
             </tr>
             <!-- Add more rows as needed -->
         </tbody>
@@ -178,10 +140,33 @@ include 'php/database_connect.php';
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
+
+<script type="module">
+  
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
+    authDomain: "ctmeu-d5575.firebaseapp.com",
+    projectId: "ctmeu-d5575",
+    storageBucket: "ctmeu-d5575.appspot.com",
+    messagingSenderId: "1062661015515",
+    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
+    measurementId: "G-65PXT5618B"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 <script>
     
  var currentPage = 0;
-    var rowsPerPage = 10;
+    var rowsPerPage = 5;
     var tableBody = document.getElementById("tableBody");
     var numRows = tableBody.rows.length;
     var numPages = Math.ceil(numRows / rowsPerPage);

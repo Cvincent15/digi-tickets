@@ -129,6 +129,51 @@ if ($result->num_rows > 0) {
   </div>
   </div>
   <script>
+// Function to send data to the server and insert it into the database
+function sendDataToDatabase(name, username, password, status) {
+            // Create a new XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+            
+            // Prepare the request
+            xhr.open("POST", "php/createaccount.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            
+            // Set up the callback function to handle the response
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    // Request completed successfully
+                    console.log(xhr.responseText);
+                    // You can perform additional actions here after the data is inserted
+                }
+            };
+            
+            // Prepare the data to be sent as a URL-encoded string
+            var data = "name=" + encodeURIComponent(name) +
+                       "&username=" + encodeURIComponent(username) +
+                       "&password=" + encodeURIComponent(password) +
+                       "&status=" + encodeURIComponent(status);
+            
+            // Send the request
+            xhr.send(data);
+        }
+        
+        // Add event listener to the submit button
+        document.getElementById("submit-button").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            var name = document.getElementById("name").value;
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var status = document.getElementById("status").value;
+
+            // Call the function to send data to the database
+            sendDataToDatabase(name, username, password, status);
+
+            // Reset the form fields
+            document.getElementById("create-account-form").reset();
+        });
+
+
 function validateInput(input) {
       const regex = /^[a-zA-Z0-9]+$/; // Alphanumeric regex pattern
       const value = input.value;
@@ -179,17 +224,22 @@ function validateInput(input) {
     var selectedRow = null;
 
     // Function to populate the form fields with the selected row data
-    function populateFormFields(row) {
-      var nameField = document.getElementById("name");
-      var usernameField = document.getElementById("username");
-      var passwordField = document.getElementById("password");
-      var statusField = document.getElementById("status");
-
-      nameField.value = row.cells[0].innerHTML;
-      usernameField.value = row.cells[1].innerHTML;
-      passwordField.value = row.cells[2].innerHTML;
-      statusField.value = row.cells[3].innerHTML;
-    }
+    function addToTable(name, username, password, status) {
+            // Create a new row in the table
+            var table = document.getElementById("user-table").getElementsByTagName("tbody")[0];
+            var newRow = table.insertRow(table.rows.length);
+            
+            // Insert data into the cells of the new row
+            var nameCell = newRow.insertCell(0);
+            var usernameCell = newRow.insertCell(1);
+            var passwordCell = newRow.insertCell(2);
+            var statusCell = newRow.insertCell(3);
+            
+            nameCell.innerHTML = name;
+            usernameCell.innerHTML = username;
+            passwordCell.innerHTML = password;
+            statusCell.innerHTML = status;
+        }
 
     // Function to clear the form fields
     function clearFormFields() {
