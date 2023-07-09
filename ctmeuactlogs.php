@@ -25,128 +25,171 @@ include 'php/database_connect.php';
   
   <div class="navbar-inner">
   <div class="navbar-right">
-    <h5>Welcome, <?php echo $_SESSION['status']; ?> <?php echo $_SESSION['name']; ?></h5>
-    <button class="btn btn-primary" onclick="location.href='php/logout.php'">Log out?</button>
+    <h5 id="welcome-text"></h5>
+    <button class="btn btn-primary" id="logout-button">Log out?</button>
+    <a href="ctmeupage.php" class="link">Records</a>
+    <a href="#" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link"><b>Activity Logs</b></a>
+    <!-- firebase only super admin can access this -->
+    <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
   </div>
   </div>
 </nav>
 
 <div class="pagination" style="text-align:right; margin-top: 5px; margin-left:5px; margin-right:auto;">
     
-    <div class="table-info" style="color:white;">
+    <div class="pagination" style="color:white;">
       <span id="tableNumber"></span>/<span id="totalTables"></span>
-      <button id="prevBtn" onclick="previousPage()" class="disabled seek"><</button>
-    <button class="seek" id="nextBtn" onclick="nextPage()">></button>
+      <button id="previous-btn" class="disabled seek"><</button>
+    <button class="seek" id="next-btn">></button>
     </div>
   </div>
 
-<div class="table-container">
+  <div class="table-container">
 <table>
         <thead>
             <tr>
                 <th>No.</th>
-                <th>Ticket Number</th>
-                <th>Driver's Name</th>
+                <th>Address</th>
+                <th>District No.</th>
                 <th>License No.</th>
-                <th>Violation</th>
-                <th>Vehicle Type</th>
-                <th>Plate No.</th>
-                <th>Date & Time</th>
+                <th>Name</th>
             </tr>
         </thead>
-        <tbody id="tableBody">
+        <tbody id="ticket-table-body">
             <!-- Replace the sample data below with the data fetched from your database -->
-            <tr>
-                <td>Data 1</td>
-                <td>Data 2</td>
-                <td>Data 3</td>
-                <td>Data 4</td>
-                <td>Data 5</td>
-                <td>Data 6</td>
-                <td>Data 7</td>
-                <td>Data 8</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            <tr>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
-                <td>Data 13</td>
-                <td>Data 14</td>
-                <td>Data 15</td>
-                <td>Data 16</td>
-            </tr>
-            
+           
             <!-- Add more rows as needed -->
         </tbody>
     </table>
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
+    authDomain: "ctmeu-d5575.firebaseapp.com",
+    projectId: "ctmeu-d5575",
+    storageBucket: "ctmeu-d5575.appspot.com",
+    messagingSenderId: "1062661015515",
+    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
+    measurementId: "G-65PXT5618B"
+  };
+
+    // Initialize Firebase
+    initializeApp(firebaseConfig);
+    const db = getFirestore();
+
+    const ticketTableBody = document.getElementById("ticket-table-body");
     
- var currentPage = 0;
-    var rowsPerPage = 10;
-    var tableBody = document.getElementById("tableBody");
-    var numRows = tableBody.rows.length;
-    var numPages = Math.ceil(numRows / rowsPerPage);
 
-    var tableNumberEl = document.getElementById("tableNumber");
-    var totalTablesEl = document.getElementById("totalTables");
+    // Fetch data from Firestore and populate the table
+    const fetchData = async () => {
+      const ticketCollection = collection(db, "Ticket");
+      const querySnapshot = await getDocs(ticketCollection);
 
-    function showPage(page) {
-      var startRow = page * rowsPerPage;
-      var endRow = startRow + rowsPerPage;
+      let count = 1; // Counter for numbering rows
 
-      for (var i = 0; i < numRows; i++) {
-        if (i >= startRow && i < endRow) {
-          tableBody.rows[i].style.display = "table-row";
-        } else {
-          tableBody.rows[i].style.display = "none";
-        }
+      querySnapshot.forEach((doc) => {
+        const { address, district, license, name } = doc.data();
+
+        const row = document.createElement("tr");
+
+        const countCell = document.createElement("td");
+        countCell.textContent = count++;
+
+        const addressCell = document.createElement("td");
+        addressCell.textContent = address;
+
+        const districtCell = document.createElement("td");
+        districtCell.textContent = district;
+
+        const licenseCell = document.createElement("td");
+        licenseCell.textContent = license;
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = name;
+
+        row.appendChild(countCell);
+        row.appendChild(addressCell);
+        row.appendChild(districtCell);
+        row.appendChild(licenseCell);
+        row.appendChild(nameCell);
+
+        ticketTableBody.appendChild(row);
+      });
+    };
+
+    fetchData().catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+
+    
+
+    // Check if user is logged in
+    const isLoggedIn = sessionStorage.getItem('username') !== null;
+
+    if (isLoggedIn) {
+      // Get the username from the session storage
+      const username = sessionStorage.getItem('username');
+
+      // Get the user document from Firestore
+const usersCollection = collection(db, 'usersCTMEU');
+const userQuery = query(usersCollection, where('username', '==', username));
+
+
+getDocs(userQuery)
+  .then((querySnapshot) => {
+    if (!querySnapshot.empty) {
+      const docSnapshot = querySnapshot.docs[0];
+      const userData = docSnapshot.data();
+      const status = userData.status;
+      const firstName = userData.firstName;
+      const lastName = userData.lastName;
+
+      // Check if the status is "Enforcer"
+      if (status === 'Enforcer') {
+        const specialButton = document.getElementById('noEnforcers');
+        specialButton.style.display = 'none';
       }
-      
-      tableNumberEl.textContent = page + 1;
+     else {
+      console.error('User document not found');
     }
+    
 
-    function nextPage() {
-      if (currentPage < numPages - 1) {
-        currentPage++;
-        showPage(currentPage);
-        document.getElementById("prevBtn").classList.remove("disabled");
-      }
-
-      if (currentPage === numPages - 1) {
-        document.getElementById("nextBtn").classList.add("disabled");
-      }
+      // Display the logged-in user's credentials
+      const welcomeText = document.getElementById('welcome-text');
+      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+    } else {
+      console.error('User document not found');
     }
+  })
+  .catch((error) => {
+    console.error('Error retrieving user document:', error);
+  });
 
-    function previousPage() {
-      if (currentPage > 0) {
-        currentPage--;
-        showPage(currentPage);
-        document.getElementById("nextBtn").classList.remove("disabled");
-      }
 
-      if (currentPage === 0) {
-        document.getElementById("prevBtn").classList.add("disabled");
-      }
+      // Logout button
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        // End session
+        sessionStorage.removeItem('username');
+
+        // Redirect back to the login page (replace "login.html" with the actual login page)
+        window.location.href = 'index.php';
+      });
+    } else {
+      // User is not logged in, redirect to the login page
+      window.location.href = 'index.php';
     }
-
-    showPage(currentPage);
-
-    totalTablesEl.textContent = numPages;
 </script>
 </body>
 </html>

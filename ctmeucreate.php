@@ -1,8 +1,3 @@
-<?php
-session_start();
-include 'php/database_connect.php';
-?>
-
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
 <head>
@@ -85,51 +80,249 @@ include 'php/database_connect.php';
   
   <div class="navbar-inner">
   <div class="navbar-right">
-    <h5>Welcome, <?php echo $_SESSION['status']; ?> <?php echo $_SESSION['name']; ?></h5>
-    <button class="btn btn-primary" onclick="location.href='php/logout.php'">Log out?</button>
+    <h5 id="welcome-text"></h5>
+    <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link">Records</a>
     <a href="#" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
-    <?php if ($_SESSION['status'] == 'Super Admin') {?>
+    <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link"><b>Create Accounts</b></a>
-    <?php }?>
   </div>
   </div>
 </nav>
 <div class="container">
     <div class="form-container">
-  <form method="POST" action="php/createaccount.php">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" onkeyup="validateName();" required><br>
+  <form method="POST" id="signup-form">
+    <label for="name">First Name:</label>
+    <input type="text" id="firstName" name="firstName" onkeyup="validateName();" required><br>
     <div id="name-error" class="error" style="display: none;"></div>
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" onkeyup="validateUsername();" required><br>
+    <label for="username">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" onkeyup="validateUsername();" required><br>
     <div id="username-error" class="error" style="display: none;"></div>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" onkeyup="validatePassword();" required><br>
-    <div id="password-error" class="error" style="display: none;"></div>
-
     <label for="status">Status:</label>
-    <select id="status" name="status">
-    <option value="empty"></option>
-      <option value="Enforcer">Enforcer</option>
-      <option value="IT Personnel">IT Personnel</option>
-      <option value="Super Admin">Super Admin</option>
+    <select id="status" required>
+    <option value="empty" disabled></option>
+    <option value="Enforcer">Enforcer</option>
+      <option value="IT Administrator">IT Admin</option>
+      <option value="Super Administrator">Super Admin</option>
     </select><br>
 
-    <button id="submit-button" type="submit">Submit</button>
+    <button id="submit-button" type="submit" value="Sign Up">Generate Account</button>
     <button type="reset">Clear</button>
     <button id="delete-button" type="button" style="display: none;">Delete</button>
   </form>
   </div>
   <div class="table-container">
-  
-  <?php include 'php/fetchaccounts.php'; ?>
-  
+  <table id="user-table">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Password</th>
+        <th>Status</th>
+        <th>Username</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Table body will be populated dynamically -->
+    </tbody>
+  </table>
   </div>
   </div>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getFirestore, collection, doc, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
+    authDomain: "ctmeu-d5575.firebaseapp.com",
+    databaseURL: "https://ctmeu-d5575-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ctmeu-d5575",
+    storageBucket: "ctmeu-d5575.appspot.com",
+    messagingSenderId: "1062661015515",
+    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
+    measurementId: "G-65PXT5618B"
+  };
+
+   // Initialize Firebase
+   initializeApp(firebaseConfig);
+    const db = getFirestore();
+
+    // Handle form submission
+    const form = document.getElementById('signup-form');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  // Get form values
+  const firstName = document.getElementById('firstName').value;
+  const lastName = document.getElementById('lastName').value;
+  const status = document.getElementById('status').value;
+
+  // Create abbreviated status
+  let abbreviatedStatus = '';
+  if (status === 'Enforcer') {
+    abbreviatedStatus = 'enf';
+  } else if (status === 'IT Administrator') {
+    abbreviatedStatus = 'ita';
+  } else if (status === 'Super Administrator') {
+    abbreviatedStatus = 'sua';
+  }
+
+  // Generate a random password
+  const password = generateRandomPassword();
+
+  function generateRandomPassword() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const length = 8;
+  let password = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    password += characters.charAt(randomIndex);
+  }
+
+  return password;
+}
+
+      // Create username based on status and name
+      const username = abbreviatedStatus + firstName.charAt(0).toUpperCase() + lastName;
+      const usersCollection = collection(db, 'usersCTMEU');
+      if (status === 'Super Administrator' && querySnapshot.size >= 2) {
+              console.error('Maximum number of Super Administrators reached');
+              return;
+            }
+
+      addDoc(usersCollection, {
+        firstName: firstName,
+        lastName: lastName,
+        status: status,
+        username: username,
+        password: password
+      })
+      .then(() => {
+        console.log('User created successfully!');
+        // Reset form
+        form.reset();
+      })
+      .catch((error) => {
+        console.error('Error creating user:', error);
+      });
+    });
+
+    // Check if user is logged in
+    const isLoggedIn = sessionStorage.getItem('username') !== null;
+
+    if (isLoggedIn) {
+      // Get the username from the session storage
+      const username = sessionStorage.getItem('username');
+
+      // Get the user document from Firestore
+const usersCollection = collection(db, 'usersCTMEU');
+const userQuery = query(usersCollection, where('username', '==', username));
+
+getDocs(userQuery)
+  .then((querySnapshot) => {
+    if (!querySnapshot.empty) {
+      const docSnapshot = querySnapshot.docs[0];
+      const userData = docSnapshot.data();
+      const status = userData.status;
+      const firstName = userData.firstName;
+      const lastName = userData.lastName;
+
+      if (status === 'IT Administrator') {
+              // Disable the "Super Administrator" option for IT Administrators
+              const statusSelect = document.getElementById('status');
+              const superAdminOption = statusSelect.querySelector('option[value="Super Administrator"]');
+              superAdminOption.disabled = true;
+            }
+
+      // Display the logged-in user's credentials
+      const welcomeText = document.getElementById('welcome-text');
+      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+    } else {
+      console.error('User document not found');
+    }
+  })
+  .catch((error) => {
+    console.error('Error retrieving user document:', error);
+  });
+
+
+      // Logout button
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        // End session
+        sessionStorage.removeItem('username');
+
+        // Redirect back to the login page (replace "login.html" with the actual login page)
+        window.location.href = 'index.php';
+      });
+    } else {
+      // User is not logged in, redirect to the login page
+      window.location.href = 'index.php';
+    }
+
+    // Fetch user data from Firestore
+    const fetchUserData = async () => {
+      const usersCollection = collection(db, 'usersCTMEU');
+      const querySnapshot = await getDocs(usersCollection);
+      const userData = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const { firstName, lastName, password, status, username } = data;
+        userData.push({ firstName, lastName, password, status, username });
+      });
+
+      return userData;
+    };
+
+    // Display user data in the table
+    const displayUserData = async () => {
+      const userData = await fetchUserData();
+      const tableBody = document.querySelector('#user-table tbody');
+
+      userData.forEach((user) => {
+        const row = document.createElement('tr');
+        const { firstName, lastName, password, status, username } = user;
+
+        const firstNameCell = document.createElement('td');
+        firstNameCell.textContent = firstName;
+
+        const lastNameCell = document.createElement('td');
+        lastNameCell.textContent = lastName;
+
+        const passwordCell = document.createElement('td');
+        passwordCell.textContent = password;
+
+        const statusCell = document.createElement('td');
+        statusCell.textContent = status;
+
+        const usernameCell = document.createElement('td');
+        usernameCell.textContent = username;
+
+        row.appendChild(firstNameCell);
+        row.appendChild(lastNameCell);
+        row.appendChild(passwordCell);
+        row.appendChild(statusCell);
+        row.appendChild(usernameCell);
+
+        tableBody.appendChild(row);
+
+        
+      });
+    };
+
+    // Call the function to display user data
+    displayUserData();
+  </script>
   <script>
 
     function validateName() {

@@ -27,24 +27,23 @@ include 'php/database_connect.php';
   
   <div class="navbar-inner">
   <div class="navbar-right">
-    <h5>Welcome, <?php echo $_SESSION['status']; ?> <?php echo $_SESSION['name']; ?></h5>
-    <button class="btn btn-primary" onclick="location.href='php/logout.php'">Log out?</button>
+    <h5 id="welcome-text"></h5>
+    <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link"><b>Records</b></a>
     <a href="#" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
-    <?php if ($_SESSION['status'] == 'Super Admin') {?>
-    <a href="ctmeucreate.php" class="link">Create Accounts</a>
-    <?php }?>
+    <!-- firebase only super admin can access this -->
+    <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
   </div>
   </div>
 </nav>
 
 <div class="pagination" style="text-align:right; margin-top: 5px; margin-left:5px; margin-right:auto;">
     
-    <div class="table-info" style="color:white;">
+    <div class="pagination" style="color:white;">
       <span id="tableNumber"></span>/<span id="totalTables"></span>
-      <button id="prevBtn" onclick="previousPage()" class="disabled seek"><</button>
-    <button class="seek" id="nextBtn" onclick="nextPage()">></button>
+      <button id="previous-btn" class="disabled seek"><</button>
+    <button class="seek" id="next-btn">></button>
     </div>
   </div>
 
@@ -53,87 +52,15 @@ include 'php/database_connect.php';
         <thead>
             <tr>
                 <th>No.</th>
-                <th>Ticket Number</th>
-                <th>Driver's Name</th>
+                <th>Address</th>
+                <th>District No.</th>
                 <th>License No.</th>
-                <th>Violation</th>
-                <th>Vehicle Type</th>
-                <th>Plate No.</th>
-                <th>Date & Time</th>
+                <th>Name</th>
             </tr>
         </thead>
-        <tbody id="tableBody">
+        <tbody id="ticket-table-body">
             <!-- Replace the sample data below with the data fetched from your database -->
-            <tr>
-                <td>1</td>
-                <td>1234560</td>
-                <td>Zsyra Almendral</td>
-                <td>11345</td>
-                <td>illegal parking</td>
-                <td>Motorcycle Mio</td>
-                <td>MMM-111</td>
-                <td>2023/04/10, 11:11 AM</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>1234561</td>
-                <td>Jeon Jungkook</td>
-                <td>12345</td>
-                <td>No License</td>
-                <td>Tesla</td>
-                <td>TSL-003</td>
-                <td>2023/04/11, 4:50 PM</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>1234562</td>
-                <td>Vincent Cosio</td>
-                <td>54321</td>
-                <td>no helmet</td>
-                <td>Motorcycle Mio</td>
-                <td>DDD-111</td>
-                <td>2023/04/12, 1:21 PM</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>1234563</td>
-                <td>Lorenz Artillagas</td>
-                <td>32154</td>
-                <td>illegal parking</td>
-                <td>Motorcycle Mio</td>
-                <td>EEE-111</td>
-                <td>2023/04/13, 9:50 AM</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>1234564</td>
-                <td>Kristine Casindac</td>
-                <td>53241</td>
-                <td>no helmet</td>
-                <td>Motorcycle Mio</td>
-                <td>FFF-555</td>
-                <td>2023/04/14, 6:01 PM</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>1234565</td>
-                <td>Jazzlyn Aquino</td>
-                <td>24351</td>
-                <td>illegal parking</td>
-                <td>Motorcycle Mio</td>
-                <td>GGG-333</td>
-                <td>2023/04/15, 8:12 AM</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>1234566</td>
-                <td>Dan Carlo Ramirez</td>
-                <td>52132</td>
-                <td>no helmet</td>
-                <td>Motorcycle Mio</td>
-                <td>HHH-444</td>
-                <td>2023/04/16, 3:24 AM</td>
-            </tr>
+           
             <!-- Add more rows as needed -->
         </tbody>
     </table>
@@ -142,7 +69,9 @@ include 'php/database_connect.php';
 <script src="js/jquery-3.6.4.js"></script>
 
 <script type="module">
-  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -158,64 +87,111 @@ include 'php/database_connect.php';
     measurementId: "G-65PXT5618B"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
+    // Initialize Firebase
+    initializeApp(firebaseConfig);
+    const db = getFirestore();
 
-<script>
+    const ticketTableBody = document.getElementById("ticket-table-body");
     
- var currentPage = 0;
-    var rowsPerPage = 5;
-    var tableBody = document.getElementById("tableBody");
-    var numRows = tableBody.rows.length;
-    var numPages = Math.ceil(numRows / rowsPerPage);
 
-    var tableNumberEl = document.getElementById("tableNumber");
-    var totalTablesEl = document.getElementById("totalTables");
+    // Fetch data from Firestore and populate the table
+    const fetchData = async () => {
+      const ticketCollection = collection(db, "Ticket");
+      const querySnapshot = await getDocs(ticketCollection);
 
-    function showPage(page) {
-      var startRow = page * rowsPerPage;
-      var endRow = startRow + rowsPerPage;
+      let count = 1; // Counter for numbering rows
 
-      for (var i = 0; i < numRows; i++) {
-        if (i >= startRow && i < endRow) {
-          tableBody.rows[i].style.display = "table-row";
-        } else {
-          tableBody.rows[i].style.display = "none";
-        }
+      querySnapshot.forEach((doc) => {
+        const { address, district, license, name } = doc.data();
+
+        const row = document.createElement("tr");
+
+        const countCell = document.createElement("td");
+        countCell.textContent = count++;
+
+        const addressCell = document.createElement("td");
+        addressCell.textContent = address;
+
+        const districtCell = document.createElement("td");
+        districtCell.textContent = district;
+
+        const licenseCell = document.createElement("td");
+        licenseCell.textContent = license;
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = name;
+
+        row.appendChild(countCell);
+        row.appendChild(addressCell);
+        row.appendChild(districtCell);
+        row.appendChild(licenseCell);
+        row.appendChild(nameCell);
+
+        ticketTableBody.appendChild(row);
+      });
+    };
+
+    fetchData().catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+
+    
+
+    // Check if user is logged in
+    const isLoggedIn = sessionStorage.getItem('username') !== null;
+
+    if (isLoggedIn) {
+      // Get the username from the session storage
+      const username = sessionStorage.getItem('username');
+
+      // Get the user document from Firestore
+const usersCollection = collection(db, 'usersCTMEU');
+const userQuery = query(usersCollection, where('username', '==', username));
+
+
+getDocs(userQuery)
+  .then((querySnapshot) => {
+    if (!querySnapshot.empty) {
+      const docSnapshot = querySnapshot.docs[0];
+      const userData = docSnapshot.data();
+      const status = userData.status;
+      const firstName = userData.firstName;
+      const lastName = userData.lastName;
+
+      // Check if the status is "Enforcer"
+      if (status === 'Enforcer') {
+        const specialButton = document.getElementById('noEnforcers');
+        specialButton.style.display = 'none';
       }
-      
-      tableNumberEl.textContent = page + 1;
+    
+
+      // Display the logged-in user's credentials
+      const welcomeText = document.getElementById('welcome-text');
+      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+    } else {
+      console.error('User document not found');
     }
+  })
+  .catch((error) => {
+    console.error('Error retrieving user document:', error);
+  });
 
-    function nextPage() {
-      if (currentPage < numPages - 1) {
-        currentPage++;
-        showPage(currentPage);
-        document.getElementById("prevBtn").classList.remove("disabled");
-      }
 
-      if (currentPage === numPages - 1) {
-        document.getElementById("nextBtn").classList.add("disabled");
-      }
+      // Logout button
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        // End session
+        sessionStorage.removeItem('username');
+
+        // Redirect back to the login page (replace "login.html" with the actual login page)
+        window.location.href = 'index.php';
+      });
+    } else {
+      // User is not logged in, redirect to the login page
+      window.location.href = 'index.php';
     }
-
-    function previousPage() {
-      if (currentPage > 0) {
-        currentPage--;
-        showPage(currentPage);
-        document.getElementById("nextBtn").classList.remove("disabled");
-      }
-
-      if (currentPage === 0) {
-        document.getElementById("prevBtn").classList.add("disabled");
-      }
-    }
-
-    showPage(currentPage);
-
-    totalTablesEl.textContent = numPages;
 </script>
+
+
 </body>
 </html>
