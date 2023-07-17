@@ -379,7 +379,7 @@ getDocs(userQuery)
     // Function to clear the form fields
     function clearFormFields() {
       selectedRow = null;
-      document.getElementById("create-account-form").reset();
+      document.getElementById("signup-form").reset();
       document.getElementById("submit-button").textContent = "Submit";
     }
 
@@ -419,7 +419,7 @@ document.getElementById("delete-button").addEventListener("click", function(even
 
 
 
-    document.getElementById("create-account-form").addEventListener("submit", function(event) {
+    document.getElementById("signup-form").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent form submission
 
       var name = document.getElementById("name").value;
@@ -450,7 +450,7 @@ document.getElementById("delete-button").addEventListener("click", function(even
         statusCell.innerHTML = status;
       }
 
-      document.getElementById("create-account-form").reset();
+      document.getElementById("signup-form").reset();
     });
   </script>
 <script src="js/script.js"></script>

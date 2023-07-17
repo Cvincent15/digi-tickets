@@ -94,48 +94,64 @@ include 'php/database_connect.php';
     const ticketTableBody = document.getElementById("ticket-table-body");
     
 
-    // Fetch data from Firestore and populate the table
-    const fetchData = async () => {
-      const ticketCollection = collection(db, "Ticket");
-      const querySnapshot = await getDocs(ticketCollection);
+    // Function to fetch data from Firestore and populate the table
+  const fetchData = async () => {
+    const ticketCollection = collection(db, "Ticket");
+    const querySnapshot = await getDocs(ticketCollection);
 
-      let count = 1; // Counter for numbering rows
+    let count = 1; // Counter for numbering rows
 
-      querySnapshot.forEach((doc) => {
-        const { address, district, license, name } = doc.data();
+    // Clear existing table rows to avoid duplication
+    ticketTableBody.innerHTML = "";
 
-        const row = document.createElement("tr");
+    querySnapshot.forEach((doc) => {
+      const { address, district, license, name } = doc.data();
+      const docId = doc.id; // Get the auto-generated document ID
 
-        const countCell = document.createElement("td");
-        countCell.textContent = count++;
+      const row = document.createElement("tr");
 
-        const addressCell = document.createElement("td");
-        addressCell.textContent = address;
+      const countCell = document.createElement("td");
+      countCell.textContent = count++;
 
-        const districtCell = document.createElement("td");
-        districtCell.textContent = district;
+      const addressCell = document.createElement("td");
+      addressCell.textContent = address;
 
-        const licenseCell = document.createElement("td");
-        licenseCell.textContent = license;
+      const districtCell = document.createElement("td");
+      districtCell.textContent = district;
 
-        const nameCell = document.createElement("td");
-        nameCell.textContent = name;
+      const licenseCell = document.createElement("td");
+      licenseCell.textContent = license;
 
-        row.appendChild(countCell);
-        row.appendChild(addressCell);
-        row.appendChild(districtCell);
-        row.appendChild(licenseCell);
-        row.appendChild(nameCell);
+      const nameCell = document.createElement("td");
+      nameCell.textContent = name;
 
-        ticketTableBody.appendChild(row);
-      });
-    };
+      row.appendChild(countCell);
+      row.appendChild(addressCell);
+      row.appendChild(districtCell);
+      row.appendChild(licenseCell);
+      row.appendChild(nameCell);
 
+      ticketTableBody.appendChild(row);
+
+      // Pass the row data and document ID as an object to the handleRowClick function
+      row.addEventListener('click', () => handleRowClick({ address, district, license, name, docId }));
+    });
+  };
+ // Function to fetch data at intervals
+ const autoLoadData = () => {
     fetchData().catch((error) => {
       console.error("Error fetching data:", error);
     });
+  };
 
-    
+  // Set the time interval in milliseconds (e.g., 5000 ms for 5 seconds)
+  const intervalTime = 5000;
+
+  // Initial data fetch
+  autoLoadData();
+
+  // Start fetching data at intervals
+  setInterval(autoLoadData, intervalTime);
 
     // Check if user is logged in
     const isLoggedIn = sessionStorage.getItem('username') !== null;
@@ -191,7 +207,14 @@ getDocs(userQuery)
       window.location.href = 'index.php';
     }
 </script>
-
+<script>
+  // Function to handle row click and redirect to the detail page
+  const handleRowClick = (row) => {
+    const rowJSON = JSON.stringify(row);
+    const docId = encodeURIComponent(row.docId);
+    window.location.href = `detail.php?data=${encodeURIComponent(rowJSON)}&docId=${docId}`;
+  };
+</script>
 
 </body>
 </html>
