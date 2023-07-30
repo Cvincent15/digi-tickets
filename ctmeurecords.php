@@ -29,8 +29,8 @@ include 'php/database_connect.php';
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link"><b>Records</b></a>
-    <a href="ctmeurecords.php" class="link">Reports</a>
+    <a href="ctmeupage.php" class="link">Records</a>
+    <a href="ctmeurecords.php" class="link"><b>Reports</b></a>
     <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
@@ -38,6 +38,16 @@ include 'php/database_connect.php';
   </div>
   </div>
 </nav>
+<!--
+<div class="pagination" style="text-align:right; margin-top: 5px; margin-left:5px; margin-right:auto;">
+    
+    <div class="pagination" style="color:white;">
+      <span id="tableNumber"></span>/<span id="totalTables"></span>
+      <button id="previous-btn" class="disabled seek"><</button>
+    <button class="seek" id="next-btn">></button>
+    </div>
+  </div>
+-->
 <div class="table-container">
 <table>
         <thead>

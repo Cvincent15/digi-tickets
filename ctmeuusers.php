@@ -12,6 +12,14 @@ include 'php/database_connect.php';
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
+<style>
+   .card {
+            margin: 10px auto;
+            width: 500px;
+            height: auto;
+            text-align: left;
+        }
+</style>
 <body style="height: auto;">
 
 <nav class="navbar">
@@ -29,15 +37,41 @@ include 'php/database_connect.php';
     <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link noEnforcers">Records</a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
-    <a href="ctmeuactlogs.php" class="link"><b>Activity Logs</b></a>
+    <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
     <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" class="noEnforcers"class="link">Create Accounts</a>
-    <a href="ctmeuusers.php" class="link">User Account</a>
+    <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
+    <a href="ctmeuusers.php" class="link"><b>User Account</b></a>
   </div>
   </div>
 </nav>
 
+<div class="card" style="margin: 10px auto; width: 500px;">
+  <h1 style='text-align:center;'>User Details</h1>
+  <h6 id='fname-text' style='margin-left:20px;'></h6>
+  <h6 id='lname-text' style='margin-left:20px;'></h6>
+  <h6 id='stat-text' style='margin-left:20px;'></h6><br>
+  <form id="passwordChangeForm" style="text-align: center;">
+    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+      <label for="currentPassword" style="text-align: left;">Current Password:</label>
+      <input type="password" id="currentPassword" name="currentPassword" required>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+      <label for="newPassword" style="text-align: left;">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword" required>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+      <label for="confirmPassword" style="text-align: left;">Confirm New Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+    </div>
+
+    <button class='btn btn-primary' type="submit" style='margin: 20px auto;'>Change Password</button>
+  </form>
+</div>
+
   <div class="table-container">
+  
 <table>
         <thead>
             <tr>
@@ -59,7 +93,7 @@ include 'php/database_connect.php';
 <script src="js/jquery-3.6.4.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+  import { getFirestore, collection, doc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
@@ -79,6 +113,67 @@ include 'php/database_connect.php';
     // Initialize Firebase
     initializeApp(firebaseConfig);
     const db = getFirestore();
+
+     // Function to handle the form submission for password change
+  const handlePasswordChange = async (event) => {
+    event.preventDefault();
+
+    // Get the form input values
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Check if the new password matches the confirmed password
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+
+    // Get the current user's username from session storage
+    const username = sessionStorage.getItem('username');
+
+    // Check if the user is logged in
+    if (!username) {
+      alert('User is not logged in.');
+      return;
+    }
+
+    // Get the user document from Firestore
+    const usersCollection = collection(db, 'usersCTMEU');
+    const userQuery = query(usersCollection, where('username', '==', username));
+
+    const querySnapshot = await getDocs(userQuery);
+    if (!querySnapshot.empty) {
+      const docSnapshot = querySnapshot.docs[0];
+      const userData = docSnapshot.data();
+      const currentPasswordFromDb = userData.password;
+
+      // Check if the entered current password matches the stored current password
+      if (currentPassword !== currentPasswordFromDb) {
+        alert('Current password is incorrect.');
+        return;
+      }
+
+      // If everything is valid, update the password in Firestore
+      try {
+        await updateDoc(doc(usersCollection, docSnapshot.id), { password: newPassword });
+        alert('Password changed successfully.');
+        // Clear the form fields
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+      } catch (error) {
+        console.error('Error updating password:', error);
+        alert('An error occurred while updating the password.');
+      }
+    } else {
+      alert('User document not found.');
+    }
+  };
+
+  // Add a form submit event listener
+  const passwordChangeForm = document.getElementById('passwordChangeForm');
+  passwordChangeForm.addEventListener('submit', handlePasswordChange);
 
     const ticketTableBody = document.getElementById("ticket-table-body");
     
@@ -163,10 +258,16 @@ getDocs(userQuery)
       console.error('User document not found');
     }
     
-
       // Display the logged-in user's credentials
       const welcomeText = document.getElementById('welcome-text');
       welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+      // Display the logged-in user's credentials
+      const fnameText = document.getElementById('fname-text');
+      fnameText.textContent = `First Name: ${firstName}`;
+      const lnameText = document.getElementById('lname-text');
+      lnameText.textContent = `Last Name: ${lastName}`;
+      const statText = document.getElementById('stat-text');
+      statText.textContent = `Status: ${status}`;
     } else {
       console.error('User document not found');
     }

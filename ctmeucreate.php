@@ -83,10 +83,11 @@
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link">Records</a>
-    <a href="#" class="link">Reports</a>
+    <a href="ctmeurecords.php" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link"><b>Create Accounts</b></a>
+    <a href="ctmeuusers.php" class="link">User Account</a>
   </div>
   </div>
 </nav>
@@ -94,12 +95,12 @@
     <div class="form-container">
   <form method="POST" id="signup-form">
     <label for="name">First Name:</label>
-    <input type="text" id="firstName" name="firstName" onkeyup="validateName();" required><br>
-    <div id="name-error" class="error" style="display: none;"></div>
+    <input type="text" id="firstName" name="firstName" onkeyup="validateFName();" required><br>
+    <div id="fname-error" class="error" style="display: none;"></div>
 
     <label for="username">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" onkeyup="validateUsername();" required><br>
-    <div id="username-error" class="error" style="display: none;"></div>
+    <input type="text" id="lastName" name="lastName" onkeyup="validateLName();" required><br>
+    <div id="lname-error" class="error" style="display: none;"></div>
 
     <label for="status">Status:</label>
     <select id="status" required>
@@ -120,9 +121,9 @@
       <tr>
         <th>First Name</th>
         <th>Last Name</th>
+        <th>Username</th>
         <th>Password</th>
         <th>Status</th>
-        <th>Username</th>
       </tr>
     </thead>
     <tbody>
@@ -194,11 +195,25 @@ form.addEventListener('submit', (e) => {
       // Create username based on status and name
       const username = abbreviatedStatus + firstName.charAt(0).toUpperCase() + lastName;
       const usersCollection = collection(db, 'usersCTMEU');
-      if (status === 'Super Administrator' && querySnapshot.size >= 2) {
-              console.error('Maximum number of Super Administrators reached');
-              return;
-            }
 
+       // Fetch "IT Administrator" users and "Super Administrator" users and check the count
+  const itAdminQuery = query(usersCollection, where('status', '==', 'IT Administrator'));
+  const superAdminQuery = query(usersCollection, where('status', '==', 'Super Administrator'));
+
+
+      Promise.all([getDocs(itAdminQuery), getDocs(superAdminQuery)])
+    .then(([itAdminSnapshot, superAdminSnapshot]) => {
+      if (status === 'IT Administrator' && itAdminSnapshot.size >= 4) {
+        alert('Maximum number of IT Administrators reached');
+        return;
+      }
+
+      if (status === 'Super Administrator' && superAdminSnapshot.size >= 2) {
+        alert('Maximum number of Super Administrators reached');
+        return;
+      }
+
+      // Add the new document for IT Administrator or Super Administrator
       addDoc(usersCollection, {
         firstName: firstName,
         lastName: lastName,
@@ -214,6 +229,11 @@ form.addEventListener('submit', (e) => {
       .catch((error) => {
         console.error('Error creating user:', error);
       });
+    })
+    .catch((error) => {
+      console.error('Error fetching users:', error);
+    });
+  
     });
 
     // Check if user is logged in
@@ -310,9 +330,9 @@ getDocs(userQuery)
 
         row.appendChild(firstNameCell);
         row.appendChild(lastNameCell);
+        row.appendChild(usernameCell);
         row.appendChild(passwordCell);
         row.appendChild(statusCell);
-        row.appendChild(usernameCell);
 
         tableBody.appendChild(row);
 
@@ -325,9 +345,9 @@ getDocs(userQuery)
   </script>
   <script>
 
-    function validateName() {
-      var nameInput = document.getElementById("name");
-      var nameError = document.getElementById("name-error");
+    function validateFName() {
+      var nameInput = document.getElementById("firstName");
+      var nameError = document.getElementById("fname-error");
       
       if (nameInput.value.length < 3) {
         nameError.innerHTML = "Name must be at least 3 characters long.";
@@ -337,44 +357,20 @@ getDocs(userQuery)
       }
     }
 
-    function validateUsername() {
-      var usernameInput = document.getElementById("username");
-      var usernameError = document.getElementById("username-error");
-
-      if (usernameInput.value.length < 5) {
-        usernameError.innerHTML = "Username must be at least 5 characters long.";
-        usernameError.style.display = "block";
+    function validateLName() {
+      var nameInput = document.getElementById("lastName");
+      var nameError = document.getElementById("lname-error");
+      
+      if (nameInput.value.length < 3) {
+        nameError.innerHTML = "Name must be at least 3 characters long.";
+        nameError.style.display = "block";
       } else {
-        usernameError.style.display = "none";
-      }
-    }
-
-    function validatePassword() {
-      var passwordInput = document.getElementById("password");
-      var passwordError = document.getElementById("password-error");
-
-      if (passwordInput.value.length < 8) {
-        passwordError.innerHTML = "Password must be at least 8 characters long.";
-        passwordError.style.display = "block";
-      } else {
-        passwordError.style.display = "none";
+        nameError.style.display = "none";
       }
     }
 
     var selectedRow = null;
 
-    // Function to populate the form fields with the selected row data
-    function populateFormFields(row) {
-      var nameField = document.getElementById("name");
-      var usernameField = document.getElementById("username");
-      var passwordField = document.getElementById("password");
-      var statusField = document.getElementById("status");
-
-      nameField.value = row.cells[0].innerHTML;
-      usernameField.value = row.cells[1].innerHTML;
-      passwordField.value = row.cells[2].innerHTML;
-      statusField.value = row.cells[3].innerHTML;
-    }
 
     // Function to clear the form fields
     function clearFormFields() {
