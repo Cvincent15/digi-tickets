@@ -6,6 +6,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Ticket Details</title>
+    <style>
+      .form-control{
+        min-width:300px;
+        max-width:auto;
+      }
+    </style>
 </head>
 <body>
 
@@ -35,54 +41,57 @@
 <div class="container" style="margin-top:20px;">
     <!-- Display the row data here for editing or viewing -->
     <?php
-    if (isset($_GET['data'])) {
-        $rowData = json_decode($_GET['data'], true);
-    ?>
+if (isset($_GET['data'])) {
+    $rowData = json_decode($_GET['data'], true);
+
+?>
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Ticket Details</h5>
             <table class="table">
                 <tbody>
-                <tr>
+                    <tr>
                       
-                      <th>Time: <?php echo $timeFormatted ?? ''; ?></th>
-                  </tr>
-                  <tr>
-                      <th>Name</th>
-                      <td><input type="text" class="form-control" id="name" name="name" value="<?php echo $rowData['name']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>License</th>
-                      <td><input type="text" class="form-control" id="license" name="license" value="<?php echo $rowData['license']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>Address</th>
-                      <td><input type="text" class="form-control" id="address" name="address" value="<?php echo $rowData['address']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>District</th>
-                      <td><input type="text" class="form-control" id="district" name="district" value="<?php echo $rowData['district']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>Owner's Name</th>
-                      <td><input type="text" class="form-control" id="owner" name="owner" value="<?php echo $rowData['owner']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>Owner's Address</th>
-                      <td><input type="text" class="form-control" id="ownerAddress" name="ownerAddress" value="<?php echo $rowData['ownerAddress']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>License Plate</th>
-                      <td><input type="text" class="form-control" id="plate" name="plate" value="<?php echo $rowData['plate']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>Type of Vehicle</th>
-                      <td><input type="text" class="form-control" id="vehicle" name="vehicle" value="<?php echo $rowData['vehicle']; ?>" readonly></td>
-                  </tr>
-                  <tr>
-                      <th>Place Occurred</th>
-                      <td><input type="text" class="form-control" id="placeOccurred" name="placeOccurred" value="<?php echo $rowData['placeOccurred']; ?>" readonly></td>
-                  </tr>
+                        <th>Time: <?php echo $timeFormatted ?? ''; ?></th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <td><input type="text" class="form-control" id="name" name="name" value="<?php echo $rowData['name']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>License</th>
+                        <td><input type="text" class="form-control" id="license" name="license" value="<?php echo $rowData['license']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>Address</th>
+                        <td><input type="text" class="form-control" id="address" name="address" value="<?php echo $rowData['address']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>District</th>
+                        <td><input type="text" class="form-control" id="district" name="district" value="<?php echo $rowData['district']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>Owner's Name</th>
+                        <td><input type="text" class="form-control" id="owner" name="owner" value="<?php echo $rowData['owner']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>Owner's Address</th>
+                        <td><input type="text" class="form-control" id="ownerAddress" name="ownerAddress" value="<?php echo $rowData['ownerAddress']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>License Plate</th>
+                        <td><input type="text" class="form-control" id="plate" name="plate" value="<?php echo $rowData['plate']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>Type of Vehicle</th>
+                        <td><input type="text" class="form-control" id="vehicle" name="vehicle" value="<?php echo $rowData['vehicle']; ?>" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>Place Occurred</th>
+                        <td><input type="text" class="form-control" id="placeOccurred" name="placeOccurred" value="<?php echo $rowData['placeOccurred']; ?>" readonly></td>
+                    </tr>
+                    
+                    
                     
                     <!-- Add more rows for other details as needed -->
                 </tbody>
@@ -123,7 +132,7 @@
 <script src="js/jquery-3.6.4.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDocs, query, where, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+  import { getFirestore, collection, doc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
@@ -145,21 +154,10 @@
     const db = getFirestore();
  // Check if user is logged in
  const isLoggedIn = sessionStorage.getItem('username') !== null;
-
- // Function to track changes and store them in Firestore
- const trackChanges = async (docId, changedField, oldValue, newValue) => {
-    const changesCollection = collection(db, 'ChangeLog');
-
-    // Add a new document with the changes
-    await addDoc(changesCollection, {
-      docId,
-      changedField,
-      oldValue,
-      newValue,
-      timestamp: new Date(),
-    });
-  };
-
+<?php
+ $timestamp = $rowData['time'];
+ $timeString = date('Y-m-d H:i:s', $timestamp->getSeconds());
+ ?>
 
 // Function to fetch violation data from Firestore
 const fetchViolationData = async (docId) => {
@@ -193,8 +191,11 @@ const fetchViolationData = async (docId) => {
     }
   };
 
+  
+
 // Add event listener for the "Edit" / "Save Changes" button
 const saveChangesBtn = document.getElementById('save-changes-btn');
+document.addEventListener('DOMContentLoaded', () => {
   saveChangesBtn.addEventListener('click', () => {
     const addressInput = document.getElementById('address');
     const licenseInput = document.getElementById('license');
@@ -206,7 +207,7 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
     const vehicleInput = document.getElementById('vehicle');
     const placeOccurredInput = document.getElementById('placeOccurred');
 
-    if (saveChangesBtn.textContent === 'Edit') {
+    if (saveChangesBtn.textContent.trim() === 'Edit') {
       // Switch to edit mode
       addressInput.readOnly = false;
       ownerInput.readOnly = false;
@@ -235,14 +236,12 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
 
       // Update the Firestore document with the new data
       const docId = "<?php echo $_GET['docId'] ?? ''; ?>"; // Retrieve the document ID from query parameters
-
-      const ticketDocId = "<?php echo $_GET['docId'] ?? ''; ?>";
       
     // Check if docId exists and is not empty before proceeding with the update
     if (docId) {
       // Update the Firestore document with the new data
       const ticket = collection(db, 'Ticket'); // Replace 'usersCTMEU' with your actual collection name
-      const docRef = doc(ticket, ticketDocId); // Get the reference to the specific document
+      const docRef = doc(ticket, docId); // Get the reference to the specific document
 
       const newData = {
         address: addressInput.value,
@@ -253,7 +252,7 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
         vehicle: vehicleInput.value,
         license: licenseInput.value,
         placeOccurred: placeOccurredInput.value,
-        name: nameInput.value,
+        name: nameInput.value
         // Add other fields as needed
       };
 
@@ -272,8 +271,6 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
           saveChangesBtn.textContent = 'Edit';
           // Fetch and display violation data if it exists
           fetchViolationData(docId);
-
-          
 
           // After saving changes, update the displayed data
           const tableData = {
@@ -294,22 +291,11 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
           if (docId) {
     fetchViolationData(docId);
   }
-        
 
           // Update the URL with the new data
           history.replaceState(null, null, '?' + queryParams.toString());
 
-          // Track changes before updating the Firestore document
-          for (const field in newData) {
-            if (newData.hasOwnProperty(field) && newData[field] !== rowData[field]) {
-              // Call the tracking function for each changed field
-              trackChanges(ticketDocId, field, rowData[field], newData[field]);
-            }
-          }
-        
-
         })
-        
         .catch((error) => {
           console.error('Error updating document:', error);
           // You can add error handling logic here, such as showing an error message to the user
@@ -320,15 +306,16 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
     }
 } 
   });
+});
 
 if (isLoggedIn) {
-  
   // Get the username from the session storage
   const username = sessionStorage.getItem('username');
 
   // Get the user document from Firestore
 const usersCollection = collection(db, 'usersCTMEU');
 const userQuery = query(usersCollection, where('username', '==', username));
+// Display the logged-in user's credentials
 
 
 getDocs(userQuery)
@@ -346,10 +333,9 @@ if (!querySnapshot.empty) {
     specialButton.style.display = 'none';
   }
 
-
-  // Display the logged-in user's credentials
   const welcomeText = document.getElementById('welcome-text');
   welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+  
 } else {
   console.error('User document not found');
 }
@@ -373,7 +359,11 @@ console.error('Error retrieving user document:', error);
   window.location.href = 'index.php';
 }
 
+
+
 </script>
 <!-- Add any other scripts you may need -->
 </body>
 </html>
+
+

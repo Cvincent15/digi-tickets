@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'php/database_connect.php';
+//include 'php/database_connect.php';
 ?>
 
 <!DOCTYPE html>
@@ -14,6 +14,11 @@ include 'php/database_connect.php';
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
+<style>
+  .clickable-row {
+    cursor: pointer;
+  }
+</style>
 <body style="height: auto;">
 
 <nav class="navbar">
@@ -45,8 +50,8 @@ include 'php/database_connect.php';
                 <th>No.</th>
                 <th>Name</th>
                 <th>License No.</th>
-                <th>District No.</th>
                 <th>Address</th>
+                <th>Time of Occurence</th>
             </tr>
         </thead>
         <tbody id="ticket-table-body">
@@ -96,38 +101,41 @@ include 'php/database_connect.php';
     ticketTableBody.innerHTML = "";
 
     querySnapshot.forEach((doc) => {
-      const { address, district, license, name } = doc.data();
-      const docId = doc.id; // Get the auto-generated document ID
-      if (address && district && license && name) {
-      const row = document.createElement("tr");
+  const { address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred } = doc.data();
+  const docId = doc.id; // Get the auto-generated document ID
+  if (address || time || license || name) {
+    const row = document.createElement("tr");
 
-      const countCell = document.createElement("td");
-      countCell.textContent = count++;
+    const countCell = document.createElement("td");
+    countCell.textContent = count++;
 
-      const addressCell = document.createElement("td");
-      addressCell.textContent = address;
+    const addressCell = document.createElement("td");
+    addressCell.textContent = address;
 
-      const districtCell = document.createElement("td");
-      districtCell.textContent = district;
+    const timeCell = document.createElement("td");
+    timeCell.textContent = time ? formatTimestamp(time) : ''; // Check if time exists and call the formatTimestamp function
 
-      const licenseCell = document.createElement("td");
-      licenseCell.textContent = license;
+    const licenseCell = document.createElement("td");
+    licenseCell.textContent = license;
 
-      const nameCell = document.createElement("td");
-      nameCell.textContent = name;
+    const nameCell = document.createElement("td");
+    nameCell.textContent = name;
 
-        row.appendChild(countCell);
-        row.appendChild(addressCell);
-        row.appendChild(districtCell);
-        row.appendChild(licenseCell);
-        row.appendChild(nameCell);
+    row.appendChild(countCell);
+    row.appendChild(nameCell);
+    row.appendChild(licenseCell);
+    row.appendChild(addressCell);
+    row.appendChild(timeCell);
 
-      ticketTableBody.appendChild(row);
+    row.classList.add('clickable-row');
 
-      // Pass the row data and document ID as an object to the handleRowClick function
-      row.addEventListener('click', () => handleRowClick({ address, district, license, name, docId }));
-      }
-    });
+    ticketTableBody.appendChild(row);
+
+    // Pass the row data and document ID as an object to the handleRowClick function
+    row.addEventListener('click', () => handleRowClick({ address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred, docId }));
+  }
+});
+
   };
  // Function to fetch data at intervals
  const autoLoadData = () => {
@@ -214,6 +222,19 @@ getDocs(userQuery)
     const docId = encodeURIComponent(row.docId);
     window.location.href = `detail.php?data=${encodeURIComponent(rowJSON)}&docId=${docId}`;
   };
+  function formatTimestamp(time) {
+  const timestamp = new Date(time.seconds * 1000 + time.nanoseconds / 1000000);
+  const formattedTime = timestamp.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short'
+  });
+  return formattedTime;
+}
 </script>
 
 </body>

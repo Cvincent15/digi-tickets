@@ -1,6 +1,7 @@
 <?php
+// Start the session
 session_start();
-include 'php/database_connect.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -27,33 +28,35 @@ include 'php/database_connect.php';
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link noEnforcers">Records</a>
-    <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
+    <a href="ctmeupage.php" class="link">Records</a>
+    <a href="ctmeurecords.php" class="link">Reports</a>
     <a href="ctmeuactlogs.php" class="link"><b>Activity Logs</b></a>
     <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" class="noEnforcers"class="link">Create Accounts</a>
+    <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
   </div>
   </div>
 </nav>
 
   <div class="table-container">
-<table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>License No.</th>
-                <th>District No.</th>
-                <th>Address</th>
-            </tr>
-        </thead>
-        <tbody id="ticket-table-body">
-            <!-- Replace the sample data below with the data fetched from your database -->
-           
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
+  <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Changes History</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Changed Field</th>
+                            <th>Old Value</th>
+                            <th>New Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="changes-table-body">
+                        <!-- Rows for changes history will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
@@ -80,51 +83,38 @@ include 'php/database_connect.php';
     initializeApp(firebaseConfig);
     const db = getFirestore();
 
-    const ticketTableBody = document.getElementById("ticket-table-body");
-    
+   // Function to fetch change log data from Firestore
+  const fetchChangeLogData = async () => {
+    const changeLogCollection = collection(db, "changelog");
 
-    // Fetch data from Firestore and populate the table
-    const fetchData = async () => {
-      const ticketCollection = collection(db, "Ticket");
-      const querySnapshot = await getDocs(ticketCollection);
+    const querySnapshot = await getDocs(changeLogCollection);
 
-      let count = 1; // Counter for numbering rows
+    if (!querySnapshot.empty) {
+      const changesTableBody = document.getElementById("changes-table-body");
+      changesTableBody.innerHTML = "";
 
       querySnapshot.forEach((doc) => {
-        const { address, district, license, name } = doc.data();
-        if (address && district && license && name) {
+        const changeLogData = doc.data();
+        const { timestamp, docId, newData } = changeLogData;
 
+        // Create and populate the change log table row
         const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${timestamp.toDate().toLocaleString()}</td>
+          <td>${docId}</td>
+          <td>${newData.name}</td>
+          <td>${newData.license}</td>
+          <!-- Add more cells for other fields as needed -->
+        `;
 
-        const countCell = document.createElement("td");
-        countCell.textContent = count++;
-
-        const addressCell = document.createElement("td");
-        addressCell.textContent = address;
-
-        const districtCell = document.createElement("td");
-        districtCell.textContent = district;
-
-        const licenseCell = document.createElement("td");
-        licenseCell.textContent = license;
-
-        const nameCell = document.createElement("td");
-        nameCell.textContent = name;
-
-        row.appendChild(countCell);
-        row.appendChild(addressCell);
-        row.appendChild(districtCell);
-        row.appendChild(licenseCell);
-        row.appendChild(nameCell);
-
-        ticketTableBody.appendChild(row);
-        }
+        // Append the row to the change log table body
+        changesTableBody.appendChild(row);
       });
-    };
+    }
+  };
 
-    fetchData().catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+  // Fetch and display the change log data when the page loads
+  fetchChangeLogData();
 
     
 

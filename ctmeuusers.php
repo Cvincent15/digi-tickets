@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'php/database_connect.php';
+//include 'php/database_connect.php';
 ?>
 
 <!DOCTYPE html>
@@ -14,11 +14,15 @@ include 'php/database_connect.php';
 </head>
 <style>
    .card {
-            margin: 10px auto;
-            width: 500px;
-            height: auto;
-            text-align: left;
-        }
+        margin: 100px auto;
+        width: 700px; /* Adjust the width as needed */
+        height: auto; /* Adjust the height as needed */
+        text-align: left;
+    }
+    button.Change {
+        font-size: 18px; /* Adjust the font size as needed */
+        padding: 12px 30px; /* Adjust the padding as needed */
+    }
 </style>
 <body style="height: auto;">
 
@@ -45,43 +49,35 @@ include 'php/database_connect.php';
   </div>
 </nav>
 
-<div class="card" style="margin: 10px auto; width: 500px;">
+<div class="card">
   <h1 style='text-align:center;'>User Details</h1>
-  <h6 id='fname-text' style='margin-left:20px;'></h6>
-  <h6 id='lname-text' style='margin-left:20px;'></h6>
-  <h6 id='stat-text' style='margin-left:20px;'></h6><br>
+  <h4 id='fname-text' style='margin-left:20px;'></h4>
+  <h4 id='lname-text' style='margin-left:20px;'></h4>
+  <h4 id='stat-text' style='margin-left:20px;'></h4><br>
   <form id="passwordChangeForm" style="text-align: center;">
     <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <label for="currentPassword" style="text-align: left;">Current Password:</label>
+      <h4 for="currentPassword" style="text-align: left;">Current Password:</h4>
       <input type="password" id="currentPassword" name="currentPassword" required>
     </div>
 
     <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <label for="newPassword" style="text-align: left;">New Password:</label>
+      <h4 for="newPassword" style="text-align: left;">New Password:</h4>
       <input type="password" id="newPassword" name="newPassword" required>
     </div>
 
     <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <label for="confirmPassword" style="text-align: left;">Confirm New Password:</label>
+      <h4 for="confirmPassword" style="text-align: left;">Confirm New Password:</h4>
       <input type="password" id="confirmPassword" name="confirmPassword" required>
     </div>
 
-    <button class='btn btn-primary' type="submit" style='margin: 20px auto;'>Change Password</button>
+    <button class='btn btn-primary Change' type="submit" style='margin: 20px auto;'>Change Password</button>
   </form>
 </div>
 
   <div class="table-container">
   
 <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>License No.</th>
-                <th>District No.</th>
-                <th>Address</th>
-            </tr>
-        </thead>
+        
         <tbody id="ticket-table-body">
             <!-- Replace the sample data below with the data fetched from your database -->
            
@@ -174,54 +170,6 @@ include 'php/database_connect.php';
   // Add a form submit event listener
   const passwordChangeForm = document.getElementById('passwordChangeForm');
   passwordChangeForm.addEventListener('submit', handlePasswordChange);
-
-    const ticketTableBody = document.getElementById("ticket-table-body");
-    
-
-    // Fetch data from Firestore and populate the table
-    const fetchData = async () => {
-      const ticketCollection = collection(db, "Ticket");
-      const querySnapshot = await getDocs(ticketCollection);
-
-      let count = 1; // Counter for numbering rows
-
-      querySnapshot.forEach((doc) => {
-        const { address, district, license, name } = doc.data();
-        if (address && district && license && name) {
-
-        const row = document.createElement("tr");
-
-        const countCell = document.createElement("td");
-        countCell.textContent = count++;
-
-        const addressCell = document.createElement("td");
-        addressCell.textContent = address;
-
-        const districtCell = document.createElement("td");
-        districtCell.textContent = district;
-
-        const licenseCell = document.createElement("td");
-        licenseCell.textContent = license;
-
-        const nameCell = document.createElement("td");
-        nameCell.textContent = name;
-
-        row.appendChild(countCell);
-        row.appendChild(addressCell);
-        row.appendChild(districtCell);
-        row.appendChild(licenseCell);
-        row.appendChild(nameCell);
-
-        ticketTableBody.appendChild(row);
-        }
-      });
-    };
-
-    fetchData().catch((error) => {
-      console.error("Error fetching data:", error);
-    });
-
-    
 
     // Check if user is logged in
     const isLoggedIn = sessionStorage.getItem('username') !== null;
