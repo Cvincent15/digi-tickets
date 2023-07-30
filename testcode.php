@@ -1,297 +1,139 @@
-<?php
-include 'php/database_connect.php';
-?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    .container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .form-container {
-      flex-basis: 50%;
-      padding: 20px;
-    }
-
-    .table-container {
-      flex-basis: 50%;
-      padding: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    form {
-      margin-bottom: 20px;
-    }
-
-    input[type="text"], input[type="password"], select {
-      width: 100%;
-      padding: 12px 20px;
-      margin: 8px 0;
-      display: inline-block;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 14px 20px;
-      margin-right: 10px;
-      border: none;
-      cursor: pointer;
-    }
-
-    button[type="submit"] {
-      background-color: #4CAF50;
-    }
-
-    button[type="reset"] {
-      background-color: #f44336;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
-  <div class="container">
-    <div class="form-container">
-  <form id="create-account-form" method="POST" action="php/createaccount.php">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" onkeyup="validateName();" oninput="validateInput(this);" required><br>
-    <div id="name-error" class="error" style="display: none;"></div>
+   <button onclick="generatePDF()">PDF</button>
+   
+<script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
+<script>
+  function generatePDF(){
+//or in browser
+var pdfObject = jsPDFInvoiceTemplate.default(props); //returns number of pages created
+console.log("object created:", pdfObject);
+  }
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" onkeyup="validateUsername();" oninput="validateInput(this);" required><br>
-    <div id="username-error" class="error" style="display: none;"></div>
+ 
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" onkeyup="validatePassword();" oninput="validateInput(this);" required><br>
-    <div id="password-error" class="error" style="display: none;"></div>
-
-    <label for="status">Status:</label>
-    <select id="status" name="status">
-    <option value="empty"></option>
-      <option value="Enforcer">Enforcer</option>
-      <option value="IT Personnel">IT Personnel</option>
-      <option value="Super Admin">Super Admin</option>
-    </select><br>
-
-    <button id="submit-button" type="submit">Submit</button>
-    <button type="reset">Clear</button>
-  </form>
-  </div>
-  <div class="table-container">
-  <?php
-  
-// Retrieve the user accounts from the database
-$sql = "SELECT * FROM users";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    echo "<table id='user-table'>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>";
-
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>
-                <td>".$row["name"]."</td>
-                <td>".$row["username"]."</td>
-                <td>".$row["password"]."</td>
-                <td>".$row["status"]."</td>
-              </tr>";
-    }
-
-    echo "</tbody>
-        </table>";
-} else {
-    echo "No user accounts found.";
-}
-
-  ?>
-  </div>
-  </div>
-  <script>
-// Function to send data to the server and insert it into the database
-function sendDataToDatabase(name, username, password, status) {
-            // Create a new XMLHttpRequest object
-            var xhr = new XMLHttpRequest();
-            
-            // Prepare the request
-            xhr.open("POST", "php/createaccount.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            
-            // Set up the callback function to handle the response
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    // Request completed successfully
-                    console.log(xhr.responseText);
-                    // You can perform additional actions here after the data is inserted
-                }
-            };
-            
-            // Prepare the data to be sent as a URL-encoded string
-            var data = "name=" + encodeURIComponent(name) +
-                       "&username=" + encodeURIComponent(username) +
-                       "&password=" + encodeURIComponent(password) +
-                       "&status=" + encodeURIComponent(status);
-            
-            // Send the request
-            xhr.send(data);
+var props = {
+    outputType: jsPDFInvoiceTemplate.OutputType.Save,
+    returnJsPDFDocObject: true,
+    fileName: "CTMEU Report",
+    orientationLandscape: true,
+    compress: true,
+    logo: {
+        src: "https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/logo.png",
+        type: 'PNG', //optional, when src= data:uri (nodejs case)
+        width: 53.33, //aspect ratio = width/height
+        height: 26.66,
+        margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0 //negative or positive num, from the current position
         }
-        
-        // Add event listener to the submit button
-        document.getElementById("submit-button").addEventListener("click", function(event) {
-            event.preventDefault(); // Prevent form submission
-
-            var name = document.getElementById("name").value;
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            var status = document.getElementById("status").value;
-
-            // Call the function to send data to the database
-            sendDataToDatabase(name, username, password, status);
-
-            // Reset the form fields
-            document.getElementById("create-account-form").reset();
-        });
-
-
-function validateInput(input) {
-      const regex = /^[a-zA-Z0-9]+$/; // Alphanumeric regex pattern
-      const value = input.value;
-
-      if (!regex.test(value)) {
-        input.style.borderColor = "red";
-      } else {
-        input.style.borderColor = "";
-      }
-    }
-
-    function validateName() {
-      var nameInput = document.getElementById("name");
-      var nameError = document.getElementById("name-error");
-      
-      if (nameInput.value.length < 3) {
-        nameError.innerHTML = "Name must be at least 3 characters long.";
-        nameError.style.display = "block";
-      } else {
-        nameError.style.display = "none";
-      }
-    }
-
-    function validateUsername() {
-      var usernameInput = document.getElementById("username");
-      var usernameError = document.getElementById("username-error");
-
-      if (usernameInput.value.length < 5) {
-        usernameError.innerHTML = "Username must be at least 5 characters long.";
-        usernameError.style.display = "block";
-      } else {
-        usernameError.style.display = "none";
-      }
-    }
-
-    function validatePassword() {
-      var passwordInput = document.getElementById("password");
-      var passwordError = document.getElementById("password-error");
-
-      if (passwordInput.value.length < 8) {
-        passwordError.innerHTML = "Password must be at least 8 characters long.";
-        passwordError.style.display = "block";
-      } else {
-        passwordError.style.display = "none";
-      }
-    }
-
-    var selectedRow = null;
-
-    // Function to populate the form fields with the selected row data
-    function addToTable(name, username, password, status) {
-            // Create a new row in the table
-            var table = document.getElementById("user-table").getElementsByTagName("tbody")[0];
-            var newRow = table.insertRow(table.rows.length);
-            
-            // Insert data into the cells of the new row
-            var nameCell = newRow.insertCell(0);
-            var usernameCell = newRow.insertCell(1);
-            var passwordCell = newRow.insertCell(2);
-            var statusCell = newRow.insertCell(3);
-            
-            nameCell.innerHTML = name;
-            usernameCell.innerHTML = username;
-            passwordCell.innerHTML = password;
-            statusCell.innerHTML = status;
+    },
+    stamp: {
+        inAllPages: true, //by default = false, just in the last page
+        src: "https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg",
+        type: 'JPG', //optional, when src= data:uri (nodejs case)
+        width: 20, //aspect ratio = width/height
+        height: 20,
+        margin: {
+            top: 0, //negative or positive num, from the current position
+            left: 0 //negative or positive num, from the current position
         }
-
-    // Function to clear the form fields
-    function clearFormFields() {
-      selectedRow = null;
-      document.getElementById("create-account-form").reset();
-      document.getElementById("submit-button").textContent = "Submit";
-    }
-
-    document.getElementById("user-table").addEventListener("click", function(event) {
-      var row = event.target.parentElement;
-      if (selectedRow !== row) {
-        populateFormFields(row);
-        selectedRow = row;
-        document.getElementById("submit-button").textContent = "Update";
-      } else {
-        clearFormFields();
-      }
-    });
-
-    document.getElementById("create-account-form").addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent form submission
-
-      var name = document.getElementById("name").value;
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
-      var status = document.getElementById("status").value;
-
-      if (selectedRow) {
-        // Update the selected row
-        selectedRow.cells[0].innerHTML = name;
-        selectedRow.cells[1].innerHTML = username;
-        selectedRow.cells[2].innerHTML = password;
-        selectedRow.cells[3].innerHTML = status;
-        clearFormFields();
-      } else {
-        // Add a new row to the table
-        var table = document.getElementById("user-table").getElementsByTagName('tbody')[0];
-        var newRow = table.insertRow(table.rows.length);
-
-        var nameCell = newRow.insertCell(0);
-        var usernameCell = newRow.insertCell(1);
-        var passwordCell = newRow.insertCell(2);
-        var statusCell = newRow.insertCell(3);
-
-        nameCell.innerHTML = name;
-        usernameCell.innerHTML = username;
-        passwordCell.innerHTML = password;
-        statusCell.innerHTML = status;
-      }
-
-      document.getElementById("create-account-form").reset();
-    });
-  </script>
+    },
+    business: {
+        name: "Business Name",
+        address: "Albania, Tirane ish-Dogana, Durres 2001",
+        phone: "(+355) 069 11 11 111",
+        email: "email@example.com",
+        email_1: "info@example.al",
+        website: "www.example.al",
+    },
+    contact: {
+        label: "Invoice issued for:",
+        name: "Client Name",
+        address: "Albania, Tirane, Astir",
+        phone: "(+355) 069 22 22 222",
+        email: "client@website.al",
+        otherInfo: "www.website.al",
+    },
+    invoice: {
+        label: "Invoice #: ",
+        num: 19,
+        invDate: "Payment Date: 01/01/2021 18:12",
+        invGenDate: "Invoice Date: 02/02/2021 10:17",
+        headerBorder: false,
+        tableBodyBorder: false,
+        header: [
+          {
+            title: "#", 
+            style: { 
+              width: 10 
+            } 
+          }, 
+          { 
+            title: "Title",
+            style: {
+              width: 30
+            } 
+          }, 
+          { 
+            title: "Description",
+            style: {
+              width: 80
+            } 
+          }, 
+          { title: "Price"},
+          { title: "Quantity"},
+          { title: "Unit"},
+          { title: "Total"}
+        ],
+        table: Array.from(Array(10), (item, index)=>([
+            index + 1,
+            "There are many variations ",
+            "Lorem Ipsum is simply dummy text dummy text ",
+            200.5,
+            4.5,
+            "m2",
+            400.5
+        ])),
+        additionalRows: [{
+            col1: 'Total:',
+            col2: '145,250.50',
+            col3: 'ALL',
+            style: {
+                fontSize: 14 //optional, default 12
+            }
+        },
+        {
+            col1: 'VAT:',
+            col2: '20',
+            col3: '%',
+            style: {
+                fontSize: 10 //optional, default 12
+            }
+        },
+        {
+            col1: 'SubTotal:',
+            col2: '116,199.90',
+            col3: 'ALL',
+            style: {
+                fontSize: 10 //optional, default 12
+            }
+        }],
+        invDescLabel: "Invoice Note",
+        invDesc: "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary.",
+    },
+    footer: {
+        text: "The invoice is created on a computer and is valid without the signature and stamp.",
+    },
+    pageEnable: true,
+    pageLabel: "Page ",
+};
+</script>
 </body>
 </html>
