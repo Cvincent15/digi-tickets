@@ -11,7 +11,6 @@ session_start();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src= "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.0.9/css/boxicons.min.css">
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -19,11 +18,6 @@ session_start();
   .clickable-row {
     cursor: pointer;
   }
-
-  .hidden {
-  display: none;
-  margin: auto;
-}
 </style>
 <body style="height: auto;">
 
@@ -40,10 +34,10 @@ session_start();
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link"><b>Records</b></a>
+    <a href="ctmeupage.php" class="link">Records</a>
     <a href="ctmeurecords.php" class="link">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+    <a href="ctmeuactlogs.php" class="link" id="noEnforcers"><b>Archive</b></a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
@@ -59,7 +53,6 @@ session_start();
                 <th>License No.</th>
                 <th>Address</th>
                 <th>District</th>
-                <th><button class="btn btn-primary" id="toggle-archive-buttons"><i class='bx bx-show'></i></button></th>
             </tr>
         </thead>
         <tbody id="ticket-table-body">
@@ -100,7 +93,7 @@ session_start();
 
     // Function to fetch data from Firestore and populate the table
   const fetchData = async () => {
-    const ticketCollection = collection(db, "Ticket");
+    const ticketCollection = collection(db, "archive");
     const querySnapshot = await getDocs(ticketCollection);
 
     let count = 1; // Counter for numbering rows
@@ -132,20 +125,11 @@ session_start();
       const nameCell = document.createElement("td");
       nameCell.textContent = name;
 
-      // Archive button cell
-      const archiveButtonCell = document.createElement("td");
-      const archiveButton = document.createElement("button");
-      archiveButton.innerHTML = "<i class='bx bx-archive-in'></i>";
-      archiveButton.classList.add("btn", "btn-primary", "hidden", "archive-button");
-      archiveButton.addEventListener("click", (event) => handleArchiveButtonClick(event, docId, row)); // Pass the event as well
-      archiveButtonCell.appendChild(archiveButton);
-
       row.appendChild(countCell);
       row.appendChild(nameCell);
       row.appendChild(licenseCell);
       row.appendChild(addressCell);
       row.appendChild(districtCell);
-      row.appendChild(archiveButtonCell); // Add the archive button cell to the row
 
       row.classList.add('clickable-row');
 
@@ -156,51 +140,34 @@ session_start();
     }
   });
 
-  // JavaScript to toggle the visibility of archive buttons
-document.getElementById("toggle-archive-buttons").addEventListener("click", () => {
-  const archiveButtons = document.querySelectorAll(".archive-button");
-  for (const button of archiveButtons) {
-    button.classList.toggle("hidden");
-  }
-});
-
   // Function to handle archive button click
-const handleArchiveButtonClick = async (event, docId, row) => {
-  event.stopPropagation(); // Prevent the click event from bubbling up to the row's click event
+  const handleArchiveButtonClick = async (event, docId, row) => {
+    event.stopPropagation(); // Prevent the click event from bubbling up to the row's click event
+    try {
+      // Get the document reference for the ticket
+      const ticketRef = doc(db, 'Ticket', docId);
 
-  // Show a confirmation dialog to the user
-  const confirmed = window.confirm('Are you sure you want to archive this ticket?');
+      // Get the ticket data before archiving
+      const ticketSnapshot = await getDoc(ticketRef);
+      const ticketData = ticketSnapshot.data();
 
-  if (!confirmed) {
-    // User clicked "Cancel", do nothing
-    return;
-  }
+      // Add the ticket data to the 'archive' collection
+      const archiveCollection = collection(db, 'archive');
+      await addDoc(archiveCollection, ticketData);
 
-  try {
-    // Get the document reference for the ticket
-    const ticketRef = doc(db, 'Ticket', docId);
+      // Delete the ticket from the 'Ticket' collection
+      await deleteDoc(ticketRef);
 
-    // Get the ticket data before archiving
-    const ticketSnapshot = await getDoc(ticketRef);
-    const ticketData = ticketSnapshot.data();
+      // Remove the row from the table
+      ticketTableBody.removeChild(row);
 
-    // Add the ticket data to the 'archive' collection
-    const archiveCollection = collection(db, 'archive');
-    await addDoc(archiveCollection, ticketData);
-
-    // Delete the ticket from the 'Ticket' collection
-    await deleteDoc(ticketRef);
-
-    // Remove the row from the table
-    ticketTableBody.removeChild(row);
-
-    // Show an alert to indicate successful archival
-    alert('Ticket archived successfully!');
-  } catch (error) {
-    console.error('Error archiving ticket:', error);
-    // You can add error handling logic here, such as showing an error message to the user
-  }
-};
+      // Show an alert to indicate successful archival
+      alert('Ticket archived successfully!');
+    } catch (error) {
+      console.error('Error archiving ticket:', error);
+      // You can add error handling logic here, such as showing an error message to the user
+    }
+  };
 
   };
  // Function to fetch data at intervals
@@ -211,7 +178,7 @@ const handleArchiveButtonClick = async (event, docId, row) => {
   };
 
   // Set the time interval in milliseconds (e.g., 5000 ms for 5 seconds)
-  const intervalTime = 20000;
+  const intervalTime = 5000;
 
   // Initial data fetch
   autoLoadData();
@@ -231,50 +198,45 @@ const usersCollection = collection(db, 'usersCTMEU');
 const userQuery = query(usersCollection, where('username', '==', username));
 
 function archiveRow(docId) {
-  // Custom confirmation dialog
-  const confirmation = confirm("Are you sure you want to archive this record?\n\nClick 'Yes' to proceed or 'No' to cancel.");
-  if (confirmation) {
-    const ticketDocRef = doc(db, 'Ticket', docId); // Reference to the Firestore document
-    const archiveCollection = collection(db, 'archive'); // Reference to the "archive" collection
+      // Confirm before archiving
+      if (confirm("Are you sure you want to archive this record?")) {
+        const ticketDocRef = doc(db, 'Ticket', docId); // Reference to the Firestore document
+        const archiveCollection = collection(db, 'archive'); // Reference to the "archive" collection
 
-    // Fetch the original document data
-    getDoc(ticketDocRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        const originalData = docSnap.data();
+        // Fetch the original document data
+        getDoc(ticketDocRef).then((docSnap) => {
+          if (docSnap.exists()) {
+            const originalData = docSnap.data();
 
-        // Add the original data to the "archive" collection
-        addDoc(archiveCollection, originalData)
-          .then(() => {
-            // Archive successful
-            alert('Record archived successfully!');
-            // Delete the original document from the "Ticket" collection
-            deleteDoc(ticketDocRef)
+            // Add the original data to the "archive" collection
+            addDoc(archiveCollection, originalData)
               .then(() => {
-                // Redirect back to the original page
-                window.location.href = 'ctmeupage.php';
+                // Archive successful
+                alert('Record archived successfully!');
+                // Delete the original document from the "Ticket" collection
+                deleteDoc(ticketDocRef)
+                  .then(() => {
+                    // Redirect back to the original page
+                    window.location.href = 'ctmeupage.php';
+                  })
+                  .catch((error) => {
+                    console.error('Error deleting document:', error);
+                    // You can add error handling logic here, such as showing an error message to the user
+                  });
               })
               .catch((error) => {
-                console.error('Error deleting document:', error);
+                console.error('Error archiving document:', error);
                 // You can add error handling logic here, such as showing an error message to the user
               });
-          })
-          .catch((error) => {
-            console.error('Error archiving document:', error);
-            // You can add error handling logic here, such as showing an error message to the user
-          });
-      } else {
-        console.error('Document not found!');
+          } else {
+            console.error('Document not found!');
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching original document data:', error);
+        });
       }
-    })
-    .catch((error) => {
-      console.error('Error fetching original document data:', error);
-    });
-  } else {
-    // The user canceled the archiving action
-    alert('Archiving canceled.');
-  }
-}
-
+    }
 
 getDocs(userQuery)
   .then((querySnapshot) => {
@@ -328,11 +290,11 @@ getDocs(userQuery)
 </script>
 <script>
   // Function to handle row click and redirect to the detail page
-  const handleRowClick = (row) => {
-    const rowJSON = JSON.stringify(row);
-    const docId = encodeURIComponent(row.docId);
-    window.location.href = `detail.php?data=${encodeURIComponent(rowJSON)}&docId=${docId}`;
-  };
+const handleRowClick = (row) => {
+  const rowJSON = JSON.stringify(row);
+  const docId = encodeURIComponent(row.docId);
+  window.location.href = `detailarch.php?data=${encodeURIComponent(rowJSON)}&docId=${docId}`;
+};
   function formatTimestamp(time) {
   const timestamp = new Date(time.seconds * 1000 + time.nanoseconds / 1000000);
   const formattedTime = timestamp.toLocaleString('en-US', {

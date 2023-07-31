@@ -43,7 +43,7 @@
     }
 
     input[type="text"], input[type="password"],input[type="number"], select {
-      width: 70%;
+      width: 100%;
       padding: 12px 20px;
       margin: 8px 0;
       display: inline-block;
@@ -87,7 +87,8 @@
     <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link">Records</a>
     <a href="ctmeurecords.php" class="link">Reports</a>
-    <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
+    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
+    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link"><b>Create Accounts</b></a>
     <a href="ctmeuusers.php" class="link">User Account</a>
@@ -136,8 +137,6 @@
         <th>Username</th>
         <th>Password</th>
         <th>Status</th>
-        <th>Start Ticket</th>
-        <th>End Ticket</th>
       </tr>
     </thead>
     <tbody>
@@ -294,9 +293,11 @@ getDocs(userQuery)
             endTicket: status === 'Enforcer' ? Number(endTicket) : null,
           })
             .then(() => {
-              console.log('User created successfully!');
+              alert('User created successfully!');
               // Reset form
               form.reset();
+              location.reload();
+              
             })
             .catch((error) => {
               console.error('Error creating user:', error);
@@ -445,8 +446,6 @@ getDocs(userQuery)
         row.appendChild(usernameCell);
         row.appendChild(passwordCell);
         row.appendChild(statusCell);
-        row.appendChild(startTicketCell);
-        row.appendChild(endTicketCell);
 
         tableBody.appendChild(row);
 
@@ -600,8 +599,8 @@ document.getElementById('update-button').addEventListener('click', function (eve
     const firstName = row.cells[0].textContent;
       const lastName = row.cells[1].textContent;
       const status = row.cells[4].textContent; // Status is in the 5th cell (index 4)
-      const startTicket = row.cells[5].textContent; // Start Ticket is in the 6th cell (index 5)
-      const endTicket = row.cells[6].textContent;
+      /*const startTicket = row.cells[5].textContent; // Start Ticket is in the 6th cell (index 5)
+      const endTicket = row.cells[6].textContent; */
 
     document.getElementById('firstName').value = firstName;
     document.getElementById('lastName').value = lastName;

@@ -24,7 +24,8 @@
     <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link noEnforcers"><b>Records</b></a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
-    <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
+    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
+    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
@@ -37,6 +38,7 @@
     <?php
     if (isset($_GET['data'])) {
         $rowData = json_decode($_GET['data'], true);
+        $defaultNAText = "N/A"; // Default value for missing data
     ?>
     <div class="card">
         <div class="card-body">
@@ -45,43 +47,43 @@
                 <tbody>
                 <tr>
                       
-                      <th>Time: <?php echo $timeFormatted ?? ''; ?></th>
+                      <!--<th>Time: <?php echo $timeFormatted ?? ''; ?></th>-->
                   </tr>
                   <tr>
                       <th>Name</th>
-                      <td><input type="text" class="form-control" id="name" name="name" value="<?php echo $rowData['name']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="name" name="name" value="<?php echo $rowData['name'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>License</th>
-                      <td><input type="text" class="form-control" id="license" name="license" value="<?php echo $rowData['license']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="license" name="license" value="<?php echo $rowData['license'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>Address</th>
-                      <td><input type="text" class="form-control" id="address" name="address" value="<?php echo $rowData['address']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="address" name="address" value="<?php echo $rowData['address'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>District</th>
-                      <td><input type="text" class="form-control" id="district" name="district" value="<?php echo $rowData['district']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="district" name="district" value="<?php echo $rowData['district'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>Owner's Name</th>
-                      <td><input type="text" class="form-control" id="owner" name="owner" value="<?php echo $rowData['owner']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="owner" name="owner" value="<?php echo $rowData['owner'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>Owner's Address</th>
-                      <td><input type="text" class="form-control" id="ownerAddress" name="ownerAddress" value="<?php echo $rowData['ownerAddress']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="ownerAddress" name="ownerAddress" value="<?php echo $rowData['ownerAddress'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>License Plate</th>
-                      <td><input type="text" class="form-control" id="plate" name="plate" value="<?php echo $rowData['plate']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="plate" name="plate" value="<?php echo $rowData['plate'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>Type of Vehicle</th>
-                      <td><input type="text" class="form-control" id="vehicle" name="vehicle" value="<?php echo $rowData['vehicle']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="vehicle" name="vehicle" value="<?php echo $rowData['vehicle'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                   <tr>
                       <th>Place Occurred</th>
-                      <td><input type="text" class="form-control" id="placeOccurred" name="placeOccurred" value="<?php echo $rowData['placeOccurred']; ?>" readonly></td>
+                      <td><input type="text" class="form-control" id="placeOccurred" name="placeOccurred" value="<?php echo $rowData['placeOccurred'] ?? $defaultNAText; ?>" readonly></td>
                   </tr>
                     
                     <!-- Add more rows for other details as needed -->
@@ -178,19 +180,24 @@ const fetchViolationData = async (docId) => {
           // Clear the existing table rows
           violationTableBody.innerHTML = '';
 
-          // Loop through the violations and create rows in the table
           ticketData.violation.forEach((violation, index) => {
-            const row = document.createElement('tr');
-            const numCell = document.createElement('td');
-            const violationCell = document.createElement('td');
+  const row = document.createElement('tr');
+  const numCell = document.createElement('td');
+  const violationCell = document.createElement('td');
 
-            numCell.textContent = index + 1; // Add 1 to index to show a 1-based count
-            violationCell.textContent = violation;
+  numCell.textContent = index + 1; // Add 1 to index to show a 1-based count
 
-            row.appendChild(numCell);
-            row.appendChild(violationCell);
-            violationTableBody.appendChild(row);
-          });
+  // Create a <span> element to hold the violation description
+  const violationDescriptionSpan = document.createElement('span');
+  violationDescriptionSpan.textContent = violation;
+
+  // Append the description element inside violationCell
+  violationCell.appendChild(violationDescriptionSpan);
+
+  row.appendChild(numCell);
+  row.appendChild(violationCell);
+  violationTableBody.appendChild(row);
+});
         }
       } else {
         console.error('Document not found!');

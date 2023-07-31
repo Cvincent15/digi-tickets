@@ -41,7 +41,8 @@ session_start();
     <button class="btn btn-primary" id="logout-button">Log out?</button>
     <a href="ctmeupage.php" class="link noEnforcers">Records</a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
-    <a href="ctmeuactlogs.php" class="link">Activity Logs</a>
+    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
+    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
     <a href="ctmeuusers.php" class="link"><b>User Account</b></a>
