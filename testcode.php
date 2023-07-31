@@ -92,7 +92,7 @@ var props = {
           { title: "Unit"},
           { title: "Total"}
         ],
-        table: Array.from(Array(10), (item, index)=>([
+        table: Array.from(Array(50), (item, index)=>([
             index + 1,
             "There are many variations ",
             "Lorem Ipsum is simply dummy text dummy text ",

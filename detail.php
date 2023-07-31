@@ -123,7 +123,7 @@
 <script src="js/jquery-3.6.4.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDocs, query, where, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+  import { getFirestore, collection, doc,getDoc, getDocs, query, where, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
@@ -160,38 +160,53 @@
     });
   };
 
-
-// Function to fetch violation data from Firestore
+// Function to fetch violation data and populate the table
 const fetchViolationData = async (docId) => {
-    const violationCollection = collection(doc(db, "Ticket", docId), "violations");
-    const querySnapshot = await getDocs(violationCollection);
+    try {
+      // Get the document reference based on the provided document ID
+      const ticketDocRef = doc(db, 'Ticket', docId); // Reference to the Firestore document
 
-    // Check if there is any violation data
-    if (!querySnapshot.empty) {
-      // Clear existing violation table rows to avoid duplication
-      violationTableBody.innerHTML = "";
+      // Get the document data
+      const docSnap = await getDoc(ticketDocRef);
+      if (docSnap.exists()) {
+        const ticketData = docSnap.data();
 
-      let count = 1;
-      querySnapshot.forEach((doc) => {
-        const { violationType} = doc.data();
+        // Check if the document has the 'violation' field and is an array
+        if (Array.isArray(ticketData.violation)) {
+          const violationTableBody = document.getElementById('violation-table-body');
 
-        // Create and populate the violation table row
-        const row = document.createElement("tr");
+          // Clear the existing table rows
+          violationTableBody.innerHTML = '';
 
-        const countCell = document.createElement("td");
-        countCell.textContent = count++;
+          // Loop through the violations and create rows in the table
+          ticketData.violation.forEach((violation, index) => {
+            const row = document.createElement('tr');
+            const numCell = document.createElement('td');
+            const violationCell = document.createElement('td');
 
-        const violationTypeCell = document.createElement("td");
-        violationTypeCell.textContent = violationType;
+            numCell.textContent = index + 1; // Add 1 to index to show a 1-based count
+            violationCell.textContent = violation;
 
-        row.appendChild(countCell);
-        row.appendChild(violationTypeCell);
-
-        // Append the row to the violation table body
-        violationTableBody.appendChild(row);
-      });
+            row.appendChild(numCell);
+            row.appendChild(violationCell);
+            violationTableBody.appendChild(row);
+          });
+        }
+      } else {
+        console.error('Document not found!');
+      }
+    } catch (error) {
+      console.error('Error fetching violation data:', error);
     }
   };
+
+  // Call the fetchViolationData function when the page loads
+  const queryParams = new URLSearchParams(window.location.search);
+  const docId = queryParams.get('docId');
+  if (docId) {
+    fetchViolationData(docId);
+  }
+
 
 // Add event listener for the "Edit" / "Save Changes" button
 const saveChangesBtn = document.getElementById('save-changes-btn');
@@ -232,6 +247,8 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
         name: nameInput.value
         // Add other fields as needed
       };
+
+      
 
       // Update the Firestore document with the new data
       const docId = "<?php echo $_GET['docId'] ?? ''; ?>"; // Retrieve the document ID from query parameters
@@ -319,6 +336,7 @@ const saveChangesBtn = document.getElementById('save-changes-btn');
       // You can add error handling logic here, such as showing an error message to the user
     }
 } 
+
   });
 
 if (isLoggedIn) {
