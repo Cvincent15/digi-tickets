@@ -1,0 +1,101 @@
+body .__bgImage {
+    background-image: url("../images/motoristbg.jpg")!important;
+    background-size: 100vw 100vh;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    backface-visibility: hidden;
+    position: fixed;
+    top: -10em;
+    bottom: -10em;
+    left: -10em;
+    right: -10em;
+    transition: all .2s linear;
+}
+header .t-Header-logo {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 2.2rem;
+}
+
+.t-Header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #A4040A !important;
+    border: none;
+    z-index: 800;
+  }
+
+.t-Header-logo{
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.t-Header-logo-link {
+    padding: 4px 8px;
+    vertical-align: top;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+  
+  .t-Header-branding {
+    height: 68px;
+    position: relative;
+    z-index: 795;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+  .t-Header-navBar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: right;
+    flex-shrink: 0;
+    margin-right: 8px;
+    height: 100%;
+}
+
+dl, ol, ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.t-Header-logo-link img {
+    max-height: 4rem;
+    display: block;
+}
+
+li {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    
+}
+
+.t-NavigationBar-item {
+    display: inline-block;
+    vertical-align: top;
+    
+}
+
+header .t-NavigationBar-item .t-Button {
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    height: 68px;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: relative;
+    text-decoration: none !important;
+}
+
+.t-Header-logo, .t-Header .t-Button--header.is-active, .t-Header .t-Button--header {
+    color: #ffffff;
+}
