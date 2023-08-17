@@ -106,8 +106,8 @@
     <input type="text" id="lastName" name="lastName" onkeyup="validateLName();" required><br>
     <div id="lname-error" class="error" style="display: none;"></div>
 
-    <label for="status">Status:</label>
-    <select id="status" required>
+    <label for="role">Role:</label>
+    <select id="role" required>
     <option value="empty" disabled></option>
       <option value="Super Administrator">Super Admin</option>
       <option value="IT Administrator">IT Admin</option>
@@ -136,7 +136,7 @@
         <th>Last Name</th>
         <th>Username</th>
         <th>Password</th>
-        <th>Status</th>
+        <th>Role</th>
       </tr>
     </thead>
     <tbody>
@@ -177,7 +177,7 @@ form.addEventListener('submit', (e) => {
   // Get form values
   const firstName = document.getElementById('firstName').value;
   const lastName = document.getElementById('lastName').value;
-  const status = document.getElementById('status').value;
+  const role = document.getElementById('role').value;
   const startTicket = document.getElementById('startTicketInput').value;
 const endTicket = document.getElementById('endTicketInput').value;
 
@@ -187,13 +187,13 @@ let selectedRowUid = null;
     let selectedEndTicket = null;
 
   // Create abbreviated status
-  let abbreviatedStatus = '';
-  if (status === 'Enforcer') {
-    abbreviatedStatus = 'enf';
-  } else if (status === 'IT Administrator') {
-    abbreviatedStatus = 'ita';
-  } else if (status === 'Super Administrator') {
-    abbreviatedStatus = 'sua';
+  let abbreviatedRole = '';
+  if (role === 'Enforcer') {
+    abbreviatedRole = 'enf';
+  } else if (role === 'IT Administrator') {
+    abbreviatedRole = 'ita';
+  } else if (role === 'Super Administrator') {
+    abbreviatedRole = 'sua';
   }
 
   // Generate a random password
@@ -213,7 +213,7 @@ let selectedRowUid = null;
 }
 
       // Create username based on status and name
-      const username = abbreviatedStatus + firstName.charAt(0).toUpperCase() + lastName;
+      const username = abbreviatedRole + firstName.charAt(0).toUpperCase() + lastName;
       const usersCollection = collection(db, 'usersCTMEU');
 
       const userQuery = query(usersCollection, where('username', '==', username));
@@ -224,12 +224,12 @@ getDocs(userQuery)
     if (!querySnapshot.empty) {
       const docSnapshot = querySnapshot.docs[0];
       const userData = docSnapshot.data();
-      const status = userData.status;
+      const role = userData.role;
       const firstName = userData.firstName;
       const lastName = userData.lastName;
 
       // Check if the status is "Enforcer"
-      if (status === 'Enforcer') {
+      if (role === 'Enforcer') {
   // Get all elements with class "noEnforcers"
   const specialButtons = document.querySelectorAll('.noEnforcers');
 
@@ -242,14 +242,14 @@ getDocs(userQuery)
       console.error('User document not found');
     }// Display the logged-in user's credentials
       const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
       // Display the logged-in user's credentials
       const fnameText = document.getElementById('fname-text');
       fnameText.textContent = `First Name: ${firstName}`;
       const lnameText = document.getElementById('lname-text');
       lnameText.textContent = `Last Name: ${lastName}`;
       const statText = document.getElementById('stat-text');
-      statText.textContent = `Status: ${status}`;
+      statText.textContent = `Role: ${role}`;
     } else {
       console.error('User document not found');
     }
@@ -263,18 +263,18 @@ getDocs(userQuery)
       
 
        // Fetch "IT Administrator" users and "Super Administrator" users and check the count
-  const itAdminQuery = query(usersCollection, where('status', '==', 'IT Administrator'));
-  const superAdminQuery = query(usersCollection, where('status', '==', 'Super Administrator'));
+  const itAdminQuery = query(usersCollection, where('role', '==', 'IT Administrator'));
+  const superAdminQuery = query(usersCollection, where('role', '==', 'Super Administrator'));
 
 
       Promise.all([getDocs(itAdminQuery), getDocs(superAdminQuery)])
     .then(([itAdminSnapshot, superAdminSnapshot]) => {
-      if (status === 'IT Administrator' && itAdminSnapshot.size >= 4) {
+      if (role === 'IT Administrator' && itAdminSnapshot.size >= 4) {
         alert('Maximum number of IT Administrators reached');
         return;
       }
 
-      if (status === 'Super Administrator' && superAdminSnapshot.size >= 2) {
+      if (role === 'Super Administrator' && superAdminSnapshot.size >= 2) {
         alert('Maximum number of Super Administrators reached');
         return;
       }
@@ -286,11 +286,11 @@ getDocs(userQuery)
           addDoc(usersCollection, {
             firstName: firstName,
             lastName: lastName,
-            status: status,
+            role: role,
             username: username,
             password: password,
-            startTicket: status === 'Enforcer' ? Number(startTicket) : null,
-            endTicket: status === 'Enforcer' ? Number(endTicket) : null,
+            startTicket: role === 'Enforcer' ? Number(startTicket) : null,
+            endTicket: role === 'Enforcer' ? Number(endTicket) : null,
           })
             .then(() => {
               alert('User created successfully!');
@@ -338,12 +338,12 @@ getDocs(userQuery)
     if (!querySnapshot.empty) {
       const docSnapshot = querySnapshot.docs[0];
       const userData = docSnapshot.data();
-      const status = userData.status;
+      const role = userData.role;
       const firstName = userData.firstName;
       const lastName = userData.lastName;
 
       // Check if the status is "Enforcer"
-      if (status === 'Enforcer') {
+      if (role === 'Enforcer') {
   // Get all elements with class "noEnforcers"
   const specialButtons = document.querySelectorAll('.noEnforcers');
 
@@ -358,14 +358,14 @@ getDocs(userQuery)
     
       // Display the logged-in user's credentials
       const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
       // Display the logged-in user's credentials
       const fnameText = document.getElementById('fname-text');
       fnameText.textContent = `First Name: ${firstName}`;
       const lnameText = document.getElementById('lname-text');
       lnameText.textContent = `Last Name: ${lastName}`;
       const statText = document.getElementById('stat-text');
-      statText.textContent = `Status: ${status}`;
+      statText.textContent = `Role: ${role}`;
     } else {
       console.error('User document not found');
     }
@@ -397,8 +397,8 @@ getDocs(userQuery)
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const { firstName, lastName, password, status, username } = data;
-      userData.push({ firstName, lastName, password, status, username, uid: doc.id });
+      const { firstName, lastName, password, role, username } = data;
+      userData.push({ firstName, lastName, password, role, username, uid: doc.id });
     });
 
     return userData;
@@ -411,7 +411,7 @@ getDocs(userQuery)
 
     userData.forEach((user) => {
       const row = document.createElement('tr');
-      const { firstName, lastName, password, status, username, startTicket, endTicket, uid } = user; // Retrieve the 'uid' from the user object
+      const { firstName, lastName, password, role, username, startTicket, endTicket, uid } = user; // Retrieve the 'uid' from the user object
 
         const firstNameCell = document.createElement('td');
         firstNameCell.textContent = firstName;
@@ -422,8 +422,8 @@ getDocs(userQuery)
         const passwordCell = document.createElement('td');
         passwordCell.textContent = password;
 
-        const statusCell = document.createElement('td');
-        statusCell.textContent = status;
+        const roleCell = document.createElement('td');
+        roleCell.textContent = role;
 
         const usernameCell = document.createElement('td');
         usernameCell.textContent = username;
@@ -433,7 +433,7 @@ getDocs(userQuery)
         const endTicketCell = document.createElement('td');
 
         // Check if the user is an enforcer and has startTicket and endTicket properties
-    if (status === 'Enforcer' && typeof startTicket === 'number' && typeof endTicket === 'number') {
+    if (role === 'Enforcer' && typeof startTicket === 'number' && typeof endTicket === 'number') {
       startTicketCell.textContent = startTicket;
       endTicketCell.textContent = endTicket;
     } else {
@@ -445,7 +445,7 @@ getDocs(userQuery)
         row.appendChild(lastNameCell);
         row.appendChild(usernameCell);
         row.appendChild(passwordCell);
-        row.appendChild(statusCell);
+        row.appendChild(roleCell);
 
         tableBody.appendChild(row);
 
@@ -504,7 +504,7 @@ function deleteUserDocument(username) {
         }
       })
       .then(() => {
-        console.log('Account deleted successfully.');
+        alert('Account deleted successfully.');
         // Refresh the page to show the updated user data
         location.reload();
       })
@@ -533,22 +533,22 @@ document.getElementById('update-button').addEventListener('click', function (eve
     // Get form values
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
-    const status = document.getElementById('status').value;
+    const role = document.getElementById('role').value;
     const startTicket = document.getElementById('startTicketInput').value;
     const endTicket = document.getElementById('endTicketInput').value;
 
     // Create abbreviated status
-    let abbreviatedStatus = '';
-    if (status === 'Enforcer') {
-      abbreviatedStatus = 'enf';
-    } else if (status === 'IT Administrator') {
-      abbreviatedStatus = 'ita';
-    } else if (status === 'Super Administrator') {
-      abbreviatedStatus = 'sua';
+    let abbreviatedRole = '';
+    if (role === 'Enforcer') {
+      abbreviatedRole = 'enf';
+    } else if (role === 'IT Administrator') {
+      abbreviatedRole = 'ita';
+    } else if (role === 'Super Administrator') {
+      abbreviatedRole = 'sua';
     }
 
     // Create username based on status and name
-    const username = abbreviatedStatus + firstName.charAt(0).toUpperCase() + lastName;
+    const username = abbreviatedRole + firstName.charAt(0).toUpperCase() + lastName;
 
     // Create a reference to the 'usersCTMEU' collection
     const usersCollection = collection(db, 'usersCTMEU');
@@ -568,18 +568,18 @@ document.getElementById('update-button').addEventListener('click', function (eve
           return updateDoc(doc(usersCollection, docSnapshot.id), {
             firstName: firstName,
             lastName: lastName,
-            status: status,
+            role: role,
             username: username,
             password: existingPassword, // Use the existing password instead of generating a new one
-            startTicket: status === 'Enforcer' ? Number(startTicket) : null,
-            endTicket: status === 'Enforcer' ? Number(endTicket) : null,
+            startTicket: role === 'Enforcer' ? Number(startTicket) : null,
+            endTicket: role === 'Enforcer' ? Number(endTicket) : null,
           });
         } else {
           console.error('Error: Account not found.');
         }
       })
       .then(() => {
-        console.log('Account updated successfully.');
+        alert('Account updated successfully.');
         // Clear the form fields and hide the buttons after updating
         clearFormFields();
         // Refresh the page to show the updated user data
@@ -598,7 +598,7 @@ document.getElementById('update-button').addEventListener('click', function (eve
   function populateFormFields(row) {
     const firstName = row.cells[0].textContent;
       const lastName = row.cells[1].textContent;
-      const status = row.cells[4].textContent; // Status is in the 5th cell (index 4)
+      const role = row.cells[4].textContent; // Status is in the 5th cell (index 4)
       /*const startTicket = row.cells[5].textContent; // Start Ticket is in the 6th cell (index 5)
       const endTicket = row.cells[6].textContent; */
 
@@ -606,10 +606,10 @@ document.getElementById('update-button').addEventListener('click', function (eve
     document.getElementById('lastName').value = lastName;
 
     // Set the selected value in the dropdown list based on the status of the row
-    const statusDropdown = document.getElementById('status');
-    for (let i = 0; i < statusDropdown.options.length; i++) {
-      if (statusDropdown.options[i].value === status) {
-        statusDropdown.selectedIndex = i;
+    const roleDropdown = document.getElementById('role');
+    for (let i = 0; i < roleDropdown.options.length; i++) {
+      if (roleDropdown.options[i].value === role) {
+        roleDropdown.selectedIndex = i;
         break;
       }
     }
@@ -622,10 +622,10 @@ document.getElementById('update-button').addEventListener('click', function (eve
 
   // Function to show/hide ticket fields based on the selected status
   function showHideTicketFields() {
-    const status = document.getElementById('status').value;
+    const role = document.getElementById('role').value;
     const ticketContainer = document.querySelector('.ticket-container');
 
-    if (status === 'Enforcer') {
+    if (role === 'Enforcer') {
     ticketContainer.style.display = 'block';
     document.getElementById('startTicketInput').required = true;
     document.getElementById('endTicketInput').required = true;
@@ -737,10 +737,10 @@ function validateInput(input) {
     
 
     function showHideTicketFields() {
-    const status = document.getElementById('status').value;
+    const role = document.getElementById('role').value;
     const ticketContainer = document.querySelector('.ticket-container');
 
-    if (status === 'Enforcer') {
+    if (role === 'Enforcer') {
       ticketContainer.style.display = 'block';
     } else {
       ticketContainer.style.display = 'none';
@@ -748,7 +748,7 @@ function validateInput(input) {
   }
 
    // Add an event listener to the status dropdown to trigger the show/hide function
-   document.getElementById('status').addEventListener('change', showHideTicketFields);
+   document.getElementById('role').addEventListener('change', showHideTicketFields);
 
 // Call the show/hide function initially to set the correct display on page load
 showHideTicketFields();

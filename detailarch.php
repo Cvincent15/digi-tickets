@@ -207,12 +207,12 @@ getDocs(userQuery)
 if (!querySnapshot.empty) {
   const docSnapshot = querySnapshot.docs[0];
   const userData = docSnapshot.data();
-  const status = userData.status;
+  const role = userData.role;
   const firstName = userData.firstName;
   const lastName = userData.lastName;
 
   // Check if the status is "Enforcer"
-  if (status === 'Enforcer') {
+  if (role === 'Enforcer') {
     const specialButton = document.getElementById('noEnforcers');
     specialButton.style.display = 'none';
   }
@@ -220,7 +220,7 @@ if (!querySnapshot.empty) {
 
   // Display the logged-in user's credentials
   const welcomeText = document.getElementById('welcome-text');
-  welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+  welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
 } else {
   console.error('User document not found');
 }

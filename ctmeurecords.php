@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src= "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+    <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
@@ -48,9 +50,10 @@
 <div class="card">
   <button class="btn btn-primary" onclick="generatePDF()" style="margin:0;">GENERATE PDF</button>
 </div>
+<div id="pdfPreviewContainer" style="margin-top: 20px;"></div>
    
-   
-<script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
+
+<script src="path/to/jsPDFInvoiceTemplate.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
   import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
@@ -132,7 +135,7 @@
   };
 
   // Set the time interval in milliseconds (e.g., 5000 ms for 5 seconds)
-  const intervalTime = 5000;
+  const intervalTime = 10000;
 
   // Initial data fetch
   autoLoadData();
@@ -157,12 +160,12 @@ getDocs(userQuery)
     if (!querySnapshot.empty) {
       const docSnapshot = querySnapshot.docs[0];
       const userData = docSnapshot.data();
-      const status = userData.status;
+      const role = userData.role;
       const firstName = userData.firstName;
       const lastName = userData.lastName;
 
       // Check if the status is "Enforcer"
-      if (status === 'Enforcer') {
+      if (role === 'Enforcer') {
         const specialButton = document.getElementById('noEnforcers');
         specialButton.style.display = 'none';
       }
@@ -170,10 +173,10 @@ getDocs(userQuery)
 
       // Display the logged-in user's credentials
       const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
 
       // Check if the status is "Enforcer"
-      if (status === 'Enforcer') {
+      if (role === 'Enforcer') {
             const specialButton = document.getElementById('noEnforcers');
             specialButton.style.display = 'none';
             // Redirect to ctmeuactlogs.php if the status is Enforcer
@@ -203,7 +206,9 @@ getDocs(userQuery)
     }
 </script>
 <script>
-  function generatePDF(){
+  
+  
+ function generatePDF(){
 //or in browser
 var pdfObject = jsPDFInvoiceTemplate.default(props); //returns number of pages created
 console.log("object created:", pdfObject);
@@ -293,6 +298,8 @@ var props = {
     pageEnable: true,
     pageLabel: "Page ",
 };
+
+
 </script>
 </body>
 </html>

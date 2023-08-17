@@ -42,7 +42,7 @@ session_start();
     <a href="ctmeupage.php" class="link noEnforcers">Records</a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+    <a href="ctmeuarchive.php" class="link noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
     <a href="ctmeuusers.php" class="link"><b>User Account</b></a>
@@ -189,12 +189,12 @@ getDocs(userQuery)
     if (!querySnapshot.empty) {
       const docSnapshot = querySnapshot.docs[0];
       const userData = docSnapshot.data();
-      const status = userData.status;
+      const role = userData.role;
       const firstName = userData.firstName;
       const lastName = userData.lastName;
 
       // Check if the status is "Enforcer"
-      if (status === 'Enforcer') {
+      if (role === 'Enforcer') {
   // Get all elements with class "noEnforcers"
   const specialButtons = document.querySelectorAll('.noEnforcers');
 
@@ -209,14 +209,14 @@ getDocs(userQuery)
     
       // Display the logged-in user's credentials
       const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${status}: ${firstName} ${lastName}`;
+      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
       // Display the logged-in user's credentials
       const fnameText = document.getElementById('fname-text');
       fnameText.textContent = `First Name: ${firstName}`;
       const lnameText = document.getElementById('lname-text');
       lnameText.textContent = `Last Name: ${lastName}`;
       const statText = document.getElementById('stat-text');
-      statText.textContent = `Status: ${status}`;
+      statText.textContent = `Role: ${role}`;
     } else {
       console.error('User document not found');
     }
