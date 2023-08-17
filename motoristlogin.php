@@ -16,45 +16,51 @@ if (isset($_SESSION['username'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/motorist.css"/>
     <title>Motorists Login</title>
 </head>
 <body class="sidebar-collapse fixed" style="height: auto;">
-    <div class="wrapper">
-        <div class="content-wrapper" style="min-height: 658px;">
-            <div class="bgslider" id="bgslider">
-                <div class="col-md-4 card frost">
-                <div class="toplayer login-card-body" style="margin-top:30%;">
-          <div class="box-header with-border">
-            <h2 class="box-title text-center"><strong>Motorists Login</strong></h2>
-          </div>
-          <div class="box-body login-box-msg">
-            <section id="introduction">
-              <p style="text-align:center;">Sign in to start your session</p>
-            </section>
-
-            <form action="php/loginM.php" method="post" accept-charset="utf-8">
-                <div class="form-group">
-                    <div class="input-group mb-0 landing">
-                        <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="50" size="50" autocomplete="off" class="form-control" required>
-                    </div>
-                </div>
-
-            <div class="form-group landing">
-                <div class="input-group">
-                    <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="text-right landing">
-                <input type="submit" name="Login" value="Sign in" id="Login" class="btn btn-primary btn-flat pull-right">
-            </div>
-            </form></div>
-        </div>
-                </div>
-            </div>
-        </div>
+<div class="__bgImage" style="transform: rotate3d(0.37383177570093457,0,0,1.2616822429906542deg) rotate3d(0,0.7661458333333333,0,2.661458333333333deg) translateZ(-80px)"></div>
+    <header class = "t-Header" id="t-Header">
+        <div class="t-Header-branding">
+    <div class="t-Header-logo">
+        <a class="t-Header-logo-link">
+        <img src="./images/ctmeusmall.png" style="float:left;">
+        </a>
     </div>
+        <div class="t-Header-navBar">
+            <ul class="t-NavigationBar">
+                <li class="t-NavigationBar-item">
+                    <a class="t-Button t-Button--icon t-Button--header t-Button--navBar">
+                        <span class="t-Button-label">CTMEU Official Page</span>
+                    </a>
+                </li>
+                <li class="t-NavigationBar-item">
+                    <a class="t-Button t-Button--icon t-Button--header t-Button--navBar">
+                        <span>
+                            <img src="./images/user-plus-regular-24white.png">
+                        </span>
+                        <span class="t-Button-label">Register</span>
+                    </a>
+                </li>
+                <li class="t-NavigationBar-item">
+                    <a class="t-Button t-Button--icon t-Button--header t-Button--navBar">
+                        <span>
+                            <img src="./images/log-in-regular-24.png">
+                        <span class="t-Button-label">Login</span>
+                 </a>
+            </li>
+        </ul>
+        </div>
+</div>
+</header>
+<div class="t-Body">
+            <div class="t-Body-main" style="margin-top: 68px;">
+    </div>
+    <div class="t-Body-title" id="t_Body_title" style="top: 68px;">
+        
+      </div>
+
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 </body>
