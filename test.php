@@ -70,11 +70,25 @@ if (isset($_SESSION['username'])) {
                 <div class="col col-12 apex-col-auto content__center">
                     <div id="content" class>
                         <center>
-                            <h3 style="width:90%;margin-bottom: 12px; ">City Traffic Management and Enforcement Unit</h3>
-                            <div class="logos"><img class="logo" src="./images/ctmeu.png"></div>
-                            <h1><b>CTMEU Portal</b></h1>
-                            <h3>The City of Santa Rosa shall be a model in local governance effectively responding to the welfare of its people through innovative policies and programs, and integrated strategy anchored on.</h3>
-                        </center>
+                        <h2>Sign Up</h2>
+  <form action="submit_form.php" method="post">
+    <label for="full_name">Full Name:</label><br>
+    <input type="text" id="full_name" name="full_name" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <label for="confirm_password">Confirm Password:</label><br>
+    <input type="password" id="confirm_password" name="confirm_password" required><br><br>
+
+    <label for="birthdate">Birthdate:</label><br>
+    <input type="date" id="birthdate" name="birthdate" required><br><br>
+
+    <input type="submit" value="Sign Up">
+  </form>
                 
                 <div class="container">
                     <div class="row">
