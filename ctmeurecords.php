@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <script src= "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
-    <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -50,10 +47,34 @@
 <div class="card">
   <button class="btn btn-primary" onclick="generatePDF()" style="margin:0;">GENERATE PDF</button>
 </div>
-<div id="pdfPreviewContainer" style="margin-top: 20px;"></div>
-   
 
-<script src="path/to/jsPDFInvoiceTemplate.js"></script>
+<div class="table-container">
+<table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>License No.</th>
+                <th>Address</th>
+                <th>District</th>
+                <th>Owner</th>
+                <th>Owner Address</th>
+                <th>Place Occurred</th>
+                <th>Plate</th>
+                <th>Vehicle</th>
+                <th>Violation</th>
+            </tr>
+        </thead>
+        <tbody id="ticket-table-body">
+            <!-- Replace the sample data below with the data fetched from your database -->
+           
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
   import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
@@ -91,7 +112,7 @@
     ticketTableBody.innerHTML = "";
 
     querySnapshot.forEach((doc) => {
-  const { address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred } = doc.data();
+  const { address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred, violation } = doc.data();
   const docId = doc.id; // Get the auto-generated document ID
   if (address || time || license || name) {
     const row = document.createElement("tr");
@@ -102,31 +123,56 @@
     const addressCell = document.createElement("td");
     addressCell.textContent = address;
 
-    const timeCell = document.createElement("td");
-    timeCell.textContent = time ? formatTimestamp(time) : ''; // Check if time exists and call the formatTimestamp function
-
     const licenseCell = document.createElement("td");
     licenseCell.textContent = license;
 
     const nameCell = document.createElement("td");
     nameCell.textContent = name;
+    
+    const districtCell = document.createElement("td");
+    districtCell.textContent = district;
+
+    const ownerCell = document.createElement("td");
+    ownerCell.textContent = owner;
+
+    const ownerAddressCell = document.createElement("td");
+    ownerAddressCell.textContent = ownerAddress;
+
+    const placeOccurredCell = document.createElement("td");
+    placeOccurredCell.textContent = placeOccurred;
+
+    const plateCell = document.createElement("td");
+    plateCell.textContent = plate;
+
+    const vehicleCell = document.createElement("td");
+    vehicleCell.textContent = vehicle;
+
+    const violationCell = document.createElement("td");
+    violationCell.textContent = violation;
 
     row.appendChild(countCell);
     row.appendChild(nameCell);
     row.appendChild(licenseCell);
     row.appendChild(addressCell);
-    row.appendChild(timeCell);
+    row.appendChild(districtCell);
+    row.appendChild(ownerCell);
+    row.appendChild(ownerAddressCell);
+    row.appendChild(placeOccurredCell);
+    row.appendChild(plateCell);
+    row.appendChild(vehicleCell);
+    row.appendChild(violationCell);
 
     row.classList.add('clickable-row');
 
     ticketTableBody.appendChild(row);
 
     // Pass the row data and document ID as an object to the handleRowClick function
-    row.addEventListener('click', () => handleRowClick({ address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred, docId }));
+    row.addEventListener('click', () => handleRowClick({ address, time, license, name, district, owner, ownerAddress, plate, vehicle, placeOccurred, violation, docId }));
   }
 });
 
   };
+
  // Function to fetch data at intervals
  const autoLoadData = () => {
     fetchData().catch((error) => {
@@ -204,102 +250,45 @@ getDocs(userQuery)
       // User is not logged in, redirect to the login page
       window.location.href = 'index.php';
     }
-</script>
-<script>
-  
-  
- function generatePDF(){
-//or in browser
-var pdfObject = jsPDFInvoiceTemplate.default(props); //returns number of pages created
-console.log("object created:", pdfObject);
-  }
 
- 
+    function generatePDF() {
+  const doc = new jsPDF();
 
-var props = {
-    outputType: jsPDFInvoiceTemplate.OutputType.Save,
-    returnJsPDFDocObject: true,
-    fileName: "CTMEU Report",
-    orientationLandscape: true,
-    compress: true,
-    logo: {
-        src: "images/logo-ctmeu.png",
-        type: 'PNG', //optional, when src= data:uri (nodejs case)
-        width: 30, //aspect ratio = width/height
-        height: 30,
-        margin: {
-            top: 0, //negative or positive num, from the current position
-            left: 0 //negative or positive num, from the current position
-        }
-    },
-    stamp: {
-        inAllPages: true, //by default = false, just in the last page
-        src: "https://raw.githubusercontent.com/edisonneza/jspdf-invoice-template/demo/images/qr_code.jpg",
-        type: 'JPG', //optional, when src= data:uri (nodejs case)
-        width: 20, //aspect ratio = width/height
-        height: 20,
-        margin: {
-            top: 0, //negative or positive num, from the current position
-            left: 0 //negative or positive num, from the current position
-        }
-    },
-    business: {
-        address: "Republika ng Pilipinas",
-        phone: "Lungsod ng Santa Rosa",
-        email: "Lalawigan ng Laguna",
-        website: "(CITY TRAFFIC MANAGEMENT AND ENFORCEMENT UNIT)",
-    },
-    invoice: {
-        headerBorder: true,
-        tableBodyBorder: true,
-        header: [
-          {
-            title: "#/Ticket #", 
-            style: { 
-              width: 30 
-            } 
-          }, 
-          { 
-            title: "APPREHENDED",
-            style: {
-              width: 60
-            } 
-          }, 
-          { 
-            title: "VIOLATION(S)",
-            style: {
-              width: 40
-            } 
-          }, 
-          { title: "PLACE OF APPREHENSION", style: {
-              width: 50
-            } },
-          { title: "DRIVER'S LICENSE NO.", style: {
-              width: 40
-            } },
-          { title: "MV PLATE #", style: {
-              width: 30
-            } },
-          { title: "DATE/TIME", style: {
-              width: 30
-            } }
-        ],
-        table: Array.from(Array(50), (item, index)=>([
-            index + 1
-            + " |0241901",
-            "John Doe",
-            "54E",
-            "Paseo",
-            "DO4-15-007416",
-            "577 DMV",
-            "07-30-23::1:45PM"
-        ])),
-    },
-    pageEnable: true,
-    pageLabel: "Page ",
-};
+  // Get the table element
+  const table = document.querySelector('table');
 
+  // Extract rows from the table
+  const rows = table.querySelectorAll('tbody tr');
 
+  // Define the starting position for the PDF table
+  let yPos = 25;
+
+  // Define column widths
+  const colWidths = [10, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+
+  // Loop through each row and extract data
+  rows.forEach((row, rowIndex) => {
+    const cells = row.querySelectorAll('td');
+    const rowData = [];
+
+    cells.forEach((cell, cellIndex) => {
+      rowData.push(cell.textContent);
+    });
+
+    // Create a new line in the PDF
+    doc.text(10, yPos, rowData.join(' | '));
+    yPos += 10;
+
+    // Check if a new page is needed
+    if (yPos >= 280) {
+      doc.addPage();
+      yPos = 10;
+    }
+  });
+
+  // Save the PDF
+  doc.save('CTMEU_Report.pdf');
+}
 </script>
 </body>
 </html>

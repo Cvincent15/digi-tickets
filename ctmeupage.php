@@ -24,6 +24,30 @@ session_start();
   display: none;
   margin: auto;
 }
+#filter-select {
+  padding: 10px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+#search-bar {
+  padding: 10px;
+  width: 50%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Hide rows that don't match the search term */
+.clickable-row {
+  display: table-row;
+}
+
 </style>
 <body style="height: auto;">
 
@@ -50,6 +74,16 @@ session_start();
   </div>
   </div>
 </nav>
+<div class="search-container">
+  <input type="text" id="search-bar" placeholder="Search...">
+  <select id="filter-select">
+    <option value="name">Name</option>
+    <option value="license">License No.</option>
+    <option value="address">Address</option>
+    <option value="district">District</option>
+  </select>
+</div>
+
 <div class="table-container">
 <table>
         <thead>
@@ -325,6 +359,79 @@ getDocs(userQuery)
       // User is not logged in, redirect to the login page
       window.location.href = 'index.php';
     }
+    
+// Get the search bar element
+const searchBar = document.getElementById("search-bar");
+
+// Add an event listener to the search bar input
+searchBar.addEventListener("input", () => {
+  const searchTerm = searchBar.value.toLowerCase(); // Get the search term and convert to lowercase
+
+  // Loop through each row in the table body
+  const rows = document.querySelectorAll(".clickable-row");
+  rows.forEach((row) => {
+    const nameCell = row.querySelector("td:nth-child(2)"); // Get the name cell
+    const name = nameCell.textContent.toLowerCase(); // Get the name value and convert to lowercase
+
+    // If the search term is found in the name, show the row; otherwise, hide the row
+    if (name.includes(searchTerm)) {
+      row.style.display = "table-row"; // Show the row
+    } else {
+      row.style.display = "none"; // Hide the row
+    }
+  });
+});
+
+// Get the filter select element
+const filterSelect = document.getElementById("filter-select");
+
+// Add an event listener to the filter select
+filterSelect.addEventListener("change", () => {
+  searchTable(); // Call the searchTable function to update the table based on the selected filter
+});
+
+// Add an event listener to the search bar input
+searchBar.addEventListener("input", () => {
+  searchTable(); // Call the searchTable function to update the table based on the search term
+});
+
+// Function to search and filter the table
+const searchTable = () => {
+  const filterValue = filterSelect.value; // Get the selected filter value
+  const searchTerm = searchBar.value.toLowerCase(); // Get the search term and convert to lowercase
+
+  // Loop through each row in the table body
+  const rows = document.querySelectorAll(".clickable-row");
+  rows.forEach((row) => {
+    const cell = row.querySelector(`td:nth-child(${getFilterIndex(filterValue)})`); // Get the cell based on the selected filter
+    const cellValue = cell.textContent.toLowerCase(); // Get the cell value and convert to lowercase
+
+    // If the search term is found in the cell value, show the row; otherwise, hide the row
+    if (cellValue.includes(searchTerm)) {
+      row.style.display = "table-row"; // Show the row
+    } else {
+      row.style.display = "none"; // Hide the row
+    }
+  });
+};
+
+// Function to get the index of the selected filter for the table cell
+const getFilterIndex = (filterValue) => {
+  switch (filterValue) {
+    case "name":
+      return 2; // Name column
+    case "license":
+      return 3; // License No. column
+    case "address":
+      return 4; // Address column
+    case "district":
+      return 5; // District column
+    default:
+      return 0; // Default to the first column
+  }
+};
+
+
 </script>
 <script>
   // Function to handle row click and redirect to the detail page
