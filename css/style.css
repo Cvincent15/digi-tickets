@@ -161,7 +161,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: gray;
+  background-color: rgb(209, 209, 209);
 }
 
 tr:nth-child(odd) {
@@ -195,7 +195,7 @@ th, td {
 
 .pagination button.disabled {
   background-color: #ddd;
-  color: #888;
+  color: #b8b8b8;
   cursor: not-allowed;
 }
 
@@ -218,4 +218,14 @@ thead {
 /* account create */
 .error {
   color: red;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.button-container button {
+  margin-left: 10px;
 }
