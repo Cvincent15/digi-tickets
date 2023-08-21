@@ -79,84 +79,80 @@ if (isset($_SESSION['username'])) {
                     <div id="content" class>
                         <center>
                         <h2>Sign Up</h2>
-  <form action="code.php" method="POST">
+  <form id="registration-form" action="code.php" method="POST">
     <label for="full_name" >Full Name:</label><br>
     <input type="text" id="full_name" name="full_name" required><br><br>
 
     <label for="email">Email:</label><br>
     <input type="email" id="email" name="email" required><br><br>
 
-    <label for="password">Phone Number:</label><br>
-    <input type="text" id="password" name="phone" required><br><br>
+    <label for="number">Phone Number:</label><br>
+    <input type="text" id="number" name="phone" required><br><br>
 
-    <label for="confirm_password">Password:</label><br>
-    <input type="password" id="pasword" name="password" required><br><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+    <button class="show-password" id="toggle-password" type="button">Show/Hide Password</button><br>
+
+    <label for="confirm_password">Confirm Password:</label><br>
+    <input type="password" id="confirm_password" name="confirm_password" required><br>
+    
 
     <label for="birthdate">Birthdate:</label><br>
     <input type="date" id="birthdate" name="birthdate" required><br><br>
 
     <button type="submit" name="register_btn" class="btn btn-primary">Register</button>
   </form>
+
+  <div id="error-modal" class="modal">
+    <div class="modal-content">
+        <span id="error-message" class="error-message">Password should have 1 capital letter, 1 special character, 1 numeric value</span>
+        <button id="close-modal" class="btn btn-secondary">Close</button>
+    </div>
+</div>
                         </center>
             </div>
         </div>
     </div>
     </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-<script>
-  function submitToFirebase(event) {
-    event.preventDefault(); // Prevent the default form submission
+    <script>
+document.getElementById('registration-form').addEventListener('submit', function(event) {
+    const passwordField = document.getElementById('password');
+    const passwordValue = passwordField.value;
 
-    const fullName = document.getElementById("full_name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    if (!isValidPassword(passwordValue)) {
+        const errorMessage = "Password must contain at least 8 characters, including at least 1 capital letter, 1 numeric digit, and 1 special character.";
+        displayErrorModal(errorMessage);
+        event.preventDefault(); // Prevent form submission
+    }
+});
 
-    // Create a new user with email and password
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // User creation successful
-        const user = userCredential.user;
-        console.log("User created:", user);
+document.getElementById('toggle-password').addEventListener('click', function() {
+    const passwordField = document.getElementById('password');
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+    } else {
+        passwordField.type = 'password';
+    }
+});
 
-        // You can add additional logic here, like redirecting to a new page
-      })
-      .catch((error) => {
-        // Handle errors
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error("Error:", errorCode, errorMessage);
-      });
-  }
+document.getElementById('close-modal').addEventListener('click', function() {
+    document.getElementById('error-modal').style.display = 'none';
+});
+
+function isValidPassword(password) {
+    // Password complexity requirements
+    const regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/;
+    return regex.test(password);
+}
+
+function displayErrorModal(message) {
+    const modal = document.getElementById('error-modal');
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = message;
+    modal.style.display = 'block';
+}
 </script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-analytics.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-auth.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
-    authDomain: "ctmeu-d5575.firebaseapp.com",
-    databaseURL: "https://ctmeu-d5575-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ctmeu-d5575",
-    storageBucket: "ctmeu-d5575.appspot.com",
-    messagingSenderId: "1062661015515",
-    appId: "1:1062661015515:web:bd8622b373772f1016c9fe",
-    measurementId: "G-MSESZ1DVDL"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 </body>
