@@ -1,3 +1,14 @@
+<?php
+session_start();
+//include 'php/database_connect.php';
+
+// Check if the user is already logged in
+if (!isset($_SESSION['username'])) {
+  // Redirect the user to the greeting page if they are already logged in
+  header("Location: index.php");
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
 <head>
@@ -84,7 +95,7 @@
   <div class="navbar-inner">
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out?</button>
+    <button class="btn btn-primary" id="logout-button">Log out</button>
     <a href="ctmeupage.php" class="link">Records</a>
     <a href="ctmeurecords.php" class="link">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
@@ -97,500 +108,172 @@
 </nav>
 <div class="container">
     <div class="form-container">
-  <form method="POST" id="signup-form">
-    <label for="name">First Name:</label>
-    <input type="text" id="firstName" name="firstName" onkeyup="validateFName();" required><br>
-    <div id="fname-error" class="error" style="display: none;"></div>
+    <form method="POST" action="register.php" id="registration-form">
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName" required><br>
 
-    <label for="username">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" onkeyup="validateLName();" required><br>
-    <div id="lname-error" class="error" style="display: none;"></div>
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" required><br>
 
     <label for="role">Role:</label>
-    <select id="role" required>
-    <option value="empty" disabled></option>
-      <option value="Super Administrator">Super Admin</option>
-      <option value="IT Administrator">IT Admin</option>
-    <option value="Enforcer">Enforcer</option>
+    <select id="role" name="role" required>
+        <option value="Super Administrator">Super Admin</option>
+        <option value="IT Administrator">IT Admin</option>
+        <option value="Enforcer">Enforcer</option>
     </select><br>
-    <div class="ticket-container" id="ticket-container">
-  <label for="startTicket">Start Ticket Number (for Enforcers):</label>
-  <input type="number" id="startTicketInput" name="startTicketInput" oninput="validateInput(this)">
-  <div id="start-ticket-error" class="error" style="display: none;"></div>
 
-  <label for="endTicket">End Ticket Number (for Enforcers):</label>
-  <input type="number" id="endTicketInput" name="endTicketInput" oninput="validateInput(this)">
-  <div id="end-ticket-error" class="error" style="display: none;"></div>
-</div>
-    <button id="submit-button" type="submit" value="Sign Up">Create Account</button>
-    <button type="submit" id="update-button" style="display: none;">Update Account</button>
-    <button type="reset"  id="reset-button">Clear</button>
-    <button id="delete-button" type="button" style="display: none;">Delete</button>
-  </form>
-  </div>
+    <!-- These fields will be automatically generated -->
+    <input type="hidden" id="username" name="username" readonly>
+
+    <input type="hidden" id="password" name="password" readonly>
+
+    <button type="submit" id="create-button">Create Account</button>
+    <button type="submit" id="update-button">Update Account</button>
+    <button type="reset" id="reset-button">Clear</button>
+<!-- Add a new button for deleting the account -->
+<button type="button" id="delete-button" style="display:none;">Delete Account</button>
+</form>
+    </div>
   <div class="table-container">
-  <table id="user-table">
+  <?php
+// Include your database connection code here
+include 'php/database_connect.php';
+
+// Function to fetch data from the users table
+function fetchUserData($conn) {
+    // Initialize an empty array to store user data
+    $userData = array();
+
+    // Prepare and execute an SQL statement to retrieve data from the users table
+    $sql = "SELECT first_name, last_name, username, password, role FROM users";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Fetch data row by row and store it in the $userData array
+        while ($row = $result->fetch_assoc()) {
+            $userData[] = $row;
+        }
+    }
+
+    // Close the database connection
+    $conn->close();
+
+    return $userData;
+}
+
+// Call the fetchUserData function to retrieve user data
+$userData = fetchUserData($conn);
+
+// Function to fetch user data based on first name, last name, and role
+function getUserData($conn, $firstName, $lastName, $role) {
+  $sql = "SELECT * FROM users WHERE first_name = ? AND last_name = ? AND role = ?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("sss", $firstName, $lastName, $role);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return $result->fetch_assoc();
+}
+
+// Function to check if a user with the same first name, last name, and role exists
+function userExists($conn, $firstName, $lastName, $role) {
+  $sql = "SELECT COUNT(*) as count FROM users WHERE first_name = ? AND last_name = ? AND role = ?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("sss", $firstName, $lastName, $role);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['count'] > 0;
+}
+
+// Initialize variables for form fields
+$firstName = $lastName = $role = $username = $password = '';
+$updateMode = false;
+
+// Check if form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $role = $_POST['role'];
+    $username = $_POST['username'];
+
+    // Check if a user with the same first name, last name, and role exists
+    if (userExists($conn, $firstName, $lastName, $role)) {
+        // If a user exists, switch to update mode
+        $updateMode = true;
+
+        // Retrieve the existing user data for pre-filling the form
+        $existingUserData = getUserData($conn, $firstName, $lastName, $role);
+
+        // Set the form fields with existing user data
+        $firstName = $existingUserData['first_name'];
+        $lastName = $existingUserData['last_name'];
+        $role = $existingUserData['role'];
+    } else {
+        // If not, generate a new password for creating a new user
+        $password = generatePassword(); // Implement a function to generate a random password
+    }
+}
+
+// Function to generate a random password (customize this function as needed)
+function generatePassword() {
+  // Generate a random password logic here
+  return "new_password"; // Change this to your password generation logic
+}
+?>
+
+<!-- Add this part in your HTML to populate the table with the fetched data -->
+<table id="user-table">
     <thead>
-      <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Username</th>
-        <th>Password</th>
-        <th>Role</th>
-      </tr>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Role</th>
+        </tr>
     </thead>
     <tbody>
-      <!-- Table body will be populated dynamically -->
+        <?php
+        // Loop through the $userData array and populate the table rows
+        foreach ($userData as $user) {
+            echo "<tr>";
+            echo "<td>" . $user['first_name'] . "</td>";
+            echo "<td>" . $user['last_name'] . "</td>";
+            echo "<td>" . $user['username'] . "</td>";
+            echo "<td>" . $user['role'] . "</td>";
+            echo "</tr>";
+        }
+        ?>
     </tbody>
-  </table>
+</table>
   </div>
   </div>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc, addDoc, getDocs, query, where, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  <script>
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
-    authDomain: "ctmeu-d5575.firebaseapp.com",
-    databaseURL: "https://ctmeu-d5575-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ctmeu-d5575",
-    storageBucket: "ctmeu-d5575.appspot.com",
-    messagingSenderId: "1062661015515",
-    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
-    measurementId: "G-65PXT5618B"
-  };
+    // Function to set the username and generate a random password
+    function setCredentials() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const role = document.getElementById('role').value.trim();
+        let username = '';
 
-   // Initialize Firebase
-   initializeApp(firebaseConfig);
-    const db = getFirestore();
-
-    // Handle form submission
-    const form = document.getElementById('signup-form');
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  // Get form values
-  const firstName = document.getElementById('firstName').value;
-  const lastName = document.getElementById('lastName').value;
-  const role = document.getElementById('role').value;
-  const startTicket = document.getElementById('startTicketInput').value;
-const endTicket = document.getElementById('endTicketInput').value;
-
-
-let selectedRowUid = null;
-  let selectedStartTicket = null;
-    let selectedEndTicket = null;
-
-  // Create abbreviated status
-  let abbreviatedRole = '';
-  if (role === 'Enforcer') {
-    abbreviatedRole = 'enf';
-  } else if (role === 'IT Administrator') {
-    abbreviatedRole = 'ita';
-  } else if (role === 'Super Administrator') {
-    abbreviatedRole = 'sua';
-  }
-
-  // Generate a random password
-  const password = generateRandomPassword();
-
-  function generateRandomPassword() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const length = 8;
-  let password = '';
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    password += characters.charAt(randomIndex);
-  }
-
-  return password;
-}
-
-      // Create username based on status and name
-      const username = abbreviatedRole + firstName.charAt(0).toUpperCase() + lastName;
-      const usersCollection = collection(db, 'usersCTMEU');
-
-      const userQuery = query(usersCollection, where('username', '==', username));
-
-
-getDocs(userQuery)
-  .then((querySnapshot) => {
-    if (!querySnapshot.empty) {
-      const docSnapshot = querySnapshot.docs[0];
-      const userData = docSnapshot.data();
-      const role = userData.role;
-      const firstName = userData.firstName;
-      const lastName = userData.lastName;
-
-      // Check if the status is "Enforcer"
-      if (role === 'Enforcer') {
-  // Get all elements with class "noEnforcers"
-  const specialButtons = document.querySelectorAll('.noEnforcers');
-
-  // Loop through each element and hide it
-  specialButtons.forEach((button) => {
-    button.style.display = 'none';
-  });
-}
-     else {
-      console.error('User document not found');
-    }// Display the logged-in user's credentials
-      const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
-      // Display the logged-in user's credentials
-      const fnameText = document.getElementById('fname-text');
-      fnameText.textContent = `First Name: ${firstName}`;
-      const lnameText = document.getElementById('lname-text');
-      lnameText.textContent = `Last Name: ${lastName}`;
-      const statText = document.getElementById('stat-text');
-      statText.textContent = `Role: ${role}`;
-    } else {
-      console.error('User document not found');
-    }
-  })
-  .catch((error) => {
-    console.error('Error retrieving user document:', error);
-  });
-      
-
-      const usernameQuery = query(usersCollection, where('username', '==', username));
-      
-
-       // Fetch "IT Administrator" users and "Super Administrator" users and check the count
-  const itAdminQuery = query(usersCollection, where('role', '==', 'IT Administrator'));
-  const superAdminQuery = query(usersCollection, where('role', '==', 'Super Administrator'));
-
-
-      Promise.all([getDocs(itAdminQuery), getDocs(superAdminQuery)])
-    .then(([itAdminSnapshot, superAdminSnapshot]) => {
-      if (role === 'IT Administrator' && itAdminSnapshot.size >= 4) {
-        alert('Maximum number of IT Administrators reached');
-        return;
-      }
-
-      if (role === 'Super Administrator' && superAdminSnapshot.size >= 2) {
-        alert('Maximum number of Super Administrators reached');
-        return;
-      }
-
-      getDocs(usernameQuery)
-      .then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          // If username does not exist, add the new document
-          addDoc(usersCollection, {
-            firstName: firstName,
-            lastName: lastName,
-            role: role,
-            username: username,
-            password: password,
-            startTicket: role === 'Enforcer' ? Number(startTicket) : null,
-            endTicket: role === 'Enforcer' ? Number(endTicket) : null,
-          })
-            .then(() => {
-              alert('User created successfully!');
-              // Reset form
-              form.reset();
-              location.reload();
-              
-            })
-            .catch((error) => {
-              console.error('Error creating user:', error);
-            });
-        } else {
-          // If username exists, update the existing document
-          if (selectedRowUid) {
-            updateAccount(selectedRowUid, firstName, lastName, status, username, password, startTicket, endTicket);
-          } else {
-            console.error('Error: UID not provided for updating user');
-          }
+        // Generate the username based on the role and camel-casing
+        if (role === 'Super Administrator') {
+            username = 'sua' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+        } else if (role === 'IT Administrator') {
+            username = 'its' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+        } else if (role === 'Enforcer') {
+            username = 'enf' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
         }
-      })
-      .catch((error) => {
-        console.error('Error checking username:', error);
-      });
-    })
-    .catch((error) => {
-      console.error('Error fetching users:', error);
-    });
+
+        // Set the username and password fields
+        document.getElementById('username').value = username;
+    }
+
+    // Add an event listener to the registration form to set the credentials
+    document.getElementById('registration-form').addEventListener('submit', setCredentials);
+</script>
   
-    });
-
-    // Check if user is logged in
-    const isLoggedIn = sessionStorage.getItem('username') !== null;
-
-    if (isLoggedIn) {
-      // Get the username from the session storage
-      const username = sessionStorage.getItem('username');
-
-      // Get the user document from Firestore
-const usersCollection = collection(db, 'usersCTMEU');
-const userQuery = query(usersCollection, where('username', '==', username));
-
-
-getDocs(userQuery)
-  .then((querySnapshot) => {
-    if (!querySnapshot.empty) {
-      const docSnapshot = querySnapshot.docs[0];
-      const userData = docSnapshot.data();
-      const role = userData.role;
-      const firstName = userData.firstName;
-      const lastName = userData.lastName;
-
-      // Check if the status is "Enforcer"
-      if (role === 'Enforcer') {
-  // Get all elements with class "noEnforcers"
-  const specialButtons = document.querySelectorAll('.noEnforcers');
-
-  // Loop through each element and hide it
-  specialButtons.forEach((button) => {
-    button.style.display = 'none';
-  });
-}
-     else {
-      console.error('User document not found');
-    }
-    
-      // Display the logged-in user's credentials
-      const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
-      // Display the logged-in user's credentials
-      const fnameText = document.getElementById('fname-text');
-      fnameText.textContent = `First Name: ${firstName}`;
-      const lnameText = document.getElementById('lname-text');
-      lnameText.textContent = `Last Name: ${lastName}`;
-      const statText = document.getElementById('stat-text');
-      statText.textContent = `Role: ${role}`;
-    } else {
-      console.error('User document not found');
-    }
-  })
-  .catch((error) => {
-    console.error('Error retrieving user document:', error);
-  });
-
-
-      // Logout button
-      const logoutButton = document.getElementById('logout-button');
-      logoutButton.addEventListener('click', () => {
-        // End session
-        sessionStorage.removeItem('username');
-
-        // Redirect back to the login page (replace "login.html" with the actual login page)
-        window.location.href = 'index.php';
-      });
-    } else {
-      // User is not logged in, redirect to the login page
-      window.location.href = 'index.php';
-    }
-
-    // Fetch user data from Firestore
-    const fetchUserData = async () => {
-    const usersCollection = collection(db, 'usersCTMEU');
-    const querySnapshot = await getDocs(usersCollection);
-    const userData = [];
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const { firstName, lastName, password, role, username } = data;
-      userData.push({ firstName, lastName, password, role, username, uid: doc.id });
-    });
-
-    return userData;
-  };
-
-    // Function to display user data in the table
-  const displayUserData = async () => {
-    const userData = await fetchUserData();
-    const tableBody = document.querySelector('#user-table tbody');
-
-    userData.forEach((user) => {
-      const row = document.createElement('tr');
-      const { firstName, lastName, password, role, username, startTicket, endTicket, uid } = user; // Retrieve the 'uid' from the user object
-
-        const firstNameCell = document.createElement('td');
-        firstNameCell.textContent = firstName;
-
-        const lastNameCell = document.createElement('td');
-        lastNameCell.textContent = lastName;
-
-        const passwordCell = document.createElement('td');
-        passwordCell.textContent = password;
-
-        const roleCell = document.createElement('td');
-        roleCell.textContent = role;
-
-        const usernameCell = document.createElement('td');
-        usernameCell.textContent = username;
-
-        const startTicketCell = document.createElement('td');
-
-        const endTicketCell = document.createElement('td');
-
-        // Check if the user is an enforcer and has startTicket and endTicket properties
-    if (role === 'Enforcer' && typeof startTicket === 'number' && typeof endTicket === 'number') {
-      startTicketCell.textContent = startTicket;
-      endTicketCell.textContent = endTicket;
-    } else {
-      startTicketCell.textContent = ''; // Set to an empty string if not applicable
-      endTicketCell.textContent = ''; // Set to an empty string if not applicable
-    }
-
-        row.appendChild(firstNameCell);
-        row.appendChild(lastNameCell);
-        row.appendChild(usernameCell);
-        row.appendChild(passwordCell);
-        row.appendChild(roleCell);
-
-        tableBody.appendChild(row);
-
-        row.setAttribute('data-uid', uid); // Set the data-uid attribute to store the user's uid
-        
-      });
-    };
-
-    // Call the function to display user data
-    displayUserData();
-
-    
-
-// Function to delete a user from the table and database
-function deleteUser(username) {
-    const tableBody = document.querySelector('#user-table tbody');
-    const rows = tableBody.getElementsByTagName('tr');
-    let rowIndexToDelete = -1;
-
-    // Find the index of the row to delete
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.cells[2].textContent === username) {
-        rowIndexToDelete = i;
-        break;
-      }
-    }
-
-    if (rowIndexToDelete !== -1) {
-      // Remove the row from the table
-      tableBody.removeChild(rows[rowIndexToDelete]);
-
-      // Delete the user document from Firestore
-      deleteUserDocument(username);
-    }
-  }
-
-    
-// Function to delete a user document
-function deleteUserDocument(username) {
-    // Create a reference to the 'usersCTMEU' collection
-    const usersCollection = collection(db, 'usersCTMEU');
-
-    // Create a query to find the document with the provided username
-    const queryToDelete = query(usersCollection, where('username', '==', username));
-    
-    getDocs(queryToDelete)
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          // Delete the document from Firestore
-          const docSnapshot = querySnapshot.docs[0];
-          const docRef = doc(usersCollection, docSnapshot.id);
-          return deleteDoc(docRef);
-        } else {
-          console.error('Error: Account not found.');
-        }
-      })
-      .then(() => {
-        alert('Account deleted successfully.');
-        // Refresh the page to show the updated user data
-        location.reload();
-      })
-      .catch((error) => {
-        console.error('Error deleting account:', error);
-      });
-}
-
-  // Add an event listener to the "Delete" button
-  document.getElementById('delete-button').addEventListener('click', function (event) {
-    const username = selectedRow.cells[2].textContent;
-    if (confirm("Are you sure you want to delete the account for username: " + username + "?")) {
-      // Call the function to delete the user from the table and the database
-      deleteUser(username);
-
-      // Clear the form fields and hide the buttons after deletion
-      clearFormFields();
-    }
-  });
-
-  
-// Add an event listener to the "Update" button
-document.getElementById('update-button').addEventListener('click', function (event) {
-    event.preventDefault(); // Prevent form submission
-
-    // Get form values
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const role = document.getElementById('role').value;
-    const startTicket = document.getElementById('startTicketInput').value;
-    const endTicket = document.getElementById('endTicketInput').value;
-
-    // Create abbreviated status
-    let abbreviatedRole = '';
-    if (role === 'Enforcer') {
-      abbreviatedRole = 'enf';
-    } else if (role === 'IT Administrator') {
-      abbreviatedRole = 'ita';
-    } else if (role === 'Super Administrator') {
-      abbreviatedRole = 'sua';
-    }
-
-    // Create username based on status and name
-    const username = abbreviatedRole + firstName.charAt(0).toUpperCase() + lastName;
-
-    // Create a reference to the 'usersCTMEU' collection
-    const usersCollection = collection(db, 'usersCTMEU');
-
-    // Create a query to find the document with the selectedRowUid
-    const queryToUpdate = query(usersCollection, where('__name__', '==', selectedRowUid));
-
-    // Fetch the existing document data from Firestore
-    getDocs(queryToUpdate)
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          const docSnapshot = querySnapshot.docs[0];
-          const existingData = docSnapshot.data();
-          const existingPassword = existingData.password; // Preserve the existing password
-
-          // Update the document with the new data, preserving the existing password
-          return updateDoc(doc(usersCollection, docSnapshot.id), {
-            firstName: firstName,
-            lastName: lastName,
-            role: role,
-            username: username,
-            password: existingPassword, // Use the existing password instead of generating a new one
-            startTicket: role === 'Enforcer' ? Number(startTicket) : null,
-            endTicket: role === 'Enforcer' ? Number(endTicket) : null,
-          });
-        } else {
-          console.error('Error: Account not found.');
-        }
-      })
-      .then(() => {
-        alert('Account updated successfully.');
-        // Clear the form fields and hide the buttons after updating
-        clearFormFields();
-        // Refresh the page to show the updated user data
-        location.reload();
-      })
-      .catch((error) => {
-        console.error('Error updating account:', error);
-      });
-  });
-    
-  </script>
   <script>
     
 
@@ -598,7 +281,7 @@ document.getElementById('update-button').addEventListener('click', function (eve
   function populateFormFields(row) {
     const firstName = row.cells[0].textContent;
       const lastName = row.cells[1].textContent;
-      const role = row.cells[4].textContent; // Status is in the 5th cell (index 4)
+      const role = row.cells[3].textContent; // Status is in the 5th cell (index 4)
       /*const startTicket = row.cells[5].textContent; // Start Ticket is in the 6th cell (index 5)
       const endTicket = row.cells[6].textContent; */
 
@@ -614,30 +297,16 @@ document.getElementById('update-button').addEventListener('click', function (eve
       }
     }
 
-    // Show/hide ticket fields based on the selected status
-    showHideTicketFields();
 
     
   }
 
-  // Function to show/hide ticket fields based on the selected status
-  function showHideTicketFields() {
-    const role = document.getElementById('role').value;
-    const ticketContainer = document.querySelector('.ticket-container');
-
-    if (role === 'Enforcer') {
-    ticketContainer.style.display = 'block';
-    document.getElementById('startTicketInput').required = true;
-    document.getElementById('endTicketInput').required = true;
-  } else {
-    ticketContainer.style.display = 'none';
-    document.getElementById('startTicketInput').required = false;
-    document.getElementById('endTicketInput').required = false;
-  }
-  }
-
-
-
+// Add a click event listener to the logout button
+document.getElementById('logout-button').addEventListener('click', function() {
+        // Perform logout actions here, e.g., clearing session, redirecting to logout.php
+        // You can use JavaScript to redirect to the logout.php page.
+        window.location.href = 'php/logout.php';
+    });
 
   // Add click event listener to the table rows instead of individual cells
   document.getElementById('user-table').addEventListener('click', function (event) {
@@ -652,7 +321,7 @@ document.getElementById('update-button').addEventListener('click', function (eve
       populateFormFields(row);
 
       // Show the "Update Account" button and "Delete" button
-      document.getElementById('submit-button').style.display = 'none';
+      document.getElementById('create-button').style.display = 'none';
       document.getElementById('update-button').style.display = 'inline-block';
       document.getElementById('delete-button').style.display = 'inline-block';
 
@@ -661,7 +330,7 @@ document.getElementById('update-button').addEventListener('click', function (eve
     } else {
       // Clear the form fields and hide the buttons
       clearFormFields();
-      document.getElementById('submit-button').style.display = 'inline-block';
+      document.getElementById('create-button').style.display = 'inline-block';
       document.getElementById('update-button').style.display = 'none';
       document.getElementById('delete-button').style.display = 'none';
 
@@ -700,9 +369,9 @@ document.getElementById('update-button').addEventListener('click', function (eve
     // Function to clear the form fields
     function clearFormFields() {
     selectedRow = null;
-    document.getElementById("signup-form").reset();
-    document.getElementById("submit-button").textContent = "Create Account";
-    document.getElementById("submit-button").style.display = "inline-block";
+    document.getElementById("registration-form").reset();
+    document.getElementById("create-button").textContent = "Create Account";
+    document.getElementById("create-button").style.display = "inline-block";
     document.getElementById("update-button").style.display = "none";
     document.getElementById("delete-button").style.display = "none";
   }
@@ -718,7 +387,7 @@ document.getElementById('update-button').addEventListener('click', function (eve
   if (selectedRow !== row) {
     populateFormFields(row);
     selectedRow = row;
-    document.getElementById("submit-button").textContent = "Update";
+    document.getElementById("create-button").textContent = "Update";
     document.getElementById("delete-button").style.display = "inline-block";
   } else {
     clearFormFields();
@@ -735,7 +404,7 @@ function validateInput(input) {
   }
 
     
-
+/*
     function showHideTicketFields() {
     const role = document.getElementById('role').value;
     const ticketContainer = document.querySelector('.ticket-container');
@@ -752,7 +421,163 @@ function validateInput(input) {
 
 // Call the show/hide function initially to set the correct display on page load
 showHideTicketFields();
+*/
 
+// Check if the user is logged in and update the welcome message
+<?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+        var role = '<?php echo $_SESSION['role']; ?>';
+        var firstName = '<?php echo $_SESSION['first_name']; ?>';
+        var lastName = '<?php echo $_SESSION['last_name']; ?>';
+
+        document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+    <?php } ?>
+
+     // Check if a user with the same first name, last name, and role exists
+     <?php if ($updateMode) { ?>
+            // If a user exists, switch to update mode
+            document.getElementById('create-button').style.display = 'none';
+            document.getElementById('update-button').style.display = 'inline-block';
+        <?php } else { ?>
+            // If not, switch back to create mode
+            document.getElementById('create-button').style.display = 'inline-block';
+            document.getElementById('update-button').style.display = 'none';
+        <?php } ?>
+
+        // Add click event listener to the table rows instead of individual cells
+document.getElementById('user-table').addEventListener('click', function (event) {
+    // Get the clicked row and its cells
+    const row = event.target.parentElement;
+    const cells = row.cells;
+
+    // If a row is clicked and not the table header row
+    if (row && row.rowIndex > 0) {
+        selectedRowUid = row.getAttribute('data-uid');
+        // Populate form fields with the selected row data
+        populateFormFields(row);
+
+        // Show the "Delete Account" button
+        document.getElementById('create-button').style.display = 'none';
+        document.getElementById('update-button').style.display = 'none';
+        document.getElementById('delete-button').style.display = 'inline-block';
+    } else {
+        // Clear the form fields and hide the buttons
+        clearFormFields();
+        document.getElementById('create-button').style.display = 'inline-block';
+        document.getElementById('update-button').style.display = 'none';
+        document.getElementById('delete-button').style.display = 'none';
+    }
+});
+
+// Add an event listener to the "Delete Account" button
+document.getElementById('delete-button').addEventListener('click', function() {
+    // Get the user information from the form fields
+    const firstNameToDelete = document.getElementById('firstName').value;
+    const lastNameToDelete = document.getElementById('lastName').value;
+    const roleToDelete = document.getElementById('role').value;
+
+    // Check if the user is trying to delete themselves
+    if (firstNameToDelete === '<?php echo $_SESSION['first_name']; ?>' &&
+        lastNameToDelete === '<?php echo $_SESSION['last_name']; ?>' &&
+        roleToDelete === '<?php echo $_SESSION['role']; ?>') {
+        alert("You cannot delete yourself.");
+        return;
+    }
+
+    // Confirm the deletion with the user
+    if (confirm("Are you sure you want to delete this user account?")) {
+        // Perform the delete action here using an AJAX request or redirect to a PHP script that handles the deletion
+        // You can use the following code to send an AJAX request to a PHP script for deletion:
+
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'php/deleteaccount.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle the response here, e.g., show a success message
+                alert(xhr.responseText);
+                // Optionally, reload the user table or perform other actions
+            }
+        };
+        xhr.send('firstName=' + encodeURIComponent(firstNameToDelete) +
+                 '&lastName=' + encodeURIComponent(lastNameToDelete) +
+                 '&role=' + encodeURIComponent(roleToDelete));
+        
+
+        // Alternatively, you can redirect to a PHP script that handles the deletion
+        // window.location.href = 'delete_user.php?firstName=' + encodeURIComponent(firstNameToDelete) +
+        //                        '&lastName=' + encodeURIComponent(lastNameToDelete) +
+        //                        '&role=' + encodeURIComponent(roleToDelete);
+    }
+});
+
+// JavaScript code: Add a click event listener to the "Update Account" button
+document.getElementById('update-button').addEventListener('click', function() {
+    // Get the user information from the form fields
+    const firstNameToUpdate = document.getElementById('firstName').value;
+    const lastNameToUpdate = document.getElementById('lastName').value;
+    const roleToUpdate = document.getElementById('role').value;
+
+    // Check if the user is trying to update themselves
+    if (firstNameToUpdate === '<?php echo $_SESSION['first_name']; ?>' &&
+        lastNameToUpdate === '<?php echo $_SESSION['last_name']; ?>' &&
+        roleToUpdate === '<?php echo $_SESSION['role']; ?>') {
+        alert("You cannot update your own account.");
+        return;
+    }
+
+    // Optionally, add validation checks for the input data
+
+    // Send an update request to the server using AJAX or redirect to a PHP script for updating
+    // You can use a similar approach as shown in the "Delete Account" button click event
+    // ...
+
+    // After the update is successful, you can show a success message and reload the user table or perform other actions
+});
+function checkExistingData() {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const role = document.getElementById('role').value.trim();
+
+  // Get all the rows in the user table
+  const tableRows = document.querySelectorAll('#user-table tbody tr');
+
+  // Variable to track if a match is found
+  let matchFound = false;
+
+  // Loop through the table rows and compare data
+  for (const row of tableRows) {
+    const rowFirstName = row.cells[0].textContent.trim();
+    const rowLastName = row.cells[1].textContent.trim();
+    const rowRole = row.cells[3].textContent.trim();
+
+    // Check if there is a match
+    if (rowFirstName === firstName && rowLastName === lastName && rowRole === role) {
+      // Match found, set the matchFound flag to true
+      matchFound = true;
+      break; // No need to continue checking
+    }
+  }
+
+  // Get the Create and Update buttons
+  const createButton = document.getElementById('create-button');
+  const updateButton = document.getElementById('update-button');
+
+  // If a match is found, hide the Create button and show the Update button
+  if (matchFound) {
+    createButton.style.display = 'none';
+    updateButton.style.display = 'inline-block';
+  } else {
+    // If no match is found, show the Create button and hide the Update button
+    createButton.style.display = 'inline-block';
+    updateButton.style.display = 'none';
+  }
+}
+
+// Add an input event listener to each input field
+document.getElementById('firstName').addEventListener('input', checkExistingData);
+document.getElementById('lastName').addEventListener('input', checkExistingData);
+document.getElementById('role').addEventListener('input', checkExistingData);
   </script>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>

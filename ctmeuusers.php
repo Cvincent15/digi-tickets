@@ -1,8 +1,14 @@
 <?php
 session_start();
 //include 'php/database_connect.php';
-?>
 
+// Check if the user is already logged in
+if (!isset($_SESSION['username'])) {
+  // Redirect the user to the greeting page if they are already logged in
+  header("Location: index.php");
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
 <head>
@@ -25,6 +31,66 @@ session_start();
     }
 </style>
 <body style="height: auto;">
+<?php
+include 'php/database_connect.php'; // Include your database connection script
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: index.php"); // Redirect to the login page if not logged in
+    exit();
+}
+
+// Fetch user data based on the logged-in user's username
+$username = $_SESSION['username'];
+$query = "SELECT * FROM users WHERE username = '$username'";
+$result = mysqli_query($conn, $query);
+
+if (!$result) {
+    // Handle the database query error
+    die("Database query failed: " . mysqli_error($conn));
+}
+
+// Fetch the user's data
+$user = mysqli_fetch_assoc($result);
+$firstName = $user['first_name'];
+$lastName = $user['last_name'];
+$status = $user['role'];
+
+// Process password change request if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Retrieve submitted data
+  $currentPassword = $_POST['currentPassword'];
+  $newPassword = $_POST['newPassword'];
+  $confirmPassword = $_POST['confirmPassword'];
+
+  // Validate the current password (you might want to implement a more secure validation)
+  if ($currentPassword === $user['password']) {
+      if ($newPassword === $confirmPassword) {
+          // Validate the new password length
+          if (validatePasswordLength($newPassword)) {
+              // Update the user's password in the database
+              $newPassword = mysqli_real_escape_string($conn, $newPassword);
+              $updateQuery = "UPDATE users SET password = '$newPassword' WHERE username = '$username'";
+              $updateResult = mysqli_query($conn, $updateQuery);
+
+              if ($updateResult) {
+                  // Password successfully updated
+                  echo "Password updated successfully.";
+              } else {
+                  // Handle the database update error
+                  echo "Password update failed: " . mysqli_error($conn);
+              }
+          } else {
+              echo "New password should be at least 8 characters long.";
+          }
+      } else {
+          echo "New password and confirm password do not match.";
+      }
+  } else {
+      echo "Current password is incorrect.";
+  }
+}
+?>
 
 <nav class="navbar">
   <div class="logo">
@@ -88,157 +154,51 @@ session_start();
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
-    authDomain: "ctmeu-d5575.firebaseapp.com",
-    projectId: "ctmeu-d5575",
-    storageBucket: "ctmeu-d5575.appspot.com",
-    messagingSenderId: "1062661015515",
-    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
-    measurementId: "G-65PXT5618B"
-  };
-
-    // Initialize Firebase
-    initializeApp(firebaseConfig);
-    const db = getFirestore();
-
-     // Function to handle the form submission for password change
-  const handlePasswordChange = async (event) => {
-    event.preventDefault();
-
-    // Get the form input values
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
-    // Check if the new password matches the confirmed password
-    if (newPassword !== confirmPassword) {
-      alert("New password and confirm password do not match.");
-      return;
-    }
-
-    // Get the current user's username from session storage
-    const username = sessionStorage.getItem('username');
-
-    // Check if the user is logged in
-    if (!username) {
-      alert('User is not logged in.');
-      return;
-    }
-
-    // Get the user document from Firestore
-    const usersCollection = collection(db, 'usersCTMEU');
-    const userQuery = query(usersCollection, where('username', '==', username));
-
-    const querySnapshot = await getDocs(userQuery);
-    if (!querySnapshot.empty) {
-      const docSnapshot = querySnapshot.docs[0];
-      const userData = docSnapshot.data();
-      const currentPasswordFromDb = userData.password;
-
-      // Check if the entered current password matches the stored current password
-      if (currentPassword !== currentPasswordFromDb) {
-        alert('Current password is incorrect.');
-        return;
-      }
-
-      // If everything is valid, update the password in Firestore
-      try {
-        await updateDoc(doc(usersCollection, docSnapshot.id), { password: newPassword });
-        alert('Password changed successfully.');
-        // Clear the form fields
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-      } catch (error) {
-        console.error('Error updating password:', error);
-        alert('An error occurred while updating the password.');
-      }
-    } else {
-      alert('User document not found.');
-    }
-  };
-
-  // Add a form submit event listener
-  const passwordChangeForm = document.getElementById('passwordChangeForm');
-  passwordChangeForm.addEventListener('submit', handlePasswordChange);
-
-    // Check if user is logged in
-    const isLoggedIn = sessionStorage.getItem('username') !== null;
-
-    if (isLoggedIn) {
-      // Get the username from the session storage
-      const username = sessionStorage.getItem('username');
-
-      // Get the user document from Firestore
-const usersCollection = collection(db, 'usersCTMEU');
-const userQuery = query(usersCollection, where('username', '==', username));
-
-
-getDocs(userQuery)
-  .then((querySnapshot) => {
-    if (!querySnapshot.empty) {
-      const docSnapshot = querySnapshot.docs[0];
-      const userData = docSnapshot.data();
-      const role = userData.role;
-      const firstName = userData.firstName;
-      const lastName = userData.lastName;
-
-      // Check if the status is "Enforcer"
-      if (role === 'Enforcer') {
-  // Get all elements with class "noEnforcers"
-  const specialButtons = document.querySelectorAll('.noEnforcers');
-
-  // Loop through each element and hide it
-  specialButtons.forEach((button) => {
-    button.style.display = 'none';
-  });
+<script>
+  function validatePasswordLength($password) {
+    return strlen($password) >= 8;
 }
-     else {
-      console.error('User document not found');
-    }
-    
-      // Display the logged-in user's credentials
-      const welcomeText = document.getElementById('welcome-text');
-      welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
-      // Display the logged-in user's credentials
-      const fnameText = document.getElementById('fname-text');
-      fnameText.textContent = `First Name: ${firstName}`;
-      const lnameText = document.getElementById('lname-text');
-      lnameText.textContent = `Last Name: ${lastName}`;
-      const statText = document.getElementById('stat-text');
-      statText.textContent = `Role: ${role}`;
-    } else {
-      console.error('User document not found');
-    }
-  })
-  .catch((error) => {
-    console.error('Error retrieving user document:', error);
-  });
 
+  $(document).ready(function () {
+    // Display user data in placeholders
+    $('#fname-text').text("First Name: " + '<?php echo $firstName; ?>');
+    $('#lname-text').text("Last Name: " + '<?php echo $lastName; ?>');
+    $('#stat-text').text("Role: " + '<?php echo $status; ?>');
 
-      // Logout button
-      const logoutButton = document.getElementById('logout-button');
-      logoutButton.addEventListener('click', () => {
-        // End session
-        sessionStorage.removeItem('username');
+    // Handle the password change form submission
+    $('#passwordChangeForm').submit(function (e) {
+        e.preventDefault();
+        var currentPassword = $('#currentPassword').val();
+        var newPassword = $('#newPassword').val();
+        var confirmPassword = $('#confirmPassword').val();
 
-        // Redirect back to the login page (replace "login.html" with the actual login page)
-        window.location.href = 'index.php';
-      });
-    } else {
-      // User is not logged in, redirect to the login page
-      window.location.href = 'index.php';
-    }
+        // Send a POST request to your PHP script to process the password change
+        $.post('php/password_change.php', {
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            confirmPassword: confirmPassword
+        }, function (data) {
+            // Display the result of the password change operation
+            alert(data);
+        });
+    });
+});
+
+// Add a click event listener to the logout button
+document.getElementById('logout-button').addEventListener('click', function() {
+        // Perform logout actions here, e.g., clearing session, redirecting to logout.php
+        // You can use JavaScript to redirect to the logout.php page.
+        window.location.href = 'php/logout.php';
+    });
+
+    // Check if the user is logged in and update the welcome message
+    <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+        var role = '<?php echo $_SESSION['role']; ?>';
+        var firstName = '<?php echo $_SESSION['first_name']; ?>';
+        var lastName = '<?php echo $_SESSION['last_name']; ?>';
+
+        document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+    <?php } ?>
 </script>
 </body>
 </html>
