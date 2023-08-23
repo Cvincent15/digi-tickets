@@ -1,262 +1,155 @@
-html body {
+*{
+    font-family: 'Inter';
+}
+
+.masthead{
     background-size: cover;
-    background-attachment: fixed;
-    font-family: 'Open Sans','Helvetica Neue','Segoe UI',Helvetica,Arial,sans-serif;
-}
-
-body .__bgImage {
-    background-image: url("../images/motoristbg.jpg")!important;
-    background-size: 100vw 100vh;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
-    backface-visibility: hidden;
-    position: fixed;
-    top: -10em;
-    bottom: -10em;
-    left: -10em;
-    right: -10em;
-    transition: all .2s linear;
-}
-header .t-Header-logo {
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 2.2rem;
-}
-
-.t-Header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background-color: #A4040A !important;
-    border: none;
-    z-index: 800;
-  }
-
-.t-Header-logo{
-    justify-content: flex-end;
-    align-items: center;
-}
-
-.t-Header-logo-link {
-    padding: 4px 8px;
-    vertical-align: top;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-  
-  .t-Header-branding {
-    height: 68px;
+    min-height: 93vh;
+    min-width: 100vh;
     position: relative;
-    z-index: 795;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    color: white;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
 }
 
 
 
-  .t-Header-navBar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    text-align: right;
-    flex-shrink: 0;
-    margin-right: 8px;
+h1 {
+    padding-top: 10px !important;
+    font-family: 'Inter';
+}
+
+h3{
+    margin: 10px !important;
+    font-weight: lighter !important;
+}
+
+h4{
+    padding-top: 60px !important;
+    font-weight: normal !important;
+}
+
+.btn-success {
+    margin: 40px !important;
+}
+
+.color-overlay{
+    position: absolute;
+    width: 100%;
     height: 100%;
 }
 
-dl, ol, ul {
-    margin-top: 0;
-    margin-bottom: 0;
-}
+/* Custom styles for transparent buttons */
+        
+        #signUpForm {
+            max-width: 500px;
+            background-color: #ffffff;
+            margin: 40px auto;
+            padding: 40px;
+        }
+        #signUpForm .form-header {
+            gap: 5px;
+            text-align: center;
+            font-size: .9em;
+        }
+        #signUpForm .form-header .stepIndicator {
+            position: relative;
+            flex: 1;
+            padding-bottom: 30px;
+        }
+        #signUpForm .form-header .stepIndicator.active {
+            font-weight: 600;
+            padding-bottom: 60px;
+        }
+        #signUpForm .form-header .stepIndicator.finish {
+            font-weight: 600;
+            color: #009688;
+        }
+        #signUpForm .form-header .stepIndicator::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            z-index: 9;
+            width: 20px;
+            height: 20px;
+            background-color: #d5efed;
+            border-radius: 50%;
+            border: 3px solid #ecf5f4;
+        }
+        #signUpForm .form-header .stepIndicator.active::before {
+            background-color: #a7ede8;
+            border: 3px solid #d5f9f6;
+        }
+        #signUpForm .form-header .stepIndicator.finish::before {
+            background-color: #009688;
+            border: 3px solid #b7e1dd;
+        }
+        #signUpForm .form-header .stepIndicator::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            width: 100%;
+            height: 3px;
+            background-color: #f3f3f3;
+        }
+        #signUpForm .form-header .stepIndicator.active::after {
+            background-color: #a7ede8;
+        }
+        #signUpForm .form-header .stepIndicator.finish::after {
+            background-color: #009688;
+        }
+        #signUpForm .form-header .stepIndicator:last-child:after {
+            display: none;
+        }
+        #signUpForm input {
+            padding: 15px 20px;
+            width: 100%;
+            font-size: 1em;
+            border: 1px solid #e3e3e3;
+            border-radius: 5px;
+        }
+        #signUpForm input:focus {
+            border: 1px solid #009688;
+            outline: 0;
+        }
+        #signUpForm input.invalid {
+            border: 1px solid #ffaba5;
+        }
+        #signUpForm .step {
+          display: none;
+        }
+        #signUpForm .form-footer{
+            overflow:auto;
+            gap: 20px;
+        }
+        #signUpForm .form-footer button{
+            background-color: #009688;
+            border: 1px solid #009688 !important;
+            color: #ffffff;
+            border: none;
+            padding: 13px 30px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            flex: 1;
+            margin-top: 5px;
+        }
+        #signUpForm .form-footer button:hover {
+          opacity: 0.8;
+        }
+        
+        #signUpForm .form-footer #prevBtn {
+            background-color: #fff;
+            color: #009688;
+        }
 
-.t-Header-logo-link img {
-    max-height: 4rem;
-    display: block;
-}
+        .row.min-vh-100.justify-content-center.align-items-center {
+            min-height: 80vh!important;
+        }
 
-li {
-    font-size: 1.4rem;
-    line-height: 2rem;
-    
-}
-
-.t-NavigationBar-item {
-    display: inline-block;
-    vertical-align: top;
-    
-}
-
-header .t-NavigationBar-item .t-Button {
-    text-transform: uppercase;
-    font-size: 1.5rem;
-    height: 68px;
-    padding-left: 5px;
-    padding-right: 5px;
-    position: relative;
-    text-decoration: none !important;
-}
-
-.t-Header-logo, .t-Header .t-Button--header.is-active, .t-Header .t-Button--header {
-    color: #ffffff;
-}
-
-
-.t-Body-contentInner:before {
-    content: "";
-    background-color: rgba(164, 4, 9,.75);
-    position: absolute;
-    left: 2rem;
-    bottom: 2rem;
-    right: 2rem;
-    top: 0;
-}
-
-.t-Body-contentInner {
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding-top: 4rem;
-    margin: 0 auto;
-    max-width: 100%;
-    padding: 16px;
-    flex-grow: 1;
-    width: 100%;
-}
-
-.t-Body-contentInner>.container {
-    padding-bottom: 80px;
-}
-
-.col .rel-col:after, .col .rel-col:before, .container:after, .container:before, .row:after, .row:before {
-    content: " ";
-    display: table;
-}
-
-.content__center {
-    display: flex;
-    flex-direction: column;
-    height: 80vh;
-    justify-content: center;
-    text-align: center;
-}
-
-.col {
-    float: left;
-    padding-right: 8px;
-    padding-left: 8px;
-    position: relative;
-}
-
-#content .logos img {
-    padding: 20px;
-    height: 250px;
-}
-
-
-
-.row {
-    margin-right: -8px;
-    margin-left: -8px;
-}
-
-.page__loaded .content__center h1, .page__loaded .content__center h3, .page__loaded .logo {
-    opacity: 1;
-    transform: scale(1,1);
-}
-
-.__greeting h1, .__greeting h3, .content__center h3, .logo {
-    transition: .5s ease-in-out;
-    opacity: 0;
-    transform: scale(.8,.8);
-}
-
-h1 {
-    font-size: 8rem;
-}
-
-#content {
-    color: white;
-}
-
-.content__center h3 {
-    font-size: 3em;
-    font-weight: 300;
-}
-
-#content button.login-button, #content button.register-button {
-    transition: background .4s ease-in-out,border .4s ease-in-out,color .4s ease-in-out,.4s ease-in-out;
-}
-
-
-#content button.t-Button--large {
-    font-size: 2rem;
-    border-radius: 1rem!important;
-    padding: 0.5em 2em;
-    box-shadow: none;
-}
-
-#content .register-button {
-    color: white;
-    border: solid 0.5px #e10017;
-    border-radius: 5px;
-    padding: 15px 50px;
-    background-color: #e10017;
-}
-
-#content button {
-    font-size: 34px;
-    font-weight: 600;
-    margin: 0 30px;
-    line-height: 2;
-}
-
-.page__landing.page__loaded .btn__animate, .page__landing.page__loaded .t-Cards-item {
-    opacity: 1;
-    transform: translate(0,0);
-}
-
-.t-Button {
-    background: 0 0;
-    background-clip: padding-box;
-    border: 0.1rem solid;
-    cursor: pointer;
-    display: inline-block;
-    font: inherit;
-    margin: 0;
-    text-align: center;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    vertical-align: middle;
-}
-
-.t-BreadcrumbRegion--useBreadcrumbTitle .t-Breadcrumb-item:last-child, .t-Button {
-    position: relative;
-}
-
-.col, .grid-debug-on .container, .grid-debug-on .row, .t-Header-branding, .t-HeroRegion {
-    position: relative;
-}
-
-header .t-NavigationBar-item .t-Button {
-    text-transform: uppercase;
-    font-size: 1.5rem;
-    height: 68px;
-    padding: 24px 10px;
-    position: relative;
-}
-
-h1 {
-    font-weight: 300;
-    font-size: 10rem !important;
-    margin: 0;
-}
+        .col.login {
+            background-color: white;
+            color: black;
+        }
