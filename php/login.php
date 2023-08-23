@@ -40,21 +40,27 @@ if ($result && mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
 
     // Extract the required information
-    $name = $row['name'];
-    $status = $row['status'];
-    $_SESSION['name'] = $name;
-    $_SESSION['status'] = $status;
+    $fname = $row['first_name'];
+    $lname = $row['last_name'];
+    $status = $row['role'];
+    $_SESSION['first_name'] = $fname;
+    $_SESSION['last_name'] = $lname;
+    $_SESSION['role'] = $status;
 
-    if($_SESSION['status'] == 'Enforcer'){
+    $_SESSION['username'] = $username;
+    
+
+    if($_SESSION['role'] == 'Enforcer'){
         header('Location: ../ctmeuactlogs.php');
     }
     else{
+        
         header('Location: ../ctmeupage.php');
-    exit();
     }
 } else {
     // Display an error message if the user was not found
     echo "User not found.";
+    header('Refresh: 1; URL= ../index.php');
 }
 
 // Close the statement and connection

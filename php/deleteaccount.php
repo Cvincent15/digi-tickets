@@ -1,62 +1,50 @@
-<script>
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+<?php
+// Start the session to access user information
+session_start();
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
-  authDomain: "ctmeu-d5575.firebaseapp.com",
-  databaseURL: "https://ctmeu-d5575-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "ctmeu-d5575",
-  storageBucket: "ctmeu-d5575.appspot.com",
-  messagingSenderId: "1062661015515",
-  appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
-  measurementId: "G-65PXT5618B"
-};
+/*
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    // Redirect to the login page or perform other actions if the user is not logged in
+    header("Location: ../index.php"); // Change "login.php" to your actual login page
+    exit();
+}
+*/
 
- // Initialize Firebase
- initializeApp(firebaseConfig);
-  const db = getFirestore();
+// Include your database connection code here
+include 'database_connect.php';
 
-  // Function to delete a user document
-  function deleteUserDocument(username) {
-    // Create a reference to the 'usersCTMEU' collection
-    const usersCollection = collection(db, 'usersCTMEU');
+// Check if the request method is POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the user information to be deleted from the POST request
+    $firstNameToDelete = $_POST['firstName'];
+    $lastNameToDelete = $_POST['lastName'];
+    $roleToDelete = $_POST['role'];
 
-    // Query the Firestore collection to find the document with the provided username
-    const query = where('username', '==', username);
-    getDocs(query(usersCollection))
-      .then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          // Delete the document from Firestore
-          const docSnapshot = querySnapshot.docs[0];
-          const docRef = doc(usersCollection, docSnapshot.id);
-          return deleteDoc(docRef);
-        } else {
-          console.error('Error: Account not found.');
-        }
-      })
-      .then(() => {
-        console.log('Account deleted successfully.');
-        // Redirect back to the same page
-        window.location.href = window.location.href;
-      })
-      .catch((error) => {
-        console.error('Error deleting account:', error);
-      });
-  }
-
-  // Add an event listener to the "Delete" button
-  document.getElementById('delete-button').addEventListener('click', function (event) {
-    const username = document.getElementById('username').value;
-    if (confirm("Are you sure you want to delete the account for username: " + username + "?")) {
-      // Call the function to delete the user document
-      deleteUserDocument(username);
+    // Check if the user is trying to delete themselves
+    if ($firstNameToDelete === $_SESSION['first_name'] &&
+        $lastNameToDelete === $_SESSION['last_name'] &&
+        $roleToDelete === $_SESSION['role']) {
+        echo "You cannot delete yourself.";
+        exit();
     }
-  });
 
-</script>
+    // Prepare and execute an SQL statement to delete the user account
+    $sql = "DELETE FROM users WHERE first_name = ? AND last_name = ? AND role = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $firstNameToDelete, $lastNameToDelete, $roleToDelete);
+
+    if ($stmt->execute()) {
+        // Deletion was successful
+        echo "User account deleted successfully.";
+        header("Location: ../ctmeucreate.php"); // Change "error.php" to your actual error page
+    }
+    // Close the database connection
+    $stmt->close();
+    $conn->close();
+} else {
+    // If the request method is not POST, redirect to an error page or perform other actions
+    header("Location: error.php"); // Change "error.php" to your actual error page
+    exit();
+}
+?>

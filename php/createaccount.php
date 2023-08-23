@@ -1,14 +1,16 @@
 <?php
 session_start();
-include 'fetchaccounts.php';
 include 'database_connect.php';
 
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST["name"];
     $username = $_POST["username"];
-    $password = $_POST["password"];
+    $password = "password123"; // Set the default password
     $status = $_POST["status"];
+
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Check if the username already exists in the database
     $checkQuery = "SELECT * FROM users WHERE username = ?";
@@ -21,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Username already exists, perform an update instead of insert
         $updateQuery = "UPDATE users SET name = ?, password = ?, status = ? WHERE username = ?";
         $updateStatement = $conn->prepare($updateQuery);
-        $updateStatement->bind_param("ssss", $name, $password, $status, $username);
+        $updateStatement->bind_param("ssss", $name, $hashedPassword, $status, $username);
 
         if ($updateStatement->execute()) {
             echo "Account updated successfully.";
@@ -35,10 +37,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Username doesn't exist, perform an insert
         $insertQuery = "INSERT INTO users (name, username, password, status) VALUES (?, ?, ?, ?)";
         $insertStatement = $conn->prepare($insertQuery);
-        $insertStatement->bind_param("ssss", $name, $username, $password, $status);
+        $insertStatement->bind_param("ssss", $name, $username, $hashedPassword, $status);
 
         if ($insertStatement->execute()) {
-            echo "New account created successfully.";
+            // Account created successfully, display an alert with the username and default password
+            echo "<script>alert('New account created successfully. Username: $username, Default Password: $password');</script>";
         } else {
             echo "Error creating account: " . $insertStatement->error;
         }
