@@ -39,35 +39,19 @@
 
 <div class="masthead" style="background-image: url('./images/mainbg.png');">
 <div class="container min-vh-100 text-center justify-content-center align-items-center">
-  <div class="row">
-    <div class="col">
-      <h4>City Traffic Management and Enforcement Unit</h4>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <h1>Motorist Portal</h1>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <img src="./images/ctmeu.png">
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <h3>A front line government agency showcasing fast and efficient public service for a progressive land transport sector</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-    <button type="button" class="btn btn-success btn-lg" style="background-color: #5CBA13;" onclick="redirectToRegister()">Register</button>
-        <button type="button" class="btn btn-outline-light btn-lg" onclick="redirectToLogin()">Log In</button>
-    </div>
+<div class="row min-vh-100 justify-content-center align-items-center">
+  <div class="col">
+    <h1 style="font-size:60px;">Welcome, User</h1></br>
+    <h2>What would you like to do?</h2> </br>
+    <button type="button" class="btn btn-light"><img src="./images/Vector.png"></br>Profile</button>
+    <button type="button" class="btn btn-light"><img src="./images/alternatecard.png"></br>Digital ID</button>
+    <button type="button" class="btn btn-light"><img src="./images/alternateinvoice.png"></br>Transactions</button> </br></br>
+    <button type="button" class="btn btn-light"><img src="./images/gavel.png"></br>Violations</button>
+    <button type="button" class="btn btn-light"><img src="./images/alternate_file.png"></br>Documents</button>
   </div>
 </div>
 </div>
-    </div>
+</div>
 
     <script>
     function redirectToRegister() {
