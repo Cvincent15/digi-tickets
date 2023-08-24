@@ -1,55 +1,38 @@
 <?php
-session_start();
+// Include your database connection code here
+include 'php/database_connect.php';
+
+// Check if the form data has been submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve user input from the form and trim it
+    $firstName = trim($_POST["firstName"]);
+    $lastName = trim($_POST["lastName"]);
+    $role = trim($_POST["role"]);
+    $username = trim($_POST["username"]);
+    
+    // Set the default password for everyone
+    $password = "password123";
+
+    // Hash the password (for security)
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Prepare an SQL statement to insert the user data into the database
+    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, role, username, password) VALUES (?, ?, ?, ?, ?)");
+
+    // Bind the parameters to the statement
+    $stmt->bind_param("sssss", $firstName, $lastName, $role, $username, $hashedPassword);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        // Registration successful
+        header('Location: ctmeucreate.php');
+    } else {
+        // Registration failed
+        echo "Error: " . $stmt->error;
+    }
+
+    // Close the statement and database connection
+    $stmt->close();
+    $conn->close();
+}
 ?>
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-
-            <?php
-            if(isset($_SESSION['status']))
-            {
-                echo "<h5 class='alert alert-success'>" .$_SESSION['status']."</h5>";
-                unset($_SESSION['status']);
-            }
-            ?>
-
-            <div class="card">
-                <div class="card-header">
-                    <h4>
-                        Registration
-                        <a href="index.php" class="btn btn-danger float-end">BACK</a>
-                    </h4>
-                </div>
-                <div class="card-body">
-
-                <form action="code.php" method="POST">
-
-                <div class="form-group mb-3">
-                    <label for="">Full Name</label>
-                    <input type="text" name="full_name" class="form-control">
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="">Phone No.</label>
-                    <input type="text" name="phone" class="form-control">
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="">Email</label>
-                    <input type="text" name="email" class="form-control">
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="">Password</label>
-                    <input type="password" name="password" class="form-control">
-                </div>
-                <div class="form-group mb-3">
-                    <button type="submit" name="register_btn" class="btn btn-primary">Register</button>
-                </div>
-                </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>

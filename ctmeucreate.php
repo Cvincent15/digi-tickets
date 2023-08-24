@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
   // Redirect the user to the greeting page if they are already logged in
   header("Location: index.php");
   exit();
-}
+} 
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -122,6 +122,15 @@ if (!isset($_SESSION['username'])) {
         <option value="Enforcer">Enforcer</option>
     </select><br>
 
+    <div class="ticket-container" style="display: none;">
+  <label for="startTicket">Start Ticket:</label>
+  <input type="number" id="startTicket" name="startTicket" maxlength="6"><br>
+</div>
+
+<div class="ticket-container" style="display: none;">
+  <label for="endTicket">End Ticket:</label>
+  <input type="number" id="endTicket" name="endTicket" maxlength="6"><br>
+</div>
     <!-- These fields will be automatically generated -->
     <input type="hidden" id="username" name="username" readonly>
 
@@ -174,6 +183,17 @@ function getUserData($conn, $firstName, $lastName, $role) {
   return $result->fetch_assoc();
 }
 
+// Function to count the number of users with a specific role
+function countUsersByRole($conn, $role) {
+  $sql = "SELECT COUNT(*) as count FROM users WHERE role = ?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("s", $role);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['count'];
+}
+
 // Function to check if a user with the same first name, last name, and role exists
 function userExists($conn, $firstName, $lastName, $role) {
   $sql = "SELECT COUNT(*) as count FROM users WHERE first_name = ? AND last_name = ? AND role = ?";
@@ -198,21 +218,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
 
     // Check if a user with the same first name, last name, and role exists
-    if (userExists($conn, $firstName, $lastName, $role)) {
-        // If a user exists, switch to update mode
-        $updateMode = true;
+if (userExists($conn, $firstName, $lastName, $role)) {
+  // If a user exists, switch to update mode
+  $updateMode = true;
 
-        // Retrieve the existing user data for pre-filling the form
-        $existingUserData = getUserData($conn, $firstName, $lastName, $role);
+  // Retrieve the existing user data for pre-filling the form
+  $existingUserData = getUserData($conn, $firstName, $lastName, $role);
 
-        // Set the form fields with existing user data
-        $firstName = $existingUserData['first_name'];
-        $lastName = $existingUserData['last_name'];
-        $role = $existingUserData['role'];
-    } else {
-        // If not, generate a new password for creating a new user
-        $password = generatePassword(); // Implement a function to generate a random password
-    }
+  // Set the form fields with existing user data
+  $firstName = $existingUserData['first_name'];
+  $lastName = $existingUserData['last_name'];
+  $role = $existingUserData['role'];
+} else {
+  // Check the role limits
+  $superAdminLimit = 2;
+  $itAdminLimit = 4;
+
+  // Count the number of existing Super Administrators and IT Administrators
+  $superAdminCount = countUsersByRole($conn, 'Super Administrator');
+  $itAdminCount = countUsersByRole($conn, 'IT Administrator');
+
+  // Check if the limit has been reached for the selected role
+  if (($role === 'Super Administrator' && $superAdminCount >= $superAdminLimit) ||
+      ($role === 'IT Administrator' && $itAdminCount >= $itAdminLimit)) {
+      // Limit reached, display an error message
+      $errorMessage = 'The limit for ' . $role . 's has been reached.';
+  } else {
+      // Generate a new password for creating a new user
+      $password = generatePassword(); // Implement a function to generate a random password
+  }
+}
 }
 
 // Function to generate a random password (customize this function as needed)
@@ -403,25 +438,29 @@ function validateInput(input) {
     }
   }
 
-    
-/*
-    function showHideTicketFields() {
-    const role = document.getElementById('role').value;
-    const ticketContainer = document.querySelector('.ticket-container');
+// Function to show or hide the ticket fields based on the selected role
+function showHideTicketFields() {
+  const role = document.getElementById('role').value;
+  const ticketContainers = document.querySelectorAll('.ticket-container');
 
-    if (role === 'Enforcer') {
-      ticketContainer.style.display = 'block';
-    } else {
-      ticketContainer.style.display = 'none';
-    }
+  if (role === 'Enforcer') {
+    // Show the ticket containers
+    ticketContainers.forEach(container => {
+      container.style.display = 'block';
+    });
+  } else {
+    // Hide the ticket containers
+    ticketContainers.forEach(container => {
+      container.style.display = 'none';
+    });
   }
+}
 
-   // Add an event listener to the status dropdown to trigger the show/hide function
-   document.getElementById('role').addEventListener('change', showHideTicketFields);
+// Add an event listener to the role dropdown to trigger the show/hide function
+document.getElementById('role').addEventListener('change', showHideTicketFields);
 
 // Call the show/hide function initially to set the correct display on page load
 showHideTicketFields();
-*/
 
 // Check if the user is logged in and update the welcome message
 <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
@@ -495,7 +534,8 @@ document.getElementById('delete-button').addEventListener('click', function() {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 // Handle the response here, e.g., show a success message
-                alert(xhr.responseText);
+                alert("Deleted Successfully");
+                location.reload();
                 // Optionally, reload the user table or perform other actions
             }
         };

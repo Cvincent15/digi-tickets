@@ -1,3 +1,16 @@
+<?php
+session_start();
+//include 'php/database_connect.php';
+
+// Check if the user is already logged in
+if (!isset($_SESSION['username'])) {
+    // Redirect the user to the greeting page if they are already logged in
+    header("Location: index.php");
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
