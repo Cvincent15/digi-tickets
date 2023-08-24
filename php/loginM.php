@@ -1,5 +1,4 @@
 <?php
-session_start();
 include 'database_connect.php';
 
 // Retrieve the login form data

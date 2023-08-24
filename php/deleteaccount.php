@@ -1,7 +1,5 @@
 <?php
-// Start the session to access user information
 session_start();
-
 /*
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
@@ -43,8 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     $conn->close();
 } else {
+    /*
     // If the request method is not POST, redirect to an error page or perform other actions
     header("Location: error.php"); // Change "error.php" to your actual error page
+    */
     exit();
 }
 ?>

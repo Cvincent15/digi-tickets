@@ -1,11 +1,12 @@
 <?php
+
 session_start();
 include 'database_connect.php'; // Include your database connection script
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     // Redirect to the login page if not logged in
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
