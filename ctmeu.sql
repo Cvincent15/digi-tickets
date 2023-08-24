@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 23, 2023 at 03:35 PM
+-- Generation Time: Aug 24, 2023 at 11:27 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -32,7 +32,7 @@ CREATE TABLE `users` (
   `first_name` varchar(20) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `role` varchar(50) NOT NULL,
   `startTicket` int(6) DEFAULT NULL,
   `endTicket` int(6) DEFAULT NULL
@@ -43,13 +43,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `last_name`, `username`, `password`, `role`, `startTicket`, `endTicket`) VALUES
-(40, 'Vincent Andrei', 'Cosio', 'suaVCosio', '$2y$10$DaMOaTZBb5Z.aARcCHYT5uBXewoTHccNFEyuXFOEjvg', 'Super Administrator', 0, 0),
-(42, 'Kristine Emerald', 'Casindac', 'itsKCasindac', '$2y$10$bLduxFLI6OO5PONITBL4cuAO3WLD6xwQVa8g.TfhL1k', 'IT Administrator', 0, 0),
-(43, 'Jazzlyn Kate', 'Aquino', 'itsJAquino', '$2y$10$uhpH0FZSH9eQt06OXfBev.AdQd.c.2DbJHGtjbxGbfO', 'IT Administrator', 0, 0),
-(44, 'Dan Carlo', 'Ramirez', 'enfDRamirez', '$2y$10$vFt1tdS71i5ZxdyrQAroYu39sFeNa71IOADV724OhmY', 'Enforcer', 0, 0),
-(45, 'Zsyra Beatrise', 'Almendral', 'itsZAlmendral', '$2y$10$pKkz1pc7Fvp0vPFfGYxNmeL5e/uwmW3cjpcc9eIhIRr', 'IT Administrator', 0, 0),
-(50, 'Kyle Dennis', 'Dalida', 'enfKDalida', '$2y$10$QGRj4sqhw5B4Psrlrs3MnuQCJuCdmHeIVkBTokwtAej', 'Enforcer', 0, 0),
-(52, 'Lorenz Adrian', 'Artillagas', 'suaLArtillagas', '$2y$10$fQ2eXI1ZwIOQzcQ0sxKsHOoClarZk4URmDrNLNhDcRD', 'Super Administrator', NULL, NULL);
+(55, 'Lorenz Adrian', 'Artillagas', 'suaLArtillagas', '$2y$10$eBRzuxuhARfOglgnoDfPIOKWfWOO1fzm/7dtn7ekY.KOp51SmHux2', 'Super Administrator', NULL, NULL),
+(56, 'Vincent Andrei', 'Cosio', 'suaVCosio', '$2y$10$CgVBRVaVWCE/gdr1wSwmKu5sBAp.ZQ4nDrJ205OYy1QabRs0mCxre', 'Super Administrator', NULL, NULL),
+(57, 'Kristine Emerald', 'Casindac', 'itsKCasindac', '$2y$10$7a79hmUn26xiO6Yduf0V5ugajSJ7V.jr28vzibUmT7jyDdTGc./KK', 'IT Administrator', NULL, NULL),
+(58, 'Zsyra Beatrise', 'Almendral', 'itsZAlmendral', '$2y$10$FoLrzPZL4WUKp7x7f7YQMuRCIKiVI1OkZqNQrm.XZ30QUQhumFrBC', 'IT Administrator', NULL, NULL),
+(59, 'Jazzlyn Kate', 'Aquino', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL),
+(60, 'Kyle Dennis', 'Dalida', 'enfKDalida', '$2y$10$g7O0UwF/Jau.8Lz/jCoLhuhqxphzIlhzxTlTA32/XX9QPNk7rBAlG', 'Enforcer', NULL, NULL),
+(61, 'Dan Carlo', 'Ramirez', 'enfDRamirez', '$2y$10$PdMN6ThGqQLV9XX5FR8aWe9GkYXhwU.fv9m0CXKYR8A3JLz3cYdXG', 'Enforcer', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -144,7 +144,7 @@ ALTER TABLE `violation_tickets`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
