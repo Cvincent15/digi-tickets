@@ -20,7 +20,7 @@ $user = $result->fetch_assoc();
 
 if ($user) {
     // Verify the hashed password
-    echo "Debug: Hashed Password in DB: " . $user['password'] . "<br>"; // Output the hashed password in the database
+    //echo "Debug: Hashed Password in DB: " . $user['password'] . "<br>"; // Output the hashed password in the database
     if (password_verify($password, $user['password'])) {
         // Password is correct, set the session variables
         $_SESSION['username'] = $username;
@@ -36,7 +36,7 @@ if ($user) {
     } else {
         // Password is incorrect, display an error message
         echo "Invalid username or password";
-        header('Refresh: 10; URL= ../index.php');
+        header('Refresh: 1; URL= ../index.php');
     }
 } else {
     // User not found, display an error message
