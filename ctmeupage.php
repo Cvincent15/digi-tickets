@@ -52,9 +52,8 @@ $violationTickets = fetchViolationTickets();
     <title>CTMEU Data Hub</title>
 </head>
 <style>
-  .clickable-row {
+  .clickable-cell {
     cursor: pointer;
-    display: table-row;
   }
 
   .hidden {
@@ -80,6 +79,14 @@ $violationTickets = fetchViolationTickets();
   border-radius: 5px;
 }
 
+/* Hide rows that don't match the search term */
+.clickable-row {
+  display: table-row;
+}
+
+.toggle-archive-button {
+    display: none;
+}
 
 </style>
 <body style="height: auto;">
@@ -131,19 +138,35 @@ $violationTickets = fetchViolationTickets();
     </thead>
     <tbody id="ticket-table-body">
     <?php
+$visibleTicketCount = 0; // Initialize a counter for visible tickets
+
 // Loop through the fetched violation ticket data and populate the table rows
 foreach ($violationTickets as $index => $ticket) {
-    // Convert the row data to a JSON string
-    $rowData = json_encode($ticket);
-    
-    echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData'>";
-    echo "<td>" . ($index + 1) . "</td>";
-    echo "<td>" . $ticket['driver_name'] . "</td>";
-    echo "<td>" . $ticket['driver_license'] . "</td>";
-    echo "<td>" . $ticket['driver_address'] . "</td>";
-    echo "<td>" . $ticket['issuing_district'] . "</td>";
-    echo "<td class='toggle-button-cell'></td>"; // Placeholder for the button
-    echo "</tr>";
+    // Check if the is_settled value is 0 before making the row clickable
+    if ($ticket['is_settled'] == 0) {
+        $visibleTicketCount++; // Increment the visible ticket counter
+
+        // Convert the row data to a JSON string
+        $rowData = json_encode($ticket);
+
+        echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
+        // Display the visible ticket count in the "No." column
+        echo "<td>" . $visibleTicketCount . "</td>";
+        // Wrap the name in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+        // Wrap the license in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+        // Wrap the address in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_address'] . "</td>";
+        // Wrap the district in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+        // Add a placeholder for the button
+        echo "<td class='toggle-button-cell'><button class='btn btn-primary toggle-archive-button'><i class='bx bx-archive-in'></i></button></td>";
+        echo "</tr>";
+    } else {
+        // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+        // Example: Display a message or simply don't include them in the table.
+    }
 }
 ?>
     </tbody>
@@ -152,41 +175,78 @@ foreach ($violationTickets as $index => $ticket) {
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
-  function rowClick(row) {
-        // Get the row data JSON string
-        var rowData = row.getAttribute('data-rowdata');
+  // Add a click event listener to the clickable cells
+document.querySelectorAll('.clickable-cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+        // Get the row data JSON string from the clicked cell's data-rowdata attribute
+        var rowData = cell.getAttribute('data-rowdata');
         
         // Redirect to the details page with the row data as a query parameter
-        window.location.href = 'detailarch.php?data=' + encodeURIComponent(rowData);
-    }
- // Add a click event listener to the toggle button in the table header
- document.getElementById('toggle-archive-buttons').addEventListener('click', function() {
-        // Get all the rows in the table body
-        var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
-
-        // Toggle the visibility of the buttons in each row
-        rows.forEach(function(row) {
-            var buttonCell = row.querySelector('.toggle-button-cell');
-            buttonCell.innerHTML = buttonCell.innerHTML === '' ? "<button class='btn btn-primary'><i class='bx bx-show'></i></button>" : '';
-        });
+        // Exclude the bx-archive-in button from the row data
+        var parsedRowData = JSON.parse(rowData);
+        delete parsedRowData.is_settled; // Remove the is_settled property
+        window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
     });
+});
+  function rowClick(row) {
+    // Get the row data JSON string
+    var rowData = row.getAttribute('data-rowdata');
+    
+    // Redirect to the details page with the row data as a query parameter
+    // Exclude the bx-archive-in button from the row data
+    var parsedRowData = JSON.parse(rowData);
+    delete parsedRowData.is_settled; // Remove the is_settled property
+    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+}
+
+// Add a click event listener to the toggle-archive-buttons button
+document.getElementById('toggle-archive-buttons').addEventListener('click', function() {
+    // Select all elements with the class toggle-archive-button
+    var archiveButtons = document.querySelectorAll('.toggle-archive-button');
+    
+    // Loop through the archive buttons and toggle their display
+    archiveButtons.forEach(function(button) {
+        button.style.display = button.style.display === 'none' ? 'inline-block' : 'none';
+    });
+});
+
+// Add an event listener to the table container (outside the foreach loop)
+document.querySelector('.table-container').addEventListener('click', function(event) {
+    if (event.target.classList.contains('toggle-archive-button')) {
+        // Handle the button click here
+        var buttonCell = event.target.closest('.toggle-button-cell');
+        buttonCell.innerHTML = ''; // Remove the button
+        
+        // Get the row data JSON string
+        var rowData = buttonCell.parentElement.getAttribute('data-rowdata');
+        var parsedRowData = JSON.parse(rowData);
+
+        // Set the is_settled value to 1
+        parsedRowData.is_settled = 1;
+
+        // Make an AJAX request to update_ticket.php
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'php/archiverow.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Database update successful
+                console.log(xhr.responseText);
+                location.reload();
+            } else {
+                // Database update failed
+                console.error('Database update failed:', xhr.responseText);
+            }
+        };
+        xhr.send(JSON.stringify(parsedRowData));
+    }
+});
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
         // Perform logout actions here, e.g., clearing session, redirecting to logout.php
         // You can use JavaScript to redirect to the logout.php page.
         window.location.href = 'php/logout.php';
     });
-
-    document.querySelectorAll('.clickable-row').forEach(function(row) {
-        row.addEventListener('click', function() {
-            // Get the row data JSON string
-            var rowData = row.getAttribute('data-rowdata');
-            
-            // Redirect to the details page with the row data as a query parameter
-            window.location.href = 'detailarch.php?data=' + encodeURIComponent(rowData);
-        });
-    });
-
 
     // Check if the user is logged in and update the welcome message
     <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
@@ -196,6 +256,49 @@ document.getElementById('logout-button').addEventListener('click', function() {
 
         document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
     <?php } ?>
+    
+    function filterTable() {
+    var filterSelect = document.getElementById('filter-select');
+    var searchInput = document.getElementById('search-bar').value.toLowerCase();
+
+    // Define an object to map filter keys to column names
+    var columnMap = {
+        'name': 'driver_name',
+        'license': 'driver_license',
+        'address': 'driver_address',
+        'district': 'issuing_district'
+    };
+
+    // Get the column name based on the selected filter key
+    var columnName = columnMap[filterSelect.value];
+
+    // Loop through the table rows and filter based on the selected column
+    var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+    rows.forEach(function(row) {
+        var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+
+        // Get the cell value based on the selected column name
+        var cellValue = String(rowData[columnName]).toLowerCase();
+
+        console.log("Search Input: " + searchInput);
+        console.log("CellValue: " + cellValue);
+        console.log("Filter Key: " + filterSelect.value);
+        console.log("Row Data: ", rowData);
+
+        if (cellValue.startsWith(searchInput)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+
+    
+// Add event listeners to trigger filtering
+document.getElementById('filter-select').addEventListener('change', filterTable);
+document.getElementById('search-bar').addEventListener('input', filterTable);
+
 </script>
 
 </body>

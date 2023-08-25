@@ -146,7 +146,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
         <option value="IT Administrator">IT Admin</option>
         <option value="Enforcer">Enforcer</option>
     </select><br>
-
+<!--
     <div class="ticket-container" style="display: none;">
   <label for="startTicket">Start Ticket:</label>
   <input type="number" id="startTicket" name="startTicket" maxlength="6"><br>
@@ -156,6 +156,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <label for="endTicket">End Ticket:</label>
   <input type="number" id="endTicket" name="endTicket" maxlength="6"><br>
 </div>
+-->
     <!-- These fields will be automatically generated -->
     <input type="hidden" id="username" name="username" readonly>
 

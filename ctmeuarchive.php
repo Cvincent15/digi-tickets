@@ -1,26 +1,58 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
+include 'php/database_connect.php'; // Include your database connection code here
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-  // Redirect the user to the greeting page if they are already logged in
+  // Redirect the user to the greeting page if they are not logged in
   header("Location: index.php");
   exit();
 }
-?>
 
+// Define a function to fetch data from the violation_tickets table
+function fetchViolationTickets() {
+  global $conn; // Assuming you have a database connection established
+
+  // Write a SQL query to fetch data from the violation_tickets table
+  $sql = "SELECT * FROM violation_tickets"; // Modify this query as needed
+
+  // Execute the query
+  $result = mysqli_query($conn, $sql);
+
+  // Check if the query was successful
+  if ($result) {
+    // Initialize an empty array to store the fetched data
+    $data = array();
+
+    // Fetch data and store it in the array
+    while ($row = mysqli_fetch_assoc($result)) {
+      $data[] = $row;
+    }
+
+    // Return the fetched data
+    return $data;
+  } else {
+    // Handle the error, e.g., display an error message
+    echo "Error: " . mysqli_error($conn);
+    return array(); // Return an empty array if there was an error
+  }
+}
+
+// Fetch the violation ticket data
+$violationTickets = fetchViolationTickets();
+?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.0.9/css/boxicons.min.css">
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
 <style>
-  .clickable-row {
+  .clickable-cell {
     cursor: pointer;
   }
 
@@ -51,7 +83,10 @@ if (!isset($_SESSION['username'])) {
 .clickable-row {
   display: table-row;
 }
-  
+
+.toggle-archive-button {
+    display: none;
+}
 
 </style>
 <body style="height: auto;">
@@ -72,7 +107,7 @@ if (!isset($_SESSION['username'])) {
     <a href="ctmeupage.php" class="link">Records</a>
     <a href="ctmeurecords.php" class="link">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-    <a href="ctmeuactlogs.php" class="link" id="noEnforcers"><b>Archive</b></a>
+    <a href="ctmeuarchive.php" class="link" id="noEnforcers"><b>Archive</b></a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
@@ -91,98 +126,78 @@ if (!isset($_SESSION['username'])) {
 
 <div class="table-container">
 <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>License No.</th>
-                <th>Address</th>
-                <th>District</th>
-            </tr>
-        </thead>
-        <tbody id="ticket-table-body">
-            <!-- Replace the sample data below with the data fetched from your database -->
-           
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>License No.</th>
+            <th>Address</th>
+            <th>District</th>
+            
+        </tr>
+    </thead>
+    <tbody id="ticket-table-body">
+    <?php
+$visibleTicketCount = 0; // Initialize a counter for visible tickets
+
+// Loop through the fetched violation ticket data and populate the table rows
+foreach ($violationTickets as $index => $ticket) {
+    // Check if the is_settled value is 0 before making the row clickable
+    if ($ticket['is_settled'] == 1) {
+        $visibleTicketCount++; // Increment the visible ticket counter
+
+        // Convert the row data to a JSON string
+        $rowData = json_encode($ticket);
+
+        echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
+        // Display the visible ticket count in the "No." column
+        echo "<td>" . $visibleTicketCount . "</td>";
+        // Wrap the name in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+        // Wrap the license in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+        // Wrap the address in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_address'] . "</td>";
+        // Wrap the district in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+        echo "</tr>";
+    } else {
+        // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+        // Example: Display a message or simply don't include them in the table.
+    }
+}
+?>
+    </tbody>
+</table>
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
-
 <script>
-  // Function to handle row click and redirect to the detail page
-const handleRowClick = (row) => {
-  const rowJSON = JSON.stringify(row);
-  const docId = encodeURIComponent(row.docId);
-  window.location.href = `detailarch.php?data=${encodeURIComponent(rowJSON)}&docId=${docId}`;
-};
-  function formatTimestamp(time) {
-  const timestamp = new Date(time.seconds * 1000 + time.nanoseconds / 1000000);
-  const formattedTime = timestamp.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    timeZoneName: 'short'
-  });
-  return formattedTime;
+  // Add a click event listener to the clickable cells
+document.querySelectorAll('.clickable-cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+        // Get the row data JSON string from the clicked cell's data-rowdata attribute
+        var rowData = cell.getAttribute('data-rowdata');
+        
+        // Redirect to the details page with the row data as a query parameter
+        // Exclude the bx-archive-in button from the row data
+        var parsedRowData = JSON.parse(rowData);
+        delete parsedRowData.is_settled; // Remove the is_settled property
+        window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+    });
+});
+  function rowClick(row) {
+    // Get the row data JSON string
+    var rowData = row.getAttribute('data-rowdata');
+    
+    // Redirect to the details page with the row data as a query parameter
+    // Exclude the bx-archive-in button from the row data
+    var parsedRowData = JSON.parse(rowData);
+    delete parsedRowData.is_settled; // Remove the is_settled property
+    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
 }
 
-// Get the filter select element
-const filterSelect = document.getElementById("filter-select");
-// Get the search bar element
-const searchBar = document.getElementById("search-bar");
-
-// Add an event listener to the filter select
-filterSelect.addEventListener("change", () => {
-  searchTable(); // Call the searchTable function to update the table based on the selected filter
-});
-
-// Add an event listener to the search bar input
-searchBar.addEventListener("input", () => {
-  searchTable(); // Call the searchTable function to update the table based on the search term
-});
-
-// Function to search and filter the table
-const searchTable = () => {
-  const filterValue = filterSelect.value; // Get the selected filter value
-  const searchTerm = searchBar.value.toLowerCase(); // Get the search term and convert to lowercase
-
-  // Loop through each row in the table body
-  const rows = document.querySelectorAll(".clickable-row");
-  rows.forEach((row) => {
-    const cell = row.querySelector(`td:nth-child(${getFilterIndex(filterValue)})`); // Get the cell based on the selected filter
-    const cellValue = cell.textContent.toLowerCase(); // Get the cell value and convert to lowercase
-
-    // If the search term is found in the cell value, show the row; otherwise, hide the row
-    if (cellValue.includes(searchTerm)) {
-      row.style.display = "table-row"; // Show the row
-    } else {
-      row.style.display = "none"; // Hide the row
-    }
-  });
-};
-
-// Function to get the index of the selected filter for the table cell
-const getFilterIndex = (filterValue) => {
-  switch (filterValue) {
-    case "name":
-      return 2; // Name column
-    case "license":
-      return 3; // License No. column
-    case "address":
-      return 4; // Address column
-    case "district":
-      return 5; // District column
-    default:
-      return 0; // Default to the first column
-  }
-};
-
-// Add a click event listener to the logout button
+  // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
         // Perform logout actions here, e.g., clearing session, redirecting to logout.php
         // You can use JavaScript to redirect to the logout.php page.
@@ -197,6 +212,49 @@ document.getElementById('logout-button').addEventListener('click', function() {
 
         document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
     <?php } ?>
+    
+    function filterTable() {
+    var filterSelect = document.getElementById('filter-select');
+    var searchInput = document.getElementById('search-bar').value.toLowerCase();
+
+    // Define an object to map filter keys to column names
+    var columnMap = {
+        'name': 'driver_name',
+        'license': 'driver_license',
+        'address': 'driver_address',
+        'district': 'issuing_district'
+    };
+
+    // Get the column name based on the selected filter key
+    var columnName = columnMap[filterSelect.value];
+
+    // Loop through the table rows and filter based on the selected column
+    var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+    rows.forEach(function(row) {
+        var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+
+        // Get the cell value based on the selected column name
+        var cellValue = String(rowData[columnName]).toLowerCase();
+
+        console.log("Search Input: " + searchInput);
+        console.log("CellValue: " + cellValue);
+        console.log("Filter Key: " + filterSelect.value);
+        console.log("Row Data: ", rowData);
+
+        if (cellValue.startsWith(searchInput)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+
+    
+// Add event listeners to trigger filtering
+document.getElementById('filter-select').addEventListener('change', filterTable);
+document.getElementById('search-bar').addEventListener('input', filterTable);
+
 </script>
 
 </body>

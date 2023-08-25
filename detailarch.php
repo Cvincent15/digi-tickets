@@ -2,20 +2,38 @@
 session_start();
 include 'php/database_connect.php'; // Include your database connection code here
 
-// Check if the user is already logged in
-if (!isset($_SESSION['username'])) {
-  // Redirect the user to the login page if they are not logged in
-  header("Location: index.php");
-  exit();
+// Function to fetch is_settled based on ticket_id
+function fetchIsSettled($ticketId, $conn) {
+    // Perform a database query to fetch is_settled based on ticket_id
+    // Replace 'your_query_here' with the actual query to retrieve is_settled
+    $query = "SELECT is_settled FROM violation_tickets WHERE ticket_id = $ticketId";
+    $result = mysqli_query($conn, $query);
+
+    // Check if the query was successful and if a row was returned
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['is_settled'];
+    } else {
+        // Return a default value or handle the error as needed
+        return 0; // Default to 'No' if not found
+    }
 }
 
-// Check if the 'data' query parameter is set in the URL
+// Check if the user is already logged in
+if (!isset($_SESSION['username'])) {
+    // Redirect the user to the login page if they are not logged in
+    header("Location: index.php");
+    exit();
+}
+
+// Check if the data parameter is set in the URL
 if (isset($_GET['data'])) {
-    // Get the 'data' from the URL and decode it
+    // Decode the JSON data passed in the URL
     $rowData = json_decode(urldecode($_GET['data']), true);
 
     // You can now use $rowData to populate your form fields for editing
 } else {
+    // If no data parameter is set, handle it accordingly (e.g., show an error message)
     echo "Error: Row data not found.";
     exit();
 }
@@ -55,7 +73,7 @@ if (isset($_GET['data'])) {
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link noEnforcers"><b>Records</b></a>
+    <a href="ctmeupage.php" class="link noEnforcers">Records</a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
     <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
@@ -120,63 +138,94 @@ if (isset($_GET['data'])) {
             <td><label for="place_of_occurrence">Place of Occurrence:</label></td>
             <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly></td>
         </tr>
-        <!-- Add more rows for additional fields as needed -->
         <tr>
             <td><label for="is_settled">Account Status:</label></td>
-            <td colspan="3"><input type="checkbox" id="is_settled" name="is_settled" value="1" <?php echo ($rowData['is_settled'] == 1) ? 'checked' : ''; ?> readonly> (Check if Settled)</td>
+            <td colspan="3">
+                <?php
+                // Check if is_settled key exists in rowData
+                $isSettled = isset($rowData['is_settled']) ? $rowData['is_settled'] : null;
+
+                // If is_settled is not in $rowData, fetch it based on ticket_id
+                if ($isSettled === null) {
+                    $ticketId = $rowData['ticket_id'];
+                    $isSettled = fetchIsSettled($ticketId, $conn);
+                }
+
+                // Convert is_settled to "Yes" or "No"
+                $accountStatus = ($isSettled == 1) ? 'Yes' : 'No';
+
+                // Display is_settled as text
+                echo '<span id="is_settled">' . $accountStatus . '</span>';
+                ?>
+            </td>
         </tr>
-        <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button type="button" id="edit-button">Edit Information</button>
-                            <button type="submit" id="save-button" style="display: none;">Save Changes</button>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div>
+        <!-- Add more rows for additional fields as needed -->
+        <tr id="edit-row">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <button type="button" id="edit-button">Edit Information</button>
+                <button type="submit" id="save-button" style="display: none;">Save Changes</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+</div>
 </div>
 
-
-    <script src="js/jquery-3.6.4.js"></script>
-    <script>
-
-<?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+<script src="js/jquery-3.6.4.js"></script>
+<script>
+    <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
     var role = '<?php echo $_SESSION['role']; ?>';
     var firstName = '<?php echo $_SESSION['first_name']; ?>';
     var lastName = '<?php echo $_SESSION['last_name']; ?>';
 
     document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
-<?php } ?>
-// Add a click event listener to the "Edit Information" button
-document.getElementById('edit-button').addEventListener('click', function() {
-    // Get all the input elements in the form
-    var inputs = document.querySelectorAll('input');
+    <?php } ?>
 
-    // Loop through the inputs and toggle the readonly-input class
-    inputs.forEach(function(input) {
-        input.classList.toggle('readonly-input');
-        input.readOnly = !input.readOnly; // Toggle the readonly property
+    // Add a click event listener to the "Edit Information" button
+    document.getElementById('edit-button').addEventListener('click', function() {
+        // Check if is_settled key exists in rowData
+        var isSettled = <?php echo isset($rowData['is_settled']) ? $rowData['is_settled'] : 0; ?>;
+
+        // Check if is_settled is 1 (settled)
+        if (isSettled === 1) {
+            // If settled, hide the "Edit Information" button and return
+            document.getElementById('edit-button').style.display = 'none';
+            return;
+        }
+
+        // Get all the input elements in the form
+        var inputs = document.querySelectorAll('input');
+
+        // Loop through the inputs and toggle the readonly-input class
+        inputs.forEach(function(input) {
+            input.classList.toggle('readonly-input');
+            input.readOnly = !input.readOnly; // Toggle the readonly property
+        });
+
+        // Toggle the button text between "Edit Information" and "Save Changes"
+        var editButton = document.getElementById('edit-button');
+        var saveButton = document.getElementById('save-button');
+        if (editButton.style.display === 'none') {
+            editButton.style.display = 'block';
+            saveButton.style.display = 'none';
+            editButton.textContent = 'Edit Information';
+        } else {
+            editButton.style.display = 'none';
+            saveButton.style.display = 'block';
+            editButton.textContent = 'Cancel';
+        }
     });
-
-    // Toggle the button text between "Edit Information" and "Save Changes"
-    var editButton = document.getElementById('edit-button');
-    var saveButton = document.getElementById('save-button');
-    if (editButton.style.display === 'none') {
-        editButton.style.display = 'block';
-        saveButton.style.display = 'none';
-        editButton.textContent = 'Edit Information';
-    } else {
-        editButton.style.display = 'none';
-        saveButton.style.display = 'block';
-        editButton.textContent = 'Cancel';
+    // Check the is_settled value and hide the "Edit Information" button if needed
+    var isSettledValue = '<?php echo $accountStatus; ?>';
+    if (isSettledValue === 'Yes') {
+        document.getElementById('edit-row').style.display = 'none';
     }
-});
-    </script>
-    <!-- Add any other scripts you may need -->
+</script>
+<!-- Add any other scripts you may need -->
 </div>
 </body>
 </html>
