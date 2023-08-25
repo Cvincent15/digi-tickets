@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result) {
         // The update was successful
         // Redirect to a success page or back to the details page
-        header("Location: ../detailarch.php");
+        header("Location: ../ctmeupage.php");
         exit();
     } else {
         // Handle the error, e.g., display an error message
