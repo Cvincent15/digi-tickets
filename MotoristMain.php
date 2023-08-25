@@ -29,6 +29,9 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Contact</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Dashboard</a>
+          </li>
         </ul>
       <button class="btn transparent-btn me-2 btn-outline-primary">Register</button>
       <button class="btn transparent-btn btn-outline-primary">Login</button>
@@ -43,11 +46,11 @@
   <div class="col">
     <h1 style="font-size:60px;">Welcome, User</h1></br>
     <h2>What would you like to do?</h2> </br>
-    <button type="button" class="btn btn-light"><img src="./images/Vector.png"></br>Profile</button>
-    <button type="button" class="btn btn-light"><img src="./images/alternatecard.png"></br>Digital ID</button>
-    <button type="button" class="btn btn-light"><img src="./images/alternateinvoice.png"></br>Transactions</button> </br></br>
-    <button type="button" class="btn btn-light"><img src="./images/gavel.png"></br>Violations</button>
-    <button type="button" class="btn btn-light"><img src="./images/alternate_file.png"></br>Documents</button>
+    <button type="button" class="btn btn-light btn-lg main" onclick="redirectToProfile()"><img src="./images/Vector.png"></br>Profile</button>
+    <button type="button" class="btn btn-light btn-lg main" onclick="redirectToId()"><img src="./images/alternatecard.png"></br>Digital ID</button>
+    <button type="button" class="btn btn-light btn-lg main" onclick="redirectToTransaction()"><img src="./images/alternateinvoice.png"></br>Transactions</button> </br></br>
+    <button type="button" class="btn btn-light btn-lg main" onclick="redirectToViolation()"><img src="./images/gavel.png"></br>Violations</button>
+    <button type="button" class="btn btn-light btn-lg main" onclick="redirectToDocuments()"><img src="./images/alternate_file.png"></br>Documents</button>
   </div>
 </div>
 </div>
@@ -60,6 +63,26 @@
 
     function redirectToLogin() {
       window.location.href = 'motorist_login.php';
+    }
+
+    function redirectToProfile() {
+      window.location.href = 'MotoristProfile.php';
+    }
+
+    function redirectToId() {
+      window.location.href = 'MotoristId.php';
+    }
+
+    function redirectToTransaction() {
+      window.location.href = 'MotoristTransaction.php';
+    }
+
+    function redirectToViolation() {
+      window.location.href = 'MotoristViolations.php';
+    }
+
+    function redirectToDocuments() {
+      window.location.href = 'MotoristDocuments.php';
     }
   </script>
 </body>
