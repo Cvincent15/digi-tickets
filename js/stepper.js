@@ -12,7 +12,7 @@ var currentTab = 0; // Current tab is set to be the first tab (0)
             document.getElementById("prevBtn").style.display = "inline";
           }
           if (n == (x.length - 1)) {
-            document.getElementById("nextBtn").innerHTML = "Submit";
+            document.getElementById("nextBtn").innerHTML = "Create Account";
           } else {
             document.getElementById("nextBtn").innerHTML = "Next";
           }
@@ -70,3 +70,4 @@ var currentTab = 0; // Current tab is set to be the first tab (0)
           //... and adds the "active" class on the current step:
           x[n].className += " active";
         }
+        
