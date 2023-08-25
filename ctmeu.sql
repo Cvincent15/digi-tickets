@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 24, 2023 at 11:27 AM
+-- Generation Time: Aug 25, 2023 at 04:37 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -48,7 +48,6 @@ INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `last_name`, `username`, `pa
 (57, 'Kristine Emerald', 'Casindac', 'itsKCasindac', '$2y$10$7a79hmUn26xiO6Yduf0V5ugajSJ7V.jr28vzibUmT7jyDdTGc./KK', 'IT Administrator', NULL, NULL),
 (58, 'Zsyra Beatrise', 'Almendral', 'itsZAlmendral', '$2y$10$FoLrzPZL4WUKp7x7f7YQMuRCIKiVI1OkZqNQrm.XZ30QUQhumFrBC', 'IT Administrator', NULL, NULL),
 (59, 'Jazzlyn Kate', 'Aquino', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL),
-(60, 'Kyle Dennis', 'Dalida', 'enfKDalida', '$2y$10$g7O0UwF/Jau.8Lz/jCoLhuhqxphzIlhzxTlTA32/XX9QPNk7rBAlG', 'Enforcer', NULL, NULL),
 (61, 'Dan Carlo', 'Ramirez', 'enfDRamirez', '$2y$10$PdMN6ThGqQLV9XX5FR8aWe9GkYXhwU.fv9m0CXKYR8A3JLz3cYdXG', 'Enforcer', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -94,16 +93,23 @@ CREATE TABLE `violation_tickets` (
   `issuing_district` varchar(20) NOT NULL,
   `vehicle_type` varchar(20) NOT NULL,
   `plate_no` varchar(20) NOT NULL,
-  `cor_no` int(20) NOT NULL,
-  `place_issued` varchar(50) NOT NULL,
+  `cor_no` int(20) DEFAULT NULL,
+  `place_issued` varchar(50) DEFAULT NULL,
   `reg_owner` varchar(50) NOT NULL,
   `reg_owner_address` varchar(50) NOT NULL,
   `date_time_violation` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `place_of_occurence` varchar(50) NOT NULL,
+  `place_of_occurrence` varchar(50) NOT NULL,
   `user_ctmeu_id` int(11) NOT NULL,
   `user_id_motorists` int(11) DEFAULT NULL,
   `is_settled` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `violation_tickets`
+--
+
+INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_address`, `driver_license`, `issuing_district`, `vehicle_type`, `plate_no`, `cor_no`, `place_issued`, `reg_owner`, `reg_owner_address`, `date_time_violation`, `place_of_occurrence`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
+(2, 'Vincent Andrei Cosio', 'Marcopolo Place, Tagapo, Santa Rosa Laguna', 'N50-20-026873', 'canlalay', 'Motorcycle', 'ABC 2345', NULL, NULL, 'Vincent Andrei Cosio', 'Marcopolo Place, Tagapo, Santa Rosa Laguna', '2023-08-25 01:12:35', 'Market Area', 61, NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -144,7 +150,7 @@ ALTER TABLE `violation_tickets`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
@@ -162,7 +168,7 @@ ALTER TABLE `violations`
 -- AUTO_INCREMENT for table `violation_tickets`
 --
 ALTER TABLE `violation_tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
