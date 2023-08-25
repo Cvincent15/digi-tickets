@@ -105,14 +105,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link noEnforcers">Records</a>
-    <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
-    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
-    <a href="ctmeuarchive.php" class="link noEnforcers">Archive</a>
-    <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
-    <a href="ctmeuusers.php" class="link"><b>User Account</b></a>
-  </div>
+    
+    <?php
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
+        } else {
+            // For other roles, show the other links
+            echo '<a href="ctmeupage.php" class="link">Records</a>';
+            echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
+            // Uncomment this line to show "Create Accounts" to other roles
+            echo '<a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>';
+            echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
+        }
+    }
+    ?>
+</div>
   </div>
 </nav>
 

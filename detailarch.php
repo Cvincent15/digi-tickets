@@ -1,11 +1,22 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
+include 'php/database_connect.php'; // Include your database connection code here
 
 // Check if the user is already logged in
-if (isset($_SESSION['username'])) {
-    // Redirect the user to the greeting page if they are already logged in
-    header("Location: ctmeupage.php");
+if (!isset($_SESSION['username'])) {
+  // Redirect the user to the login page if they are not logged in
+  header("Location: index.php");
+  exit();
+}
+
+// Check if the 'data' query parameter is set in the URL
+if (isset($_GET['data'])) {
+    // Get the 'data' from the URL and decode it
+    $rowData = json_decode(urldecode($_GET['data']), true);
+
+    // You can now use $rowData to populate your form fields for editing
+} else {
+    echo "Error: Row data not found.";
     exit();
 }
 ?>
@@ -19,6 +30,16 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Ticket Details</title>
 </head>
+
+<style>
+  .readonly-input {
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+}
+.hidden-label {
+    display: none; /* Hide the label */
+  }
+</style>
 <body>
 
 <nav class="navbar">
@@ -34,10 +55,10 @@ if (isset($_SESSION['username'])) {
   <div class="navbar-right">
     <h5 id="welcome-text"></h5>
     <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link noEnforcers">Records</a>
+    <a href="ctmeupage.php" class="link noEnforcers"><b>Records</b></a>
     <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
     <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers"><b>Archive</b></a>
+    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
@@ -46,217 +67,116 @@ if (isset($_SESSION['username'])) {
 </nav>
 
 <div class="container" style="margin-top:20px;">
-    <!-- Display the row data here for editing or viewing -->
-    <?php
-    if (isset($_GET['data'])) {
-      $rowData = json_decode($_GET['data'], true);
-?>
-</div>
-
-
-    <!-- Add the table structure here -->
-<div class="container" style="margin-top:20px;">
-  <!-- Display the row data here -->
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Ticket Details</h5>
-      <table class="table">
-        <tbody id="table-body">
-          <!-- Rows for document fields will be dynamically added here -->
-        </tbody>
-      </table>
+    <!-- Display the row data here -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Ticket Details</h5>
+            <form method="POST" action="php/editDetails.php">
+                <input type="hidden" name="ticket_id" value="<?php echo $rowData['ticket_id']; ?>">
+                
+                <table>
+        <tr>
+            <td><label for="driver_name">Driver Name:</label></td>
+            <td><input class="readonly-input" type="text" id="driver_name" name="driver_name" value="<?php echo $rowData['driver_name']; ?>" readonly></td>
+            
+            <td><label for="driver_address">Driver Address:</label></td>
+            <td><input class="readonly-input" type="text" id="driver_address" name="driver_address" value="<?php echo $rowData['driver_address']; ?>" readonly></td>
+        </tr>
+        <tr>
+            <td><label for="driver_license">Driver License No.:</label></td>
+            <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" value="<?php echo $rowData['driver_license']; ?>" readonly></td>
+            
+            <td><label for="issuing_district">Issuing District:</label></td>
+            <td><input class="readonly-input" type="text" id="issuing_district" name="issuing_district" value="<?php echo $rowData['issuing_district']; ?>" readonly></td>
+        </tr>
+        <tr>
+            <td><label for="vehicle_type">Vehicle Type:</label></td>
+            <td><input class="readonly-input" type="text" id="vehicle_type" name="vehicle_type" value="<?php echo $rowData['vehicle_type']; ?>" readonly></td>
+            
+            <td><label for="plate_no">Plate No.:</label></td>
+            <td><input class="readonly-input" type="text" id="plate_no" name="plate_no" value="<?php echo $rowData['plate_no']; ?>" readonly></td>
+        </tr>
+        <!-- Add more rows for additional fields as needed -->
+        <tr>
+            <td><label for="cor_no">COR No.:</label></td>
+            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
+            
+            <td><label for="place_issued">Place Issued:</label></td>
+            <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" value="<?php echo $rowData['place_issued']; ?>" readonly></td>
+        </tr>
+        <!-- Add more rows for additional fields as needed -->
+        <tr>
+            <td><label for="reg_owner">Registered Owner:</label></td>
+            <td><input class="readonly-input" type="text" id="reg_owner" name="reg_owner" value="<?php echo $rowData['reg_owner']; ?>" readonly></td>
+            
+            <td><label for="reg_owner_address">Registered Owner Address:</label></td>
+            <td><input class="readonly-input" type="text" id="reg_owner_address" name="reg_owner_address" value="<?php echo $rowData['reg_owner_address']; ?>" readonly></td>
+        </tr>
+        <!-- Add more rows for additional fields as needed -->
+        <tr>
+            <td><label for="date_time_violation">Date and Time of Violation:</label></td>
+            <td><input class="readonly-input" type="datetime-local" id="date_time_violation" name="date_time_violation" value="<?php echo $rowData['date_time_violation']; ?>" readonly></td>
+            
+            <td><label for="place_of_occurrence">Place of Occurrence:</label></td>
+            <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly></td>
+        </tr>
+        <!-- Add more rows for additional fields as needed -->
+        <tr>
+            <td><label for="is_settled">Account Status:</label></td>
+            <td colspan="3"><input type="checkbox" id="is_settled" name="is_settled" value="1" <?php echo ($rowData['is_settled'] == 1) ? 'checked' : ''; ?> readonly> (Check if Settled)</td>
+        </tr>
+        <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <button type="button" id="edit-button">Edit Information</button>
+                            <button type="submit" id="save-button" style="display: none;">Save Changes</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 
-<?php
-    } else {
-        echo "<p>No data available.</p>";
-    }
-    ?>
 
+    <script src="js/jquery-3.6.4.js"></script>
+    <script>
 
-<script src="js/jquery-3.6.4.js"></script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, doc,getDoc, getDocs, query, where, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+<?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+    var role = '<?php echo $_SESSION['role']; ?>';
+    var firstName = '<?php echo $_SESSION['first_name']; ?>';
+    var lastName = '<?php echo $_SESSION['last_name']; ?>';
 
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+<?php } ?>
+// Add a click event listener to the "Edit Information" button
+document.getElementById('edit-button').addEventListener('click', function() {
+    // Get all the input elements in the form
+    var inputs = document.querySelectorAll('input');
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYwTjdJbocOuQqUUPPcjQ49Y8R2eng0E",
-    authDomain: "ctmeu-d5575.firebaseapp.com",
-    projectId: "ctmeu-d5575",
-    storageBucket: "ctmeu-d5575.appspot.com",
-    messagingSenderId: "1062661015515",
-    appId: "1:1062661015515:web:c0f4f62b1f010a9216c9fe",
-    measurementId: "G-65PXT5618B"
-  };
-
-    // Initialize Firebase
-    initializeApp(firebaseConfig);
-    const db = getFirestore();
- // Check if user is logged in
- const isLoggedIn = sessionStorage.getItem('username') !== null;
-
- // Function to track changes and store them in Firestore
- const trackChanges = async (docId, changedField, oldValue, newValue) => {
-    const changesCollection = collection(db, 'ChangeLog');
-
-    // Add a new document with the changes
-    await addDoc(changesCollection, {
-      docId,
-      changedField,
-      oldValue,
-      newValue,
-      timestamp: new Date(),
+    // Loop through the inputs and toggle the readonly-input class
+    inputs.forEach(function(input) {
+        input.classList.toggle('readonly-input');
+        input.readOnly = !input.readOnly; // Toggle the readonly property
     });
-  };
 
- // Function to fetch all field names and their values from the document and display them
- const fetchDocumentData = async (docId) => {
-    try {
-      // Get the document reference based on the provided document ID
-      const ticketDocRef = doc(db, 'archive', docId); // Reference to the Firestore document
-
-      // Get the document data
-      const docSnap = await getDoc(ticketDocRef);
-      if (docSnap.exists()) {
-        const ticketData = docSnap.data();
-
-        const tableBody = document.getElementById('table-body');
-
-        // Clear the existing table rows
-        tableBody.innerHTML = '';
-
-        // Loop through all fields and create rows in the table
-        for (const [fieldName, fieldValue] of Object.entries(ticketData)) {
-          const row = document.createElement('tr');
-          const nameCell = document.createElement('td');
-          const valueCell = document.createElement('td');
-
-          nameCell.textContent = fieldName;
-          valueCell.textContent = fieldValue;
-
-          row.appendChild(nameCell);
-          row.appendChild(valueCell);
-          tableBody.appendChild(row);
-        }
-      } else {
-        console.error('Document not found!');
-      }
-    } catch (error) {
-      console.error('Error fetching document data:', error);
+    // Toggle the button text between "Edit Information" and "Save Changes"
+    var editButton = document.getElementById('edit-button');
+    var saveButton = document.getElementById('save-button');
+    if (editButton.style.display === 'none') {
+        editButton.style.display = 'block';
+        saveButton.style.display = 'none';
+        editButton.textContent = 'Edit Information';
+    } else {
+        editButton.style.display = 'none';
+        saveButton.style.display = 'block';
+        editButton.textContent = 'Cancel';
     }
-  };
-
-// Function to fetch violation data and populate the table
-const fetchViolationData = async (docId) => {
-    try {
-      // Get the document reference based on the provided document ID
-      const ticketDocRef = doc(db, 'archive', docId); // Reference to the Firestore document
-
-      // Get the document data
-      const docSnap = await getDoc(ticketDocRef);
-      if (docSnap.exists()) {
-        const ticketData = docSnap.data();
-
-        // Check if the document has the 'violation' field and is an array
-        if (Array.isArray(ticketData.violation)) {
-          const violationTableBody = document.getElementById('violation-table-body');
-
-          // Clear the existing table rows
-          violationTableBody.innerHTML = '';
-
-          // Loop through the violations and create rows in the table
-          ticketData.violation.forEach((violation, index) => {
-            const row = document.createElement('tr');
-            const numCell = document.createElement('td');
-            const violationCell = document.createElement('td');
-
-            numCell.textContent = index + 1; // Add 1 to index to show a 1-based count
-            violationCell.textContent = violation;
-
-            row.appendChild(numCell);
-            row.appendChild(violationCell);
-            violationTableBody.appendChild(row);
-          });
-        }
-      } else {
-        console.error('Document not found!');
-      }
-    } catch (error) {
-      console.error('Error fetching violation data:', error);
-    }
-  };
-
-  // Call the fetchViolationData function when the page loads
-  const queryParams = new URLSearchParams(window.location.search);
-  const docId = queryParams.get('docId');
-  if (docId) {
-    fetchViolationData(docId);
-    fetchDocumentData(docId);
-  }
-
-
-
-
-if (isLoggedIn) {
-  
-  // Get the username from the session storage
-  const username = sessionStorage.getItem('username');
-
-  // Get the user document from Firestore
-const usersCollection = collection(db, 'usersCTMEU');
-const userQuery = query(usersCollection, where('username', '==', username));
-
-
-getDocs(userQuery)
-.then((querySnapshot) => {
-if (!querySnapshot.empty) {
-  const docSnapshot = querySnapshot.docs[0];
-  const userData = docSnapshot.data();
-  const role = userData.role;
-  const firstName = userData.firstName;
-  const lastName = userData.lastName;
-
-  // Check if the status is "Enforcer"
-  if (role === 'Enforcer') {
-    const specialButton = document.getElementById('noEnforcers');
-    specialButton.style.display = 'none';
-  }
-
-
-  // Display the logged-in user's credentials
-  const welcomeText = document.getElementById('welcome-text');
-  welcomeText.textContent = `Welcome, ${role}: ${firstName} ${lastName}`;
-} else {
-  console.error('User document not found');
-}
-})
-.catch((error) => {
-console.error('Error retrieving user document:', error);
 });
-
-
-  // Logout button
-  const logoutButton = document.getElementById('logout-button');
-  logoutButton.addEventListener('click', () => {
-    // End session
-    sessionStorage.removeItem('username');
-
-    // Redirect back to the login page (replace "login.html" with the actual login page)
-    window.location.href = 'index.php';
-  });
-} else {
-  // User is not logged in, redirect to the login page
-  window.location.href = 'index.php';
-}
-
-</script>
-<!-- Add any other scripts you may need -->
+    </script>
+    <!-- Add any other scripts you may need -->
+</div>
 </body>
 </html>

@@ -82,7 +82,32 @@ if (!isset($_SESSION['username'])) {
 
   </style>
 <body style="height: auto;">
-
+<?php
+// Check if the limit_reached session variable is set
+if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
+  // Display the Bootstrap Modal when the limit is reached
+  echo '
+  <div class="modal fade" id="limitReachedModal" tabindex="-1" aria-labelledby="limitReachedModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="limitReachedModalLabel">User Limit Reached</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <p>User limit for this role has been reached.</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+  </div>';
+  
+  // Clear the session variable
+  $_SESSION["limit_reached"] = false;
+}
+?>
 <nav class="navbar">
   <div class="logo">
     <img src="images/logo-ctmeu.png" alt="Logo">
@@ -136,11 +161,12 @@ if (!isset($_SESSION['username'])) {
 
     <input type="hidden" id="password" name="password" readonly>
 
+    
+    <button type="button" id="delete-button" style="display:none;">Delete Account</button>
     <button type="submit" id="create-button">Create Account</button>
     <button type="submit" id="update-button">Update Account</button>
     <button type="reset" id="reset-button">Clear</button>
 <!-- Add a new button for deleting the account -->
-<button type="button" id="delete-button" style="display:none;">Delete Account</button>
 </form>
     </div>
   <div class="table-container">
@@ -283,7 +309,14 @@ function generatePassword() {
 </table>
   </div>
   </div>
+ 
   <script>
+
+    // JavaScript function to hide the limitReachedPopup
+    function hideLimitReachedPopup() {
+        var popup = document.getElementById('limitReachedPopup');
+        popup.style.display = 'none';
+    }
 
     // Function to set the username and generate a random password
     function setCredentials() {
