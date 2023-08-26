@@ -1,4 +1,5 @@
 <?php
+
 // Include your database connection code here
 include 'php/database_connect.php';
 

@@ -292,10 +292,11 @@ function generatePassword() {
             <th>Last Name</th>
             <th>Username</th>
             <th>Role</th>
+            <th>Reset Password</th> <!-- New column for reset button -->
         </tr>
     </thead>
     <tbody>
-        <?php
+    <?php
         // Loop through the $userData array and populate the table rows
         foreach ($userData as $user) {
             echo "<tr>";
@@ -303,6 +304,7 @@ function generatePassword() {
             echo "<td>" . $user['last_name'] . "</td>";
             echo "<td>" . $user['username'] . "</td>";
             echo "<td>" . $user['role'] . "</td>";
+            echo "<td><button class='reset-password-button'>Reset Password</button></td>"; // Reset button
             echo "</tr>";
         }
         ?>
@@ -370,6 +372,46 @@ function generatePassword() {
     
   }
 
+  function updatePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+        alert("New password and confirm password do not match.");
+        return;
+    }
+
+    // Make an AJAX request to the PHP script
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'update_password.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = xhr.responseText;
+
+            if (response === 'success') {
+                // Password updated successfully
+                alert('Password updated successfully.');
+                // You can also redirect the user or perform other actions here.
+            } else if (response === 'PasswordMismatch') {
+                alert('New password and confirm password do not match.');
+            } else if (response === 'InvalidPassword') {
+                alert('Current password is incorrect.');
+            } else if (response === 'PasswordTooShort') {
+                alert('New password is too short. It should be at least 8 characters.');
+            } else {
+                alert('An error occurred: ' + response);
+            }
+        }
+    };
+    
+    // Send the request with the form data
+    const data = `currentPassword=${currentPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`;
+    xhr.send(data);
+}
+
 // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
         // Perform logout actions here, e.g., clearing session, redirecting to logout.php
@@ -382,6 +424,18 @@ document.getElementById('logout-button').addEventListener('click', function() {
     // Get the clicked row and its cells
     const row = event.target.parentElement;
     const cells = row.cells;
+
+    if (event.target.classList.contains('reset-password-button')) {
+        // Get the corresponding row
+        const row = event.target.parentElement.parentElement;
+        
+        // Update the password for this row (assuming the first cell is the username)
+        const username = row.cells[2].textContent; // Assuming username is in the third cell (index 2)
+        updatePassword(username, 'password123'); // Call the function to update the password
+        
+        // Optionally, you can update the UI to reflect the new password
+        // For example, you can change the password in the table or display a success message.
+    }
 
     // If a row is clicked and not the table header row
     if (row && row.rowIndex > 0) {

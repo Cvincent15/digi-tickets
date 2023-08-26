@@ -1,6 +1,6 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
+include 'php/database_connect.php';
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
@@ -14,6 +14,7 @@ if (!isset($_SESSION['username'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
@@ -32,12 +33,12 @@ if (!isset($_SESSION['username'])) {
 </style>
 <body style="height: auto;">
 <?php
-include 'php/database_connect.php'; // Include your database connection script
 
-// Check if the user is logged in
+// Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: index.php"); // Redirect to the login page if not logged in
-    exit();
+  // Redirect the user to the greeting page if they are already logged in
+  header("Location: index.php");
+  exit();
 }
 
 // Fetch user data based on the logged-in user's username
@@ -56,40 +57,7 @@ $firstName = $user['first_name'];
 $lastName = $user['last_name'];
 $status = $user['role'];
 
-// Process password change request if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  // Retrieve submitted data
-  $currentPassword = $_POST['currentPassword'];
-  $newPassword = $_POST['newPassword'];
-  $confirmPassword = $_POST['confirmPassword'];
 
-  // Validate the current password (you might want to implement a more secure validation)
-  if ($currentPassword === $user['password']) {
-      if ($newPassword === $confirmPassword) {
-          // Validate the new password length
-          if (validatePasswordLength($newPassword)) {
-              // Update the user's password in the database
-              $newPassword = mysqli_real_escape_string($conn, $newPassword);
-              $updateQuery = "UPDATE users SET password = '$newPassword' WHERE username = '$username'";
-              $updateResult = mysqli_query($conn, $updateQuery);
-
-              if ($updateResult) {
-                  // Password successfully updated
-                  echo "Password updated successfully.";
-              } else {
-                  // Handle the database update error
-                  echo "Password update failed: " . mysqli_error($conn);
-              }
-          } else {
-              echo "New password should be at least 8 characters long.";
-          }
-      } else {
-          echo "New password and confirm password do not match.";
-      }
-  } else {
-      echo "Current password is incorrect.";
-  }
-}
 ?>
 
 <nav class="navbar">
@@ -136,24 +104,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <h4 id='fname-text' style='margin-left:20px;'></h4>
   <h4 id='lname-text' style='margin-left:20px;'></h4>
   <h4 id='stat-text' style='margin-left:20px;'></h4><br>
-  <form id="passwordChangeForm" style="text-align: center;">
-    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <h4 for="currentPassword" style="text-align: left;">Current Password:</h4>
-      <input type="password" id="currentPassword" name="currentPassword" required>
-    </div>
+  <form id="passwordChangeForm" style="text-align: center;" method="POST">
+            <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+                <h4 for="currentPassword" style="text-align: left;">Current Password:</h4>
+                <input type="password" id="currentPassword" name="currentPassword" required>
+            </div>
 
-    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <h4 for="newPassword" style="text-align: left;">New Password:</h4>
-      <input type="password" id="newPassword" name="newPassword" required>
-    </div>
+            <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+                <h4 for="newPassword" style="text-align: left;">New Password:</h4>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
 
-    <div style="display: flex; justify-content: space-between; margin: 0 20px;">
-      <h4 for="confirmPassword" style="text-align: left;">Confirm New Password:</h4>
-      <input type="password" id="confirmPassword" name="confirmPassword" required>
-    </div>
+            <div style="display: flex; justify-content: space-between; margin: 0 20px;">
+                <h4 for="confirmPassword" style="text-align: left;">Confirm New Password:</h4>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
 
-    <button class='btn btn-primary Change' type="submit" style='margin: 20px auto;'>Change Password</button>
-  </form>
+            <button class='btn btn-primary Change' type="submit" style='margin: 20px auto;' id="changePasswordButton">Change Password</button>
+
+        </form>
 </div>
 
   <div class="table-container">
@@ -170,9 +139,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
-  function validatePasswordLength($password) {
-    return strlen($password) >= 8;
-}
+
+$(document).ready(function () {
+    // Add a click event listener to the Change Password button
+    $('#changePasswordButton').click(function (e) {
+        e.preventDefault(); // Prevent the form from submitting normally
+
+        // Get the form data
+        var currentPassword = $('#currentPassword').val();
+        var newPassword = $('#newPassword').val();
+        var confirmPassword = $('#confirmPassword').val();
+
+        // Send an AJAX request to password_change.php
+        $.ajax({
+            type: 'POST',
+            url: 'php/password_change.php',
+            data: {
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            },
+            success: function (response) {
+                if (response === "success") {
+                    // Password updated successfully
+                    alert('Password updated successfully!');
+                } else if (response === "PasswordMismatch") {
+                    alert('New password and confirm password do not match!');
+                } else if (response === "InvalidPassword") {
+                    alert('Current password is incorrect');
+                } else {
+                    alert('An error occurred: ' + response);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('AJAX error: ' + error);
+            }
+        });
+    });
+});
 
   $(document).ready(function () {
     // Display user data in placeholders
@@ -180,23 +184,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $('#lname-text').text("Last Name: " + '<?php echo $lastName; ?>');
     $('#stat-text').text("Role: " + '<?php echo $status; ?>');
 
-    // Handle the password change form submission
-    $('#passwordChangeForm').submit(function (e) {
-        e.preventDefault();
-        var currentPassword = $('#currentPassword').val();
-        var newPassword = $('#newPassword').val();
-        var confirmPassword = $('#confirmPassword').val();
-
-        // Send a POST request to your PHP script to process the password change
-        $.post('php/password_change.php', {
-            currentPassword: currentPassword,
-            newPassword: newPassword,
-            confirmPassword: confirmPassword
-        }, function (data) {
-            // Display the result of the password change operation
-            alert(data);
-        });
-    });
 });
 
 // Add a click event listener to the logout button
