@@ -1,60 +1,55 @@
 <?php
-
 session_start();
-include 'database_connect.php'; // Include your database connection script
+include 'database_connect.php';
 
-// Check if the user is logged in
-if (!isset($_SESSION['username'])) {
-    // Redirect to the login page if not logged in
-    header("Location: ../index.php");
-    exit();
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currentPassword']) && isset($_POST['newPassword']) && isset($_POST['confirmPassword'])) {
+    $currentPassword = $_POST['currentPassword'];
+    $newPassword = $_POST['newPassword'];
+    $confirmPassword = $_POST['confirmPassword'];
 
-// Fetch user data based on the logged-in user's username
-$username = $_SESSION['username'];
-$query = "SELECT * FROM users WHERE username = '$username'";
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    // Handle the database query error
-    die("Database query failed: " . mysqli_error($conn));
-}
-
-// Fetch the user's data
-$user = mysqli_fetch_assoc($result);
-$firstName = $user['first_name'];
-$lastName = $user['last_name'];
-$status = $user['role'];
-
-// Retrieve submitted data
-$currentPassword = $_POST['currentPassword'];
-$newPassword = $_POST['newPassword'];
-$confirmPassword = $_POST['confirmPassword'];
-
-// Validate the current password (you might want to implement a more secure validation)
-if ($currentPassword === $user['password']) {
     // Check if the new password meets the minimum length requirement (e.g., 8 characters)
-    if (strlen($newPassword) >= 8) {
+    if (strlen($newPassword) < 8) {
+        echo "PasswordTooShort";
+        exit; // Exit the script
+    }
+
+    // Fetch user data based on the logged-in user's username
+    $username = $_SESSION['username'];
+    $query = "SELECT * FROM users WHERE username = '$username'";
+    $result = mysqli_query($conn, $query);
+
+    if (!$result) {
+        // Handle the database query error
+        die("Database query failed: " . mysqli_error($conn));
+    }
+
+    // Fetch the user's data
+    $user = mysqli_fetch_assoc($result);
+    $storedPassword = $user['password'];
+
+    if (password_verify($currentPassword, $storedPassword)) {
+        // Current password is correct, now check if new password matches the confirm password
         if ($newPassword === $confirmPassword) {
-            // Update the user's password in the database
-            $newPassword = mysqli_real_escape_string($conn, $newPassword);
-            $updateQuery = "UPDATE users SET password = '$newPassword' WHERE username = '$username'";
+            // Update the password in the database
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $updateQuery = "UPDATE users SET password = '$hashedPassword' WHERE username = '$username'";
             $updateResult = mysqli_query($conn, $updateQuery);
 
             if ($updateResult) {
-                // Password successfully updated
-                echo "Password updated successfully.";
+                // Password updated successfully
+                echo "success";
             } else {
-                // Handle the database update error
-                echo "Password update failed: " . mysqli_error($conn);
+                // Handle database error
+                echo "Database error: " . mysqli_error($conn);
             }
         } else {
-            echo "New password and confirm password do not match.";
+            echo "PasswordMismatch";
         }
     } else {
-        echo "New password should be at least 8 characters long.";
+        echo "InvalidPassword";
     }
 } else {
-    echo "Current password is incorrect.";
+    // Handle invalid request
+    echo "InvalidRequest";
 }
 ?>
