@@ -1,12 +1,122 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
+include 'php/database_connect.php'; // Include your database connection code here
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-    // Redirect the user to the greeting page if they are already logged in
-    header("Location: index.php");
-    exit();
+  // Redirect the user to the greeting page if they are not logged in
+  header("Location: index.php");
+  exit();
+}
+
+// Define a function to fetch data from the violation_tickets table
+function fetchViolationTickets() {
+  global $conn; // Assuming you have a database connection established
+
+  // Specify the columns you want to fetch from the violation_tickets table
+  $sql = "SELECT t.ticket_id, t.driver_name, t.driver_address, t.driver_license, t.issuing_district, t.vehicle_type, t.plate_no, t.cor_no, t.place_issued, t.reg_owner, t.reg_owner_address, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violations
+          FROM violation_tickets AS t
+          LEFT JOIN violations AS v ON t.ticket_id = v.ticket_id_violations
+          GROUP BY t.ticket_id"; // Modify this query as needed
+
+  // Execute the query
+  $result = mysqli_query($conn, $sql);
+
+  // Check if the query was successful
+  if ($result) {
+    // Initialize an empty array to store the fetched data
+    $data = array();
+
+    // Fetch data and store it in the array
+    while ($row = mysqli_fetch_assoc($result)) {
+      $data[] = $row;
+    }
+
+    // Return the fetched data
+    return $data;
+  } else {
+    // Handle the error, e.g., display an error message
+    echo "Error: " . mysqli_error($conn);
+    return array(); // Return an empty array if there was an error
+  }
+}
+
+// Fetch the violation ticket data
+$violationTickets = fetchViolationTickets();
+
+function generatePDF($data) {
+  require_once('TCPDF/tcpdf.php');
+  
+  // Create a new TCPDF instance with landscape orientation
+  $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+  
+  // Set document information
+  $pdf->SetCreator('Your Name');
+  $pdf->SetAuthor('Your Name');
+  $pdf->SetTitle('CTMEU Traffic Violation Data');
+  $pdf->SetSubject('Traffic Violation Data');
+  $pdf->SetKeywords('CTMEU, traffic violation, PDF');
+  
+  // Add a page
+  $pdf->AddPage();
+  
+  // Set font
+  $pdf->SetFont('helvetica', '', 10);
+  
+  // Define the table layout
+  $tbl = '<table width="100%" cellspacing="0" cellpadding="4" border="1">';
+  $tbl .= '<tr bgcolor="#cccccc">';
+  $tbl .= '<th>No.</th>';
+  $tbl .= '<th>Name</th>';
+  $tbl .= '<th>License No.</th>';
+  $tbl .= '<th>Address</th>';
+  $tbl .= '<th>District</th>';
+  $tbl .= '<th>Owner</th>';
+  $tbl .= '<th>Owner Address</th>';
+  $tbl .= '<th>Place Occurred</th>';
+  $tbl .= '<th>Plate</th>';
+  $tbl .= '<th>Vehicle</th>';
+  $tbl .= '<th>Violation</th>';
+  $tbl .= '<th>Date Occurred</th>';
+  $tbl .= '<th>Account Status</th>';
+  $tbl .= '</tr>';
+  
+  // Populate the table rows with data
+  foreach ($data as $row) {
+    $tbl .= '<tr>';
+    $tbl .= '<td>' . $row['ticket_id'] . '</td>';
+    $tbl .= '<td>' . $row['driver_name'] . '</td>';
+    $tbl .= '<td>' . $row['driver_license'] . '</td>';
+    $tbl .= '<td>' . $row['driver_address'] . '</td>';
+    $tbl .= '<td>' . $row['issuing_district'] . '</td>';
+    $tbl .= '<td>' . $row['reg_owner'] . '</td>';
+    $tbl .= '<td>' . $row['reg_owner_address'] . '</td>';
+    $tbl .= '<td>' . $row['place_of_occurrence'] . '</td>';
+    $tbl .= '<td>' . $row['plate_no'] . '</td>';
+    $tbl .= '<td>' . $row['vehicle_type'] . '</td>';
+    // Inside the table loop
+    if (!empty($row['violations'])) {
+      $tbl .= '<td>' . $row['violations'] . '</td>';
+    } else {
+      $tbl .= '<td>Null</td>';
+    }
+    $tbl .= '<td>' . $row['date_time_violation'] . '</td>';
+    $tbl .= '<td>' . ($row['is_settled'] == 0 ? 'Settled' : 'Unsettled') . '</td>';
+    $tbl .= '</tr>';
+  }
+  
+  $tbl .= '</table>';
+  
+  // Output the table to the PDF
+  $pdf->writeHTML($tbl, true, false, false, false, '');
+  
+  // Output the PDF as a download
+  $pdf->Output('violation_tickets.pdf', 'D');
+}
+
+if (isset($_POST['generate_pdf'])) {
+  // Generate the PDF when the form is submitted
+  generatePDF($violationTickets);
 }
 ?>
 <!DOCTYPE html>
@@ -26,9 +136,7 @@ if (!isset($_SESSION['username'])) {
         height: auto; /* Adjust the height as needed */
         text-align: left;
     }
-  .clickable-row {
-    cursor: pointer;
-  }
+  
 </style>
 <body style="height: auto;">
 
@@ -55,11 +163,55 @@ if (!isset($_SESSION['username'])) {
   </div>
   </div>
 </nav>
+
+
 <div class="card">
-  <button class="btn btn-primary" onclick="generatePDF()" style="margin:0;">GENERATE PDF</button>
+    <div class="date-filter-container">
+  <label for="start-month">Start Month:</label>
+  <select id="start-month">
+    <option value="01">January</option>
+    <option value="02">February</option>
+    <option value="03">March</option>
+    <option value="04">April</option>
+    <option value="05">May</option>
+    <option value="06">June</option>
+    <option value="07">July</option>
+    <option value="08">August</option>
+    <option value="09">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option> 
+  </select>
+
+  <label for="end-month">End Month:</label>
+  <select id="end-month">
+    <option value="01">January</option>
+    <option value="02">February</option>
+    <option value="03">March</option>
+    <option value="04">April</option>
+    <option value="05">May</option>
+    <option value="06">June</option>
+    <option value="07">July</option>
+    <option value="08">August</option>
+    <option value="09">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option> 
+  </select>
+
+  <label for="year">Year:</label>
+  <input type="text" id="year" placeholder="Enter Year">
+  
+  <button class="btn btn-primary" id="filter-button">Apply Filter</button>
+</div>
 </div>
 
-<div class="table-container">
+
+<form method="post">
+        <button class="btn btn-primary" type="submit" name="generate_pdf" style="display: none;">Generate PDF</button>
+    </form>
+
+<div class="table-container" style="display: none;">
 <table>
         <thead>
             <tr>
@@ -74,19 +226,172 @@ if (!isset($_SESSION['username'])) {
                 <th>Plate</th>
                 <th>Vehicle</th>
                 <th>Violation</th>
+                <th>Date Occurred</th>
+                <th>Account Status</th>
             </tr>
         </thead>
         <tbody id="ticket-table-body">
-            <!-- Replace the sample data below with the data fetched from your database -->
-           
-            <!-- Add more rows as needed -->
+            <?php
+            $visibleTicketCount = 0; // Initialize a counter for visible tickets
+
+            // Inside the loop that populates the table rows
+foreach ($violationTickets as $index => $ticket) {
+  // Check if the is_settled value is 0 before making the row clickable
+  if ($ticket['is_settled'] == 0) {
+      $visibleTicketCount++; // Increment the visible ticket counter
+
+      // Convert the row data to a JSON string
+      $rowData = json_encode($ticket);
+
+      echo "<tr class='clickable-row' data-rowdata='$rowData'>";
+      // Display the visible ticket count in the "No." column
+      echo "<td>" . $visibleTicketCount . "</td>";
+      // Add the columns from the fetched data
+      echo "<td>" . $ticket['driver_name'] . "</td>";
+      echo "<td>" . $ticket['driver_license'] . "</td>";
+      echo "<td>" . $ticket['driver_address'] . "</td>";
+      echo "<td>" . $ticket['issuing_district'] . "</td>";
+      echo "<td>" . $ticket['reg_owner'] . "</td>";
+      echo "<td>" . $ticket['reg_owner_address'] . "</td>";
+      echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
+      echo "<td>" . $ticket['plate_no'] . "</td>";
+      echo "<td>" . $ticket['vehicle_type'] . "</td>";
+      // Inside the table loop
+      if (!empty($ticket['violations'])) {
+          echo "<td>" . $ticket['violations'] . "</td>";
+      } else {
+          echo "<td>Null</td>";
+      }
+      echo "<td>" . $ticket['date_time_violation'] . "</td>";
+      echo "<td>Settled</td>"; // Display "Settled" for is_settled = 0
+      echo "</tr>";
+  } else {
+      // For rows with is_settled value equal to 1, display "Settled"
+      $visibleTicketCount++; // Increment the visible ticket counter
+
+      // Convert the row data to a JSON string
+      $rowData = json_encode($ticket);
+
+      echo "<tr class='clickable-row' data-rowdata='$rowData'>";
+      // Display the visible ticket count in the "No." column
+      echo "<td>" . $visibleTicketCount . "</td>";
+      // Add the columns from the fetched data
+      echo "<td>" . $ticket['driver_name'] . "</td>";
+      echo "<td>" . $ticket['driver_license'] . "</td>";
+      echo "<td>" . $ticket['driver_address'] . "</td>";
+      echo "<td>" . $ticket['issuing_district'] . "</td>";
+      echo "<td>" . $ticket['reg_owner'] . "</td>";
+      echo "<td>" . $ticket['reg_owner_address'] . "</td>";
+      echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
+      echo "<td>" . $ticket['plate_no'] . "</td>";
+      echo "<td>" . $ticket['vehicle_type'] . "</td>";
+      // Inside the table loop
+      if (!empty($ticket['violations'])) {
+          echo "<td>" . $ticket['violations'] . "</td>";
+      } else {
+          echo "<td>Null</td>";
+      }
+      echo "<td>" . $ticket['date_time_violation'] . "</td>";
+      echo "<td>Settled</td>"; // Display "Settled" for is_settled = 1
+      echo "</tr>";
+  }
+}
+            ?>
         </tbody>
     </table>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
+
     <script>
+      // Function to show or hide the "Generate PDF" button and table
+    function togglePDFButtonAndTableVisibility(show) {
+        var generatePDFButton = document.querySelector('button[name="generate_pdf"]');
+        var tableContainer = document.querySelector('.table-container');
+        
+        if (show) {
+            generatePDFButton.style.display = 'block';
+            tableContainer.style.display = 'block';
+        } else {
+            generatePDFButton.style.display = 'none';
+            tableContainer.style.display = 'none';
+        }
+    }
+    
+// Define an event listener for the filter button
+document.getElementById('filter-button').addEventListener('click', function() {
+    // Get the selected start month, end month, and year
+    var startMonth = document.getElementById('start-month').value;
+    var endMonth = document.getElementById('end-month').value;
+    var year = document.getElementById('year').value;
+
+    // Check if the start month is after the end month
+    if (year == '' || startMonth > endMonth) {
+        alert('Invalid date range. Please select a valid date range.');
+        return; // Exit the function without filtering the table
+    }
+
+    // Filter the table based on the selected date range
+    filterTableByDate(startMonth, endMonth, year);
+
+    // Show the "Generate PDF" button and table
+    togglePDFButtonAndTableVisibility(true);
+});
+// Function to filter the table based on the selected date range
+function filterTableByDate(startMonth, endMonth, year) {
+    var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+    rows.forEach(function(row) {
+        var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+        var ticketDateStr = rowData['date_time_violation'];
+        var ticketDate = new Date(ticketDateStr);
+
+        var ticketMonth = String(ticketDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-based
+        var ticketYear = String(ticketDate.getFullYear());
+
+        if (
+            (ticketYear < year) || // Ticket year is less than the selected year
+            (ticketYear === year && ticketMonth >= startMonth && ticketMonth <= endMonth)
+        ) {
+            row.style.display = ''; // Show the row if it partially matches the filter
+        } else {
+            row.style.display = 'none'; // Hide the row if it doesn't match the filter
+        }
+    });
+}
+
+
+
+// Function to populate the month options
+function populateMonthOptions() {
+    var startMonthSelect = document.getElementById('start-month');
+    var endMonthSelect = document.getElementById('end-month');
+
+    // Define an array of month names
+    var monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Populate start and end month options
+    for (var i = 1; i <= 12; i++) {
+        var monthValue = String(i).padStart(2, '0'); // Add leading zero if needed
+        var monthName = monthNames[i - 1];
+
+        // Create option elements and add them to the selects
+        var startOption = document.createElement('option');
+        startOption.value = monthValue;
+        startOption.textContent = monthName;
+        startMonthSelect.appendChild(startOption);
+
+        var endOption = document.createElement('option');
+        endOption.value = monthValue;
+        endOption.textContent = monthName;
+        endMonthSelect.appendChild(endOption);
+    }
+}
+
+// Call the function to populate month options when the page loads
+window.addEventListener('load', populateMonthOptions);
       // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
         // Perform logout actions here, e.g., clearing session, redirecting to logout.php
@@ -102,8 +407,6 @@ document.getElementById('logout-button').addEventListener('click', function() {
 
         document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
     <?php } ?>
-
-    
     </script>
 
 </body>

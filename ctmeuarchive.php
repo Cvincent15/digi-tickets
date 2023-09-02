@@ -117,10 +117,10 @@ $violationTickets = fetchViolationTickets();
 <div class="search-container">
   <input type="text" id="search-bar" placeholder="Search...">
   <select id="filter-select">
-    <option value="name">Name</option>
+  <option value="name">Name</option>
     <option value="license">License No.</option>
-    <option value="address">Address</option>
-    <option value="district">District</option>
+    <option value="vehicle">Vehicle</option>
+    <option value="place of occurrence">Place of Occurrence</option>
   </select>
 </div>
 
@@ -131,8 +131,8 @@ $violationTickets = fetchViolationTickets();
             <th>No.</th>
             <th>Name</th>
             <th>License No.</th>
-            <th>Address</th>
-            <th>District</th>
+            <th>Vehicle</th>
+            <th>Place of Occurrence</th>
             
         </tr>
     </thead>
@@ -157,9 +157,9 @@ foreach ($violationTickets as $index => $ticket) {
         // Wrap the license in a clickable <td>
         echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
         // Wrap the address in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_address'] . "</td>";
-        // Wrap the district in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                    // Wrap the district in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
         echo "</tr>";
     } else {
         // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
@@ -186,16 +186,6 @@ document.querySelectorAll('.clickable-cell').forEach(function(cell) {
         window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
     });
 });
-  function rowClick(row) {
-    // Get the row data JSON string
-    var rowData = row.getAttribute('data-rowdata');
-    
-    // Redirect to the details page with the row data as a query parameter
-    // Exclude the bx-archive-in button from the row data
-    var parsedRowData = JSON.parse(rowData);
-    delete parsedRowData.is_settled; // Remove the is_settled property
-    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
-}
 
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
@@ -221,8 +211,8 @@ document.getElementById('logout-button').addEventListener('click', function() {
     var columnMap = {
         'name': 'driver_name',
         'license': 'driver_license',
-        'address': 'driver_address',
-        'district': 'issuing_district'
+        'vehicle': 'vehicle_type',
+        'place of occurrence': 'place_of_occurrence'
     };
 
     // Get the column name based on the selected filter key

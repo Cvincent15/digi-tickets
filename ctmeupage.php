@@ -84,10 +84,6 @@ $violationTickets = fetchViolationTickets();
   display: table-row;
 }
 
-.toggle-archive-button {
-    display: none;
-}
-
 </style>
 <body style="height: auto;">
 
@@ -119,62 +115,73 @@ $violationTickets = fetchViolationTickets();
   <select id="filter-select">
     <option value="name">Name</option>
     <option value="license">License No.</option>
-    <option value="address">Address</option>
-    <option value="district">District</option>
+    <option value="vehicle">Vehicle</option>
+    <option value="place of occurrence">Place of Occurrence</option>
   </select>
 </div>
 
 <div class="table-container">
-<table>
-    <thead>
-        <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>License No.</th>
-            <th>Address</th>
-            <th>District</th>
-            <th><button class="btn btn-primary" id="toggle-archive-buttons"><i class='bx bx-show'></i></button></th>
-        </tr>
-    </thead>
-    <tbody id="ticket-table-body">
-    <?php
-$visibleTicketCount = 0; // Initialize a counter for visible tickets
+    <form id="archive-form" action="php/archiverow.php" method="POST">
+        <button type="submit" class="btn btn-primary" id="archive-button"><i class='bx bx-archive-in'></i></button>
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th><input type="checkbox" id="select-all-checkbox"></th>
+                    <th>Name</th>
+                    <th>License No.</th>
+                    <th>Vehicle</th>
+                    <th>Place of Occurrence</th>
+                </tr>
+            </thead>
+            <tbody id="ticket-table-body">
+            <?php
+            $visibleTicketCount = 0; // Initialize a counter for visible tickets
 
-// Loop through the fetched violation ticket data and populate the table rows
-foreach ($violationTickets as $index => $ticket) {
-    // Check if the is_settled value is 0 before making the row clickable
-    if ($ticket['is_settled'] == 0) {
-        $visibleTicketCount++; // Increment the visible ticket counter
+            // Loop through the fetched violation ticket data and populate the table rows
+            foreach ($violationTickets as $index => $ticket) {
+                // Check if the is_settled value is 0 before making the row clickable
+                if ($ticket['is_settled'] == 0) {
+                    $visibleTicketCount++; // Increment the visible ticket counter
 
-        // Convert the row data to a JSON string
-        $rowData = json_encode($ticket);
+                    // Convert the row data to a JSON string
+                    $rowData = json_encode($ticket);
 
-        echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
-        // Display the visible ticket count in the "No." column
-        echo "<td>" . $visibleTicketCount . "</td>";
-        // Wrap the name in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
-        // Wrap the license in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
-        // Wrap the address in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_address'] . "</td>";
-        // Wrap the district in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
-        // Add a placeholder for the button
-        echo "<td class='toggle-button-cell'><button class='btn btn-primary toggle-archive-button'><i class='bx bx-archive-in'></i></button></td>";
-        echo "</tr>";
-    } else {
-        // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
-        // Example: Display a message or simply don't include them in the table.
-    }
-}
-?>
-    </tbody>
-</table>
-    </div>
+                    echo "<tr>";
+                    // Display the visible ticket count in the "No." column
+                    echo "<td>" . $visibleTicketCount . "</td>";
+                    // Add a checkbox for archiving
+                    echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
+                    // Wrap the name in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+                    // Wrap the license in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+                    // Wrap the address in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                    // Wrap the district in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
+                    echo "</tr>";
+                } else {
+                    // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+                    // Example: Display a message or simply don't include them in the table.
+                }
+            }
+            ?>
+            </tbody>
+        </table>
+    </form>
+</div>
+
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
+document.getElementById('select-all-checkbox').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = document.getElementById('select-all-checkbox').checked;
+        });
+    });
+
   // Add a click event listener to the clickable cells
 document.querySelectorAll('.clickable-cell').forEach(function(cell) {
     cell.addEventListener('click', function() {
@@ -199,48 +206,6 @@ document.querySelectorAll('.clickable-cell').forEach(function(cell) {
     window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
 }
 
-// Add a click event listener to the toggle-archive-buttons button
-document.getElementById('toggle-archive-buttons').addEventListener('click', function() {
-    // Select all elements with the class toggle-archive-button
-    var archiveButtons = document.querySelectorAll('.toggle-archive-button');
-    
-    // Loop through the archive buttons and toggle their display
-    archiveButtons.forEach(function(button) {
-        button.style.display = button.style.display === 'none' ? 'inline-block' : 'none';
-    });
-});
-
-// Add an event listener to the table container (outside the foreach loop)
-document.querySelector('.table-container').addEventListener('click', function(event) {
-    if (event.target.classList.contains('toggle-archive-button')) {
-        // Handle the button click here
-        var buttonCell = event.target.closest('.toggle-button-cell');
-        buttonCell.innerHTML = ''; // Remove the button
-        
-        // Get the row data JSON string
-        var rowData = buttonCell.parentElement.getAttribute('data-rowdata');
-        var parsedRowData = JSON.parse(rowData);
-
-        // Set the is_settled value to 1
-        parsedRowData.is_settled = 1;
-
-        // Make an AJAX request to update_ticket.php
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'php/archiverow.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // Database update successful
-                console.log(xhr.responseText);
-                location.reload();
-            } else {
-                // Database update failed
-                console.error('Database update failed:', xhr.responseText);
-            }
-        };
-        xhr.send(JSON.stringify(parsedRowData));
-    }
-});
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
         // Perform logout actions here, e.g., clearing session, redirecting to logout.php
@@ -265,8 +230,8 @@ document.getElementById('logout-button').addEventListener('click', function() {
     var columnMap = {
         'name': 'driver_name',
         'license': 'driver_license',
-        'address': 'driver_address',
-        'district': 'issuing_district'
+        'vehicle': 'vehicle_type',
+        'place of occurrence': 'place_of_occurrence'
     };
 
     // Get the column name based on the selected filter key
