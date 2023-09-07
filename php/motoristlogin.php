@@ -3,41 +3,42 @@ session_start();
 include 'database_connect.php';
 
 // Retrieve the login form data and trim it
-$username = trim($_POST['username']);
+$email = trim($_POST['email']);
 $password = trim($_POST['password']);
 
-echo "Debug: Username: " . $username . "<br>"; // Output the username
-echo "Debug: Password: " . $password . "<br>"; // Output the password
+// Use htmlspecialchars to sanitize user input to prevent XSS
+$email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
 
 // Prepare the query using placeholders for username
-$stmt = $conn->prepare("SELECT * FROM users_motorists WHERE username = ?");
-$stmt->bind_param("s", $username);
+$stmt = $conn->prepare("SELECT driver_email, driver_password FROM users_motorists WHERE driver_email = ?");
+$stmt->bind_param("s", $email);
 $stmt->execute();
 
 // Get the result
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-if ($user) {
-    // Verify the hashed password
-    //echo "Debug: Hashed Password in DB: " . $user['password'] . "<br>"; // Output the hashed password in the database
-    if (password_verify($password, $user['driver_password'])) {
-        // Password is correct, set the session variables
-        $_SESSION['username'] = $username;
-    } else {
-        // Password is incorrect, display an error message
-        echo "Invalid username or password";
-        header('Refresh: 5; URL= ../motorist_login.php');
-    }
-} else {
-    // User not found, display an error message
-    echo "User not found.";
-    header('Refresh: 5; URL= ../motorist_ login.php');
-}
-
 // Close the statement and connection
 $stmt->close();
 $conn->close();
 
-
+if ($user) {
+    // Verify the hashed password
+    if (password_verify($password, $user['driver_password'])) {
+        // Password is correct, set the session variables
+        $_SESSION['email'] = $email;
+        header("Location: ../MotoristMain.php"); 
+        exit(); // Always exit after a header redirect
+    } else {
+        // Password is incorrect, display an error message
+        echo "Invalid username or password";
+        header('Refresh: 5; URL= ../motorist_login.php');
+        exit();
+    }
+} else {
+    // User not found, display an error message
+    echo "User not found.";
+    header('Refresh: 5; URL= ../motorist_login.php');
+    exit();
+}
 ?>

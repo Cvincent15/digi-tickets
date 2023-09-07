@@ -2,15 +2,19 @@
 session_start();
 include 'database_connect.php';
 
-// Retrieve the login form data and trim it
-$username = trim($_POST['username']);
+// Validate and sanitize the login form data
+$username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 $password = trim($_POST['password']);
 
-echo "Debug: Username: " . $username . "<br>"; // Output the username
-echo "Debug: Password: " . $password . "<br>"; // Output the password
+if (empty($username) || empty($password)) {
+    // Handle empty input data
+    echo "Invalid input data.";
+    header('Refresh: 1; URL= ../index.php');
+    exit();
+}
 
 // Prepare the query using placeholders for username
-$stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+$stmt = $conn->prepare("SELECT username, password, first_name, last_name, role FROM users WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 
@@ -20,10 +24,9 @@ $user = $result->fetch_assoc();
 
 if ($user) {
     // Verify the hashed password
-    //echo "Debug: Hashed Password in DB: " . $user['password'] . "<br>"; // Output the hashed password in the database
     if (password_verify($password, $user['password'])) {
         // Password is correct, set the session variables
-        $_SESSION['username'] = $username;
+        $_SESSION['username'] = $user['username'];
         $_SESSION['first_name'] = $user['first_name'];
         $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['role'] = $user['role'];
@@ -33,20 +36,17 @@ if ($user) {
         } else {
             header('Location: ../ctmeupage.php');
         }
+        exit(); // Always exit after a header redirect
     } else {
         // Password is incorrect, display an error message
         echo "Invalid username or password";
         header('Refresh: 1; URL= ../index.php');
+        exit();
     }
 } else {
     // User not found, display an error message
     echo "User not found.";
     header('Refresh: 1; URL= ../index.php');
+    exit();
 }
-
-// Close the statement and connection
-$stmt->close();
-$conn->close();
-
-
 ?>

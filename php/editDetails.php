@@ -10,7 +10,7 @@ if (!isset($_SESSION['username'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the form data and sanitize it (you should validate and sanitize more)
+    // Get the form data and sanitize it
     $driverName = mysqli_real_escape_string($conn, $_POST['driver_name']);
     $driverAddress = mysqli_real_escape_string($conn, $_POST['driver_address']);
     $driverLicense = mysqli_real_escape_string($conn, $_POST['driver_license']);
@@ -23,45 +23,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $regOwnerAddress = mysqli_real_escape_string($conn, $_POST['reg_owner_address']);
     $dateTimeViolation = mysqli_real_escape_string($conn, $_POST['date_time_violation']);
     $placeOfOccurrence = mysqli_real_escape_string($conn, $_POST['place_of_occurrence']);
+    $ticketId = intval($_POST['ticket_id']); // Convert to an integer
 
-    // Prepare an SQL statement to update the user data
+    // Prepare an SQL statement using prepared statements to update the user data
     $sql = "UPDATE violation_tickets 
-            SET driver_name = '$driverName', 
-                driver_address = '$driverAddress',
-                driver_license = '$driverLicense',
-                issuing_district = '$issuingDistrict',
-                vehicle_type = '$vehicleType',
-                plate_no = '$plateNo',
-                reg_owner = '$regOwner',
-                reg_owner_address = '$regOwnerAddress',
-                date_time_violation = '$dateTimeViolation',
-                place_of_occurrence = '$placeOfOccurrence'";
+            SET driver_name = ?, 
+                driver_address = ?,
+                driver_license = ?,
+                issuing_district = ?,
+                vehicle_type = ?,
+                plate_no = ?,
+                reg_owner = ?,
+                reg_owner_address = ?,
+                date_time_violation = ?,
+                place_of_occurrence = ?";
 
     // Only add cor_no and place_issued to the SQL statement if they are not empty
     if (!empty($corNo)) {
-        $sql .= ", cor_no = '$corNo'";
+        $sql .= ", cor_no = ?";
     }
     if (!empty($placeIssued)) {
-        $sql .= ", place_issued = '$placeIssued'";
+        $sql .= ", place_issued = ?";
     }
 
     // Add a WHERE clause to specify which user to update based on the ticket_id
-    $sql .= " WHERE ticket_id = " . intval($_POST['ticket_id']);
+    $sql .= " WHERE ticket_id = ?";
 
-    // Execute the SQL query
-    $result = mysqli_query($conn, $sql);
+    // Prepare the statement
+    $stmt = $conn->prepare($sql);
 
-    if ($result) {
-        // The update was successful
-        // Redirect to a success page or back to the details page
-        header("Location: ../ctmeupage.php");
-        exit();
-    } else {
-        // Handle the error, e.g., display an error message
-        echo "Error: " . mysqli_error($conn);
+    if ($stmt) {
+        // Bind the parameters to the prepared statement
+        $stmt->bind_param("ssssssssssi",
+            $driverName,
+            $driverAddress,
+            $driverLicense,
+            $issuingDistrict,
+            $vehicleType,
+            $plateNo,
+            $regOwner,
+            $regOwnerAddress,
+            $dateTimeViolation,
+            $placeOfOccurrence,
+            $ticketId
+        );
+
+        // Execute the SQL query
+        if ($stmt->execute()) {
+            // The update was successful
+            // Redirect to a success page or back to the details page
+            header("Location: ../ctmeupage.php");
+            exit();
+        } else {
+            // Handle the error, e.g., display an error message
+            echo "Error: " . $stmt->error;
+        }
+
+        // Close the prepared statement
+        $stmt->close();
     }
 } else {
     // If the request is not a POST request, redirect to an error page or handle it accordingly
     echo "Error: Invalid request method";
 }
+
+// Close the database connection
+$conn->close();
 ?>

@@ -29,10 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // No checkboxes were selected
         echo "No checkboxes were selected";
+        header('Refresh: 1; URL= ../ctmeupage.php');
     }
 } else {
     // Invalid request method
     echo "Invalid request method";
+    header('Refresh: 1; URL= ../ctmeupage.php');
 }
 
 $conn->close();
