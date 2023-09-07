@@ -1,6 +1,6 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
+include 'php/database_connect.php';
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
@@ -8,6 +8,15 @@ if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 } 
+
+// Function to count the number of super administrators
+function countSuperAdmins($conn) {
+  $sql = "SELECT COUNT(*) as count FROM users WHERE role = 'Super Administrator'";
+  $result = $conn->query($sql);
+  $row = $result->fetch_assoc();
+  return $row['count'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -19,6 +28,9 @@ if (!isset($_SESSION['username'])) {
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+    .clickable-cell {
+      cursor: pointer;
+    }
     .container {
       margin-top:10px;
       border-radius:10px;
@@ -142,10 +154,27 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
     <label for="role">Role:</label>
     <select id="role" name="role" required>
-        <option value="Super Administrator">Super Admin</option>
-        <option value="IT Administrator">IT Admin</option>
-        <option value="Enforcer">Enforcer</option>
-    </select><br>
+    <option value="Enforcer">Enforcer</option>
+    <?php
+    // Call countSuperAdmins function to get the count of super administrators
+    $superAdminCount = countSuperAdmins($conn);
+
+    $itAdminCount = countUsersByRole($conn, 'IT Administrator');
+
+    // Check if the IT admin limit has been reached (e.g., limit is 4)
+    if ($itAdminCount < 4) {
+      echo '<option value="IT Administrator">IT Admin</option>';
+  } else {
+      echo '<option value="IT Administrator" disabled>IT Admin (Limit Reached)</option>';
+  }
+
+    if ($superAdminCount < 2) {
+      echo '<option value="Super Administrator">Super Admin</option>';
+  } else {
+      echo '<option value="Super Administrator" disabled>Super Admin (Limit Reached)</option>';
+  }
+  ?>
+</select><br>
 <!--
     <div class="ticket-container" style="display: none;">
   <label for="startTicket">Start Ticket:</label>
@@ -167,13 +196,13 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     <button type="submit" id="create-button">Create Account</button>
     <button type="submit" id="update-button">Update Account</button>
     <button type="reset" id="reset-button">Clear</button>
+    
+    <button type="button" id="reset-password-button" style="display: none;">Reset Password</button>
 <!-- Add a new button for deleting the account -->
 </form>
     </div>
   <div class="table-container">
   <?php
-// Include your database connection code here
-include 'php/database_connect.php';
 
 // Function to fetch data from the users table
 function fetchUserData($conn) {
@@ -292,7 +321,6 @@ function generatePassword() {
             <th>Last Name</th>
             <th>Username</th>
             <th>Role</th>
-            <th>Reset Password</th> <!-- New column for reset button -->
         </tr>
     </thead>
     <tbody>
@@ -300,11 +328,10 @@ function generatePassword() {
         // Loop through the $userData array and populate the table rows
         foreach ($userData as $user) {
             echo "<tr>";
-            echo "<td>" . $user['first_name'] . "</td>";
-            echo "<td>" . $user['last_name'] . "</td>";
-            echo "<td>" . $user['username'] . "</td>";
-            echo "<td>" . $user['role'] . "</td>";
-            echo "<td><button class='reset-password-button'>Reset Password</button></td>"; // Reset button
+            echo "<td class='clickable-cell'>" . $user['first_name'] . "</td>";
+            echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
+            echo "<td class='clickable-cell'>" . $user['username'] . "</td>";
+            echo "<td class='clickable-cell'>" . $user['role'] . "</td>";
             echo "</tr>";
         }
         ?>
@@ -314,6 +341,72 @@ function generatePassword() {
   </div>
  
   <script>
+    
+document.getElementById('reset-button').addEventListener('click', function() {
+    // Reload the current page when the Clear button is clicked
+    location.reload();
+});
+  // Function to handle row selection and show/hide the "Reset Password" button
+function handleRowSelection(row) {
+    if (selectedRow === row) {
+        // Clear the form fields and hide the "Reset Password" button
+        clearFormFields();
+        document.getElementById('reset-password-button').style.display = 'none';
+    } else {
+        // Populate form fields with the selected row data
+        populateFormFields(row);
+        selectedRow = row;
+        document.getElementById('reset-password-button').style.display = 'inline-block';
+    }
+}
+
+// Add a click event listener to the table rows to handle row selection
+document.getElementById('user-table').addEventListener('click', function (event) {
+    // Get the clicked row
+    const row = event.target.parentElement;
+
+    // Ensure the clicked element is a row and not the table header
+    if (row && row.rowIndex > 0) {
+        handleRowSelection(row);
+    }
+});
+
+// Add a click event listener to the "Reset Password" button
+document.getElementById('reset-password-button').addEventListener('click', function () {
+    // Get the username from the form field
+    const username = document.getElementById('username').value;
+
+    // Make an AJAX request to reset the password
+    resetPassword(username);
+});
+
+// Function to reset the password by making an AJAX request to the PHP script
+function resetPassword(username) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'php/reset_password.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                const response = xhr.responseText;
+                if (response === 'success') {
+                    // Password reset successful
+                    alert('Password reset successful. New password: password123');
+                } else {
+                    // Password reset failed
+                    alert('Password reset failed.');
+                }
+            } else {
+                // Request failed
+                alert('An error occurred while resetting the password.');
+            }
+        }
+    };
+
+    // Send the request with the username as data
+    xhr.send('username=' + encodeURIComponent(username));
+}
+
 
     // JavaScript function to hide the limitReachedPopup
     function hideLimitReachedPopup() {
@@ -372,45 +465,6 @@ function generatePassword() {
     
   }
 
-  function updatePassword() {
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
-    // Check if new password and confirm password match
-    if (newPassword !== confirmPassword) {
-        alert("New password and confirm password do not match.");
-        return;
-    }
-
-    // Make an AJAX request to the PHP script
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'update_password.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = xhr.responseText;
-
-            if (response === 'success') {
-                // Password updated successfully
-                alert('Password updated successfully.');
-                // You can also redirect the user or perform other actions here.
-            } else if (response === 'PasswordMismatch') {
-                alert('New password and confirm password do not match.');
-            } else if (response === 'InvalidPassword') {
-                alert('Current password is incorrect.');
-            } else if (response === 'PasswordTooShort') {
-                alert('New password is too short. It should be at least 8 characters.');
-            } else {
-                alert('An error occurred: ' + response);
-            }
-        }
-    };
-    
-    // Send the request with the form data
-    const data = `currentPassword=${currentPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`;
-    xhr.send(data);
-}
 
 // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {
@@ -419,48 +473,6 @@ document.getElementById('logout-button').addEventListener('click', function() {
         window.location.href = 'php/logout.php';
     });
 
-  // Add click event listener to the table rows instead of individual cells
-  document.getElementById('user-table').addEventListener('click', function (event) {
-    // Get the clicked row and its cells
-    const row = event.target.parentElement;
-    const cells = row.cells;
-
-    if (event.target.classList.contains('reset-password-button')) {
-        // Get the corresponding row
-        const row = event.target.parentElement.parentElement;
-        
-        // Update the password for this row (assuming the first cell is the username)
-        const username = row.cells[2].textContent; // Assuming username is in the third cell (index 2)
-        updatePassword(username, 'password123'); // Call the function to update the password
-        
-        // Optionally, you can update the UI to reflect the new password
-        // For example, you can change the password in the table or display a success message.
-    }
-
-    // If a row is clicked and not the table header row
-    if (row && row.rowIndex > 0) {
-      selectedRowUid = row.getAttribute('data-uid');
-      // Populate form fields with the selected row data
-      populateFormFields(row);
-
-      // Show the "Update Account" button and "Delete" button
-      document.getElementById('create-button').style.display = 'none';
-      document.getElementById('update-button').style.display = 'inline-block';
-      document.getElementById('delete-button').style.display = 'inline-block';
-
-      
-      
-    } else {
-      // Clear the form fields and hide the buttons
-      clearFormFields();
-      document.getElementById('create-button').style.display = 'inline-block';
-      document.getElementById('update-button').style.display = 'none';
-      document.getElementById('delete-button').style.display = 'none';
-
-    }
-  });
-
-  
 
     function validateFName() {
       var nameInput = document.getElementById("firstName");

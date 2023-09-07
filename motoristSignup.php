@@ -1,3 +1,15 @@
+<?php
+session_start();
+include 'php/database_connect.php';
+
+// Check if the user is already logged in
+if (isset($_SESSION['email'])) {
+    // Redirect the user to the greeting page if they are already logged in
+    header("Location: MotoristMain.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,9 +22,28 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.11.14/dist/js/bootstrap-datepicker.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<style>
+  /* Hide the radio buttons */
+.btn-check {
+    display: none;
+}
+
+/* Style the labels to look like buttons */
+.btn-outline-primary {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+}
+
+/* Style the labels when selected */
+.btn-check:checked + .btn-outline-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+</style>
 
 </head>
 
@@ -20,7 +51,7 @@
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="#">
+  <a class="navbar-brand" href="motoristlogin.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
 </a>
@@ -45,14 +76,14 @@
 
 <div class="masthead" style="background-image: url('./images/mainbg.png'); padding-top: 60px;" >
 <section class="container bg-white w-75 text-dark mx-auto p-2 rounded-5">
-<form id="signUpForm" action="#!">
+<form id="signUpForm" action="php/motoristSigning.php" method="POST">
   <div class="row d-flex justify-content-center"><div class="col-md-auto mb-4"><h1 class="reg">Registration</h1></div></div>
         <!-- start step indicators -->
         <div class="form-header d-flex mb-4">
             <span class="stepIndicator">Existing License</span>
             <span class="stepIndicator">Nationality</span>
             <span class="stepIndicator">Personal Details</span>
-            <span class="stepIndicator">Contact</span>
+            <span class="stepIndicator">Contact and Password</span>
         </div>
         <!-- end step indicators -->
     
@@ -69,13 +100,12 @@
               <label class="btn btn-outline-primary" for="btn-check-outlined-2">No</label><br>
             </div>
         </div>
-            <div class="d-grid col-6 mx-auto">
+            <div >
             <div id="license-options" style="display: none;">
             <input type="checkbox" class="btn-check" id="btn-check-outlined-3" autocomplete="off">
               <label class="btn btn-outline-primary" for="btn-check-outlined-3">Driver's License</label><br>
             <input type="checkbox" class="btn-check" id="btn-check-outlined-4" autocomplete="off">
               <label class="btn btn-outline-primary" for="btn-check-outlined-4">Conductor's License</label><br>
-            </div>
             </div>
             <div id="input-fields" style="display: none;">
         <div class="row mt-4">
@@ -87,7 +117,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="License No." name="licenseNo">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="10" maxlength="20"  >
             </div>
             <div class="col-md-6 mb-3">
               <input type="date" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Expiry Date" name="expiry">
@@ -95,29 +125,30 @@
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Serial No. (back of your card)" name="serialNo">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Serial No. (back of your card)" name="serialNo" minlength="12" maxlength="12"  >
             </div>
         </div>
       </div>
         </div>
+            </div>
         </div>
         
         
     
         <!-- step two -->
         <div class="step">
-            <h2 class="text-center mb-4 mt-4" >Are you a Filipino Citizen?</h2>
-            <div class="row d-flex justify-content-center">
-            <div class="col-md-auto mb-4">
-            <input type="checkbox" class="btn-check" id="btn-check-outlined-5" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-check-outlined-5">Yes</label><br>
-            </div>
-            <div class="col-md-auto mb-4">
-              <input type="checkbox" class="btn-check" id="btn-check-outlined-6" autocomplete="off">
-              <label class="btn btn-outline-primary" for="btn-check-outlined-6">No</label><br>
+    <h2 class="text-center mb-4 mt-4">Are you a Filipino Citizen?</h2>
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-auto mb-4">
+            <input type="radio" class="btn-check" name="citizenship" id="btn-check-yes" autocomplete="off" value="1">
+            <label class="btn btn-outline-primary" for="btn-check-yes">Yes</label><br>
+        </div>
+        <div class="col-md-auto mb-4">
+            <input type="radio" class="btn-check" name="citizenship" id="btn-check-no" autocomplete="off" value="0">
+            <label class="btn btn-outline-primary" for="btn-check-no">No</label><br>
             </div>
         </div>
-        </div>
+    </div>
     
         <!-- step three -->
         <div class="step">
@@ -125,15 +156,15 @@
           <div class="row">
           <h2 class="h3 field mb-4">Name</h2>
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Last Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Last Name" name="driverLname" minlength="5" maxlength="20"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="First Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="First Name" name="driverFname" minlength="5" maxlength="20"  >
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Middle Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Middle Name" name="driverMname" minlength="5" maxlength="20"  >
             </div>
         </div>
       </div>
@@ -141,10 +172,10 @@
           <div class="row">
           <h2 class="h3 field mb-4">Birthdate</h2>
           <div class="col-md-6 mb-3">
-              <input type="date" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Date of Birth" name="fullname">
+              <input type="date" class="form-control" id="datepicker2" oninput="this.className = ''" placeholder="Date of Birth" name="birthday">
             </div>
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Gender" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Gender" name="gender" minlength="4" maxlength="10">
             </div>
           </div>
         </div>
@@ -152,15 +183,15 @@
           <div class="row">
             <h2 class="h3 field mb-4">Mother's Maiden Name</h2>
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Last Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Last Name" name="motherLname" minlength="5" maxlength="20"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="First Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="First Name" name="motherFname" minlength="5" maxlength="20"  >
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Middle Name" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Middle Name" name="motherMname" minlength="5" maxlength="20"  >
             </div>
         </div>
       </div>
@@ -175,17 +206,25 @@
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Email Address" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Email Address" name="email" minlength="10" maxlength="25" >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Confirm Email Address" name="fullname">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Email Address" name="email2" minlength="10" maxlength="25"  >
             </div>
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="text" class="form-control" id="input1" oninput="this.className = ''" placeholder="Mobile Phone" name="fullname">
+              <input type="number" class="form-control"  oninput="this.className = ''" placeholder="Mobile Phone" name="phone" minlength="11" maxlength="11">
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Password" name="password" minlength="8" maxlength="25"  >
+            </div>
+            <div class="col-md-6 mb-3">
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Password" name="password2" minlength="8" maxlength="25"  >
+            </div>
+          </div>
       </div>
         </div>
         
@@ -207,11 +246,7 @@
       window.location.href = 'motorist_login.php';
     }
   </script>
-  <script>
-    $(document).ready(function() {
-      $('#datepicker').datepicker();
-    });
-  </script>
+  
 
   
 <script>
@@ -265,7 +300,43 @@
                 input.disabled = !enable;
             });
         }
+
+        // Add event listeners for email and password confirm fields
+const emailInput = document.querySelector('input[name="email"]');
+const emailConfirmInput = document.querySelector('input[name="email2"]');
+const passwordInput = document.querySelector('input[name="password"]');
+const passwordConfirmInput = document.querySelector('input[name="password2"]');
+
+emailInput.addEventListener('input', validateEmailMatch);
+emailConfirmInput.addEventListener('input', validateEmailMatch);
+passwordInput.addEventListener('input', validatePasswordMatch);
+passwordConfirmInput.addEventListener('input', validatePasswordMatch);
+
+// Function to validate email fields
+function validateEmailMatch() {
+    const emailValue = emailInput.value;
+    const emailConfirmValue = emailConfirmInput.value;
+
+    if (emailValue !== emailConfirmValue) {
+        emailConfirmInput.setCustomValidity("Email addresses do not match");
+    } else {
+        emailConfirmInput.setCustomValidity('');
+    }
+}
+
+// Function to validate password fields
+function validatePasswordMatch() {
+    const passwordValue = passwordInput.value;
+    const passwordConfirmValue = passwordConfirmInput.value;
+
+    if (passwordValue !== passwordConfirmValue) {
+        passwordConfirmInput.setCustomValidity("Passwords do not match");
+    } else {
+        passwordConfirmInput.setCustomValidity('');
+    }
+}
 </script>
   <script src="./js/stepper.js"></script>
+  <script src="js/jquery-3.6.4.js"></script>
 </body>
 </html>

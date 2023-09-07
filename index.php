@@ -40,13 +40,13 @@ if (isset($_SESSION['username'])) {
                             <form method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
                                 <div class="form-group">
                                     <div class="input-group mb-0 landing">
-                                        <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="50" size="50" autocomplete="off" class="form-control" required>
+                                        <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group landing">
                                     <div class="input-group">
-                                        <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control" required>
+                                        <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" maxlength="20" class="form-control" required>
                                     </div>
                                 </div>
 

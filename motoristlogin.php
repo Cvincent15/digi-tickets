@@ -1,3 +1,15 @@
+<?php
+session_start();
+include 'php/database_connect.php';
+
+// Check if the user is already logged in
+if (isset($_SESSION['email'])) {
+    // Redirect the user to the greeting page if they are already logged in
+    header("Location: MotoristMain.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +18,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/motorist.css"/>
   <link rel="stylesheet" href="css/bootstrap.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="js/bootstrap.bundle.min.js"></script>
 
 </head>
@@ -14,25 +29,13 @@
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="#">
+  <a class="navbar-brand" href="motoristlogin.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
 </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="d-flex">
-        <ul class="navbar-nav me-2">
-          <li class="nav-item">
-            <a class="nav-link" href="#">LTO Official Page</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
-          </li>
-        </ul>
-      <button class="btn transparent-btn me-2 btn-outline-primary">Register</button>
-      <button class="btn transparent-btn btn-outline-primary">Login</button>
-    </div>
     </div>
   </div>
 </nav>
