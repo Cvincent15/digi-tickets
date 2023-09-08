@@ -191,13 +191,12 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
     <input type="hidden" id="password" name="password" readonly>
 
-    
-    <button type="button" id="delete-button" style="display:none;">Delete Account</button>
-    <button type="submit" id="create-button">Create Account</button>
-    <button type="submit" id="update-button">Update Account</button>
-    <button type="reset" id="reset-button">Clear</button>
-    
-    <button type="button" id="reset-password-button" style="display: none;">Reset Password</button>
+    <button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>
+<button type="submit" id="create-button" class="btn btn-success">Create Account</button>
+<button type="submit" id="update-button">Update Account</button>
+<button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
+<div style="margin-top: 20px;"></div> <!-- Add space above the Reset Password button -->
+<button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
 <!-- Add a new button for deleting the account -->
 </form>
     </div>
