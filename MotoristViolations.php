@@ -1,41 +1,3 @@
-<?php
-session_start();
-include 'php/database_connect.php';
-
-// Check if the user is logged in (you may want to add additional checks)
-if (isset($_SESSION['email'])) {
-  // Retrieve the session email
-  $email = $_SESSION['email'];
-
-  // Prepare a query to fetch user information based on the session email
-  $stmt = $conn->prepare("SELECT * FROM users_motorists WHERE driver_email = ?");
-  $stmt->bind_param("s", $email);
-  $stmt->execute();
-
-  // Get the result
-  $result = $stmt->get_result();
-  
-  // Check if a row with the session email exists
-  if ($result->num_rows > 0) {
-      // Fetch the user's information
-      $user = $result->fetch_assoc();
-      $driverFirstName = $user['driver_first_name'];
-
-      // Now, you can access the user's information, e.g., $user['driver_name'], $user['driver_age'], etc.
-  } else {
-      // User not found in the database
-      echo "User not found in the database.";
-  }
-
-  // Close the statement
-  $stmt->close();
-} else {
-  // Redirect the user to the login page if not logged in
-  header("Location: ../motoristlogin.php");
-  exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +20,7 @@ if (isset($_SESSION['email'])) {
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="#">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
 </a>
@@ -74,18 +36,18 @@ if (isset($_SESSION['email'])) {
             <a class="nav-link" href="#">Contact</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="motoristlogin.php">Dashboard</a>
+            <a class="nav-link" href="#">Dashboard</a>
           </li>
         </ul>
         <div class="dropdown">
   <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-  <img src="./images/Icon.png" style="margin-right: 10px;"><?php echo "".$driverFirstName;  ?>
+    <img src="./images/Icon.png" style="margin-right: 10px;">Jak Roberto
   </a>
 
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" href="#">Action</a></li>
     <li><a class="dropdown-item" href="#">Another action</a></li>
-    <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
+    <li><a class="dropdown-item" href="#">Something else here</a></li>
   </ul>
 </div>
     </div>
@@ -96,7 +58,7 @@ if (isset($_SESSION['email'])) {
 <div class="masthead" style="background-image: url('./images/mainbg.png'); padding-top: 60px; padding-bottom: 60px;" >
 <section class="container bg-white w-75 text-dark mx-auto p-2 rounded-5">
 <form id="profileForm" action="#!">
-  <div class="row d-flex justify-content-center align-items-center"><div class="col-md-auto mb-4"><h1 class="reg"><img src="./images/alternateinvoice.png" style="margin-right: 10px;">Violations</h1></div></div>
+  <div class="row d-flex justify-content-center align-items-center"><div class="col-md-auto mb-4"><h1 class="reg"><img src="./images/gavel.png" style="margin-right: 10px;">Violations</h1></div></div>
   <ul class="nav nav-pills ms-4">
   <li class="nav-item me-4">
     <a class="nav-link active" aria-current="page" href="#">Demerit Points</a>
