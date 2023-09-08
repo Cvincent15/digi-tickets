@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2023 at 01:45 AM
+-- Generation Time: Sep 08, 2023 at 04:52 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,31 @@ SET time_zone = "+00:00";
 --
 -- Database: `ctmeu`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `motorist_info`
+--
+
+CREATE TABLE `motorist_info` (
+  `motorist_info_id` int(11) NOT NULL,
+  `civil_status` varchar(20) DEFAULT NULL,
+  `birthplace` varchar(50) DEFAULT NULL,
+  `blood_type` varchar(10) DEFAULT NULL,
+  `complexion` varchar(20) DEFAULT NULL,
+  `eye_color` varchar(20) DEFAULT NULL,
+  `hair_color` varchar(20) DEFAULT NULL,
+  `weight` int(150) DEFAULT NULL,
+  `height` int(150) DEFAULT NULL,
+  `organ_donor` varchar(50) DEFAULT NULL,
+  `em_name` varchar(30) DEFAULT NULL,
+  `em_area_code` varchar(30) DEFAULT NULL,
+  `em_mobile` varchar(11) DEFAULT NULL,
+  `em_address` varchar(50) DEFAULT NULL,
+  `address` varchar(50) DEFAULT NULL,
+  `users_motorists_info_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -50,7 +75,7 @@ INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `last_name`, `username`, `pa
 (59, 'Jazzlyn Kate', 'Aquino', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL),
 (70, 'Kyle Dennis', 'Dalida', 'enfKDalida', '$2y$10$TKURg8EEGf32mdRWwlKbm.YMOtXsa2zrK4OkwNtcIByM9kyKV1ifu', 'Enforcer', NULL, NULL),
 (73, 'Jhimwell', 'Robles', 'enfJRobles', '$2y$10$bB5v0ePlisqJ5EdJtFDmaeXF.BwuQiKV8ze3uY1hf9u7640akKn.K', 'Enforcer', NULL, NULL),
-(74, 'Dan Carlo', 'Ramirez', 'enfDRamirez', '$2y$10$pzH/jEmPx0oVS8PTEfRhF.IpEzo/s57PBd44Rp3DYKV279cRBoqdm', 'Enforcer', NULL, NULL),
+(74, 'Dan Carlo', 'Ramirez', 'enfDRamirez', '$2y$10$AJY.heS1GdiwnWdFpgSWzu46ijT3LfjLcTg9EwFQt3HkyxPPjShrW', 'Enforcer', NULL, NULL),
 (76, 'Carl', 'Bantatua', 'enfCBantatua', '$2y$10$8NcAU3XI/00E7VxDfqESfe3T3SdpN7aK/ukXY9zptVaJ3mcwHaKnW', 'Enforcer', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -128,7 +153,7 @@ CREATE TABLE `violation_tickets` (
 --
 
 INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_address`, `driver_license`, `issuing_district`, `vehicle_type`, `plate_no`, `cor_no`, `place_issued`, `reg_owner`, `reg_owner_address`, `date_time_violation`, `place_of_occurrence`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
-(73, 'John Doe', '123 Main St, Cityville', 'DL123456', 'District A', 'Sedan', 'ABC123', NULL, NULL, 'Jane Doe', '456 Elm St, Townsville', '2023-08-01 10:51:45', 'Intersection of Oak Ave and Maple St', 74, NULL, 0),
+(73, 'John Does', '123 Main St, Cityville', 'DL123456', 'District A', 'Sedan', 'ABC123', NULL, NULL, 'Jane Doe', '456 Elm St, Townsville', '2023-08-01 10:51:45', 'Intersection of Oak Ave and Maple St', 74, NULL, 0),
 (74, 'Alice Smith', '789 Elm St, Villagetown', 'DL987654', 'District B', 'SUV', 'XYZ789', NULL, NULL, 'Bob Smith', '101 Pine St, Hamletville', '2023-07-04 10:54:31', 'Parking Lot C', 76, NULL, 0),
 (75, 'Michael Johnson', '456 Oak St, Countryside', 'DL456789', 'District C', 'Motorcycle', 'MNO456', NULL, NULL, 'Sarah Johnson', '777 Cedar St, Farmville', '2023-06-06 10:54:31', 'Highway 101', 70, NULL, 0),
 (76, 'Emily Wilson', '321 Pine St, Smalltown', 'DL654321', 'District A', 'Truck', 'DEF456', NULL, NULL, 'David Wilson', '555 Birch St, Villageville', '2023-05-09 10:54:31', 'Construction Zone', 76, NULL, 0),
@@ -152,6 +177,13 @@ INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_address`, `
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `motorist_info`
+--
+ALTER TABLE `motorist_info`
+  ADD PRIMARY KEY (`motorist_info_id`),
+  ADD KEY `motorist info id` (`users_motorists_info_id`);
 
 --
 -- Indexes for table `users`
@@ -185,10 +217,16 @@ ALTER TABLE `violation_tickets`
 --
 
 --
+-- AUTO_INCREMENT for table `motorist_info`
+--
+ALTER TABLE `motorist_info`
+  MODIFY `motorist_info_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
@@ -211,6 +249,12 @@ ALTER TABLE `violation_tickets`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `motorist_info`
+--
+ALTER TABLE `motorist_info`
+  ADD CONSTRAINT `motorist info id` FOREIGN KEY (`users_motorists_info_id`) REFERENCES `users_motorists` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `violations`
