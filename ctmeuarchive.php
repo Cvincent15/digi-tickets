@@ -124,7 +124,7 @@ foreach ($violationTickets as $ticket) {
       }
       ?>
       <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+      <a href="ctmeuarchive.php" class="link" id="noEnforcers" style="font-weight: bolder;">Archive</a>
       <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
       <a href="ctmeuusers.php" class="link">User Account</a>
     </div>

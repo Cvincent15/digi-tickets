@@ -145,12 +145,13 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
       ?>
       <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
       <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
-      <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
+      <a href="ctmeucreate.php" id="noEnforcers" class="link" style="font-weight: bolder;">Create Accounts</a>
+      <a href="ctmeuticket.php" class="link">Issue Ticket</a>
       <a href="ctmeuusers.php" class="link">User Account</a>
     </div>
   </div>
 </nav>
-<div class="container">
+<div class="container mt-5">
     <div class="form-container">
     <form method="POST" action="register.php" id="registration-form">
     <input type="hidden" id="userCtmeuId" name="userCtmeuId">

@@ -27,8 +27,8 @@ if (isset($_SESSION['username'])) {
     <div class="wrapper">
         <div class="content-wrapper" style="min-height: 658px;">
             <div class="bgslider" id="bgslider">
-                <div class="col-md-4 card frost">
-                    <div class="toplayer login-card-body" style="margin-top:30%;">
+                <div class="container d-flex justify-content-end align-items-center vh-100">
+                    <div class="toplayer login-card-body p-5 rounded-4"  style="background-color: #FFFFFF;">
                         <div class="box-header with-border">
                             <h2 class="box-title text-center"><strong>CTMEU Login</strong></h2>
                         </div>
@@ -36,24 +36,19 @@ if (isset($_SESSION['username'])) {
                             <section id="introduction">
                                 <p style="text-align:center;">Sign in to start your session</p>
                             </section>
-
-                            <form method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
-                                <div class="form-group">
-                                    <div class="input-group mb-0 landing">
-                                        <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group landing">
-                                    <div class="input-group">
-                                        <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" maxlength="20" class="form-control" required>
-                                    </div>
-                                </div>
-
-                                <div class="text-right landing">
-                                    <input type="submit" name="loginButton" value="Log In" id="loginButton" class="btn btn-primary btn-flat pull-right">
-                                </div>
-                            </form>
+                            <div class="card-body">
+            <form  method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
+              <div class="mb-3">
+                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="50" size="50" autocomplete="off" class="form-control" required type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="mb-3">
+                <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-4" required>
+              </div>
+              <div class="d-flex justify-content-center">
+              <button type="submit" name="loginButton" value="Log In" id="loginButton"  class="btn btn-primary rounded-5" style="background: linear-gradient(to bottom, #46A6FF, #0047FF); width: 100px;">Log In</button>
+              </div>
+            </form>
+          </div>
                         </div>
                     </div>
                 </div>

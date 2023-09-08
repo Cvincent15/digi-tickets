@@ -45,6 +45,8 @@ if (isset($_SESSION['email'])) {
             <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
         </ul>
+        <button type="button" class="btn transparent-btn btn-outline-primary" style="margin-right: 20px;" onclick="redirectToRegister()">Register</button>
+        <button type="button" class="btn class=btn btn-primary active" onclick="redirectToLogin()">Log In</button>
     </div>
     </div>
   </div>
@@ -58,8 +60,9 @@ if (isset($_SESSION['email'])) {
               <h1>Motorist Portal</h1>
               <img src="./images/ctmeu.png">
           </div>
-<div class="col login">         
+<div class="col login rounded-4">         
   <div class="mb-3 mt-3">
+  <div class="toplayer login-card-body p-5 rounded-4">
   <form method="POST" action="./php/motoristlogin.php">
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-Mail</label>
@@ -73,12 +76,13 @@ if (isset($_SESSION['email'])) {
                         </form>
 <p>Dont Have an Account? <a href="motoristSignup.php">Create One</a></p>
             </div>
+  </div>
         </div>
     </div>
 </div>
     <script>
     function redirectToRegister() {
-      window.location.href = 'motoristSignup.php';
+      window.location.href = 'MotoristRegistration.php';
     }
 
     function redirectToLogin() {

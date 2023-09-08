@@ -100,7 +100,7 @@ $violationTickets = fetchViolationTickets();
     <div class="navbar-right">
       <h5 id="welcome-text"></h5>
       <button class="btn btn-primary" id="logout-button">Log out</button>
-      <a href="ctmeupage.php" class="link">Records</a>
+      <a href="ctmeupage.php" class="link" style="font-weight: bold;">Records</a>
       <?php
       // Check if the user role is "IT Administrator"
       if ($_SESSION['role'] === 'IT Administrator') {
@@ -117,7 +117,7 @@ $violationTickets = fetchViolationTickets();
     </div>
   </div>
 </nav>
-<div class="search-container">
+<div class="search-container mt-5">
   <input type="text" id="search-bar" placeholder="Search...">
   <select id="filter-select">
     <option value="name">Name</option>
@@ -130,7 +130,7 @@ $violationTickets = fetchViolationTickets();
 <div class="table-container">
     <form id="archive-form" action="php/archiverow.php" method="POST">
         <button type="submit" class="btn btn-primary" id="archive-button"><i class='bx bx-archive-in'></i></button>
-        <table>
+        <table class="mt-3">
             <thead>
                 <tr>
                     <th>No.</th>
