@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2023 at 01:45 AM
+-- Generation Time: Sep 08, 2023 at 08:44 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -18,8 +18,28 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ctmeu`
+-- Database: `ctmeu2`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `motorist_documents`
+--
+
+CREATE TABLE `motorist_documents` (
+  `document_id` varchar(20) NOT NULL,
+  `license_type` varchar(20) NOT NULL,
+  `expiry_date` date NOT NULL,
+  `status` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `motorist_documents`
+--
+
+INSERT INTO `motorist_documents` (`document_id`, `license_type`, `expiry_date`, `status`) VALUES
+('N02-18-018507', 'Driver\'s License', '2023-09-16', 1);
 
 -- --------------------------------------------------------
 
