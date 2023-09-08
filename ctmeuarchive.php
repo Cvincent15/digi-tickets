@@ -38,8 +38,18 @@ function fetchViolationTickets() {
   }
 }
 
+
 // Fetch the violation ticket data
 $violationTickets = fetchViolationTickets();
+
+// Check if there are any archived tickets (is_settled = 1)
+$hasArchivedData = false;
+foreach ($violationTickets as $ticket) {
+    if ($ticket['is_settled'] == 1) {
+        $hasArchivedData = true;
+        break; // No need to continue checking once we find one archived ticket
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -90,7 +100,6 @@ $violationTickets = fetchViolationTickets();
 
 </style>
 <body style="height: auto;">
-
 <nav class="navbar">
   <div class="logo">
     <img src="images/logo-ctmeu.png" alt="Logo">
@@ -101,17 +110,24 @@ $violationTickets = fetchViolationTickets();
   </div>
   
   <div class="navbar-inner">
-  <div class="navbar-right">
-    <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link">Records</a>
-    <a href="ctmeurecords.php" class="link">Reports</a>
-    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers"><b>Archive</b></a>
-    <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
-    <a href="ctmeuusers.php" class="link">User Account</a>
-  </div>
+    <div class="navbar-right">
+      <h5 id="welcome-text"></h5>
+      <button class="btn btn-primary" id="logout-button">Log out</button>
+      <a href="ctmeupage.php" class="link">Records</a>
+      <?php
+      // Check if the user role is "IT Administrator"
+      if ($_SESSION['role'] === 'IT Administrator') {
+          // Do not display the "Create Accounts" link
+      } else {
+          // Display the "Create Accounts" link
+          echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+      }
+      ?>
+      <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
+      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+      <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
+      <a href="ctmeuusers.php" class="link">User Account</a>
+    </div>
   </div>
 </nav>
 <div class="search-container">
@@ -125,6 +141,11 @@ $violationTickets = fetchViolationTickets();
 </div>
 
 <div class="table-container">
+<?php
+// Check if there are violation tickets to display
+if ($hasArchivedData) {
+    
+?>
 <table>
     <thead>
         <tr>
@@ -169,6 +190,12 @@ foreach ($violationTickets as $index => $ticket) {
 ?>
     </tbody>
 </table>
+<?php
+} else {
+    // Display a card with the message when no archived data is found
+    echo '<div class="card" style="text-align:center;"><h1>No archived data yet.</h1></div>';
+}
+?>
     </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>

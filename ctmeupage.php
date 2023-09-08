@@ -97,17 +97,24 @@ $violationTickets = fetchViolationTickets();
   </div>
   
   <div class="navbar-inner">
-  <div class="navbar-right">
-    <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link"><b>Records</b></a>
-    <a href="ctmeurecords.php" class="link">Reports</a>
-    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
-    <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
-    <a href="ctmeuusers.php" class="link">User Account</a>
-  </div>
+    <div class="navbar-right">
+      <h5 id="welcome-text"></h5>
+      <button class="btn btn-primary" id="logout-button">Log out</button>
+      <a href="ctmeupage.php" class="link">Records</a>
+      <?php
+      // Check if the user role is "IT Administrator"
+      if ($_SESSION['role'] === 'IT Administrator') {
+          // Do not display the "Create Accounts" link
+      } else {
+          // Display the "Create Accounts" link
+          echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+      }
+      ?>
+      <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
+      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+      <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
+      <a href="ctmeuusers.php" class="link">User Account</a>
+    </div>
   </div>
 </nav>
 <div class="search-container">

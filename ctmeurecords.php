@@ -43,7 +43,6 @@ function fetchViolationTickets() {
 
 // Fetch the violation ticket data
 $violationTickets = fetchViolationTickets();
-
 function generatePDF($data) {
   require_once('TCPDF/tcpdf.php');
   
@@ -81,10 +80,12 @@ function generatePDF($data) {
   $tbl .= '<th>Account Status</th>';
   $tbl .= '</tr>';
   
+  $ticketNumber = 1; // Initialize ticket number
+
   // Populate the table rows with data
   foreach ($data as $row) {
     $tbl .= '<tr>';
-    $tbl .= '<td>' . $row['ticket_id'] . '</td>';
+    $tbl .= '<td>' . $ticketNumber . '</td>'; // Use the ticket number as No.
     $tbl .= '<td>' . $row['driver_name'] . '</td>';
     $tbl .= '<td>' . $row['driver_license'] . '</td>';
     $tbl .= '<td>' . $row['driver_address'] . '</td>';
@@ -103,6 +104,8 @@ function generatePDF($data) {
     $tbl .= '<td>' . $row['date_time_violation'] . '</td>';
     $tbl .= '<td>' . ($row['is_settled'] == 0 ? 'Settled' : 'Unsettled') . '</td>';
     $tbl .= '</tr>';
+    
+    $ticketNumber++; // Increment ticket number
   }
   
   $tbl .= '</table>';
@@ -114,11 +117,56 @@ function generatePDF($data) {
   $pdf->Output('violation_tickets.pdf', 'D');
 }
 
+
+
 if (isset($_POST['generate_pdf'])) {
   // Generate the PDF when the form is submitted
   generatePDF($violationTickets);
+}// Define a function to filter data by date range
+function filterDataByDate($data, $startMonth, $endMonth, $year) {
+  $filteredData = array();
+
+  foreach ($data as $row) {
+    $ticketDate = strtotime($row['date_time_violation']);
+    $ticketMonth = date('m', $ticketDate);
+    $ticketYear = date('Y', $ticketDate);
+
+    // Compare ticket month and year with the selected date range
+    if (
+      ($ticketYear == $year) &&
+      ($ticketMonth >= $startMonth) &&
+      ($ticketMonth <= $endMonth)
+    ) {
+      $filteredData[] = $row;
+    }
+  }
+
+  return $filteredData;
 }
+
+$dataFound = false;
+
+// Check if the filter button was clicked
+if (isset($_POST['filter-button'])) {
+  $startMonth = $_POST['start-month'];
+  $endMonth = $_POST['end-month'];
+  $year = $_POST['year'];
+
+  // Filter the data based on the selected date range
+  $filteredData = filterDataByDate($violationTickets, $startMonth, $endMonth, $year);
+
+  // Check if any data is found after filtering
+  if (!empty($filteredData)) {
+      $dataFound = true;
+  } else {
+      echo "<script>alert('No Tickets found in the specified date');</script>";
+  }
+}
+
+// Echo the $dataFound value to JavaScript when the page loads
+echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</script>';
 ?>
+
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
 <head>
@@ -169,49 +217,25 @@ if (isset($_POST['generate_pdf'])) {
     <div class="date-filter-container">
   <label for="start-month">Start Month:</label>
   <select id="start-month">
-    <option value="01">January</option>
-    <option value="02">February</option>
-    <option value="03">March</option>
-    <option value="04">April</option>
-    <option value="05">May</option>
-    <option value="06">June</option>
-    <option value="07">July</option>
-    <option value="08">August</option>
-    <option value="09">September</option>
-    <option value="10">October</option>
-    <option value="11">November</option>
-    <option value="12">December</option> 
   </select>
 
   <label for="end-month">End Month:</label>
-  <select id="end-month">
-    <option value="01">January</option>
-    <option value="02">February</option>
-    <option value="03">March</option>
-    <option value="04">April</option>
-    <option value="05">May</option>
-    <option value="06">June</option>
-    <option value="07">July</option>
-    <option value="08">August</option>
-    <option value="09">September</option>
-    <option value="10">October</option>
-    <option value="11">November</option>
-    <option value="12">December</option> 
+  <select id="end-month"> 
   </select>
 
   <label for="year">Year:</label>
-  <input type="text" id="year" placeholder="Enter Year">
-  
-  <button class="btn btn-primary" id="filter-button">Apply Filter</button>
+  <select id="year"></select>
+  <button class="btn btn-primary" id="filter-button" style="">Apply Filter</button>
 </div>
 </div>
 
-
+<div class="container" style="display: none;">
 <form method="post">
-        <button class="btn btn-primary" type="submit" name="generate_pdf" style="display: none;">Generate PDF</button>
-    </form>
+  <input type="hidden" id="filtered-data" name="filtered-data" value="">
+  <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
+</form>
 
-<div class="table-container" style="display: none;">
+<div class="table-container">
 <table>
         <thead>
             <tr>
@@ -237,7 +261,6 @@ if (isset($_POST['generate_pdf'])) {
             // Inside the loop that populates the table rows
 foreach ($violationTickets as $index => $ticket) {
   // Check if the is_settled value is 0 before making the row clickable
-  if ($ticket['is_settled'] == 0) {
       $visibleTicketCount++; // Increment the visible ticket counter
 
       // Convert the row data to a JSON string
@@ -263,63 +286,60 @@ foreach ($violationTickets as $index => $ticket) {
           echo "<td>Null</td>";
       }
       echo "<td>" . $ticket['date_time_violation'] . "</td>";
-      echo "<td>Settled</td>"; // Display "Settled" for is_settled = 0
-      echo "</tr>";
-  } else {
-      // For rows with is_settled value equal to 1, display "Settled"
-      $visibleTicketCount++; // Increment the visible ticket counter
-
-      // Convert the row data to a JSON string
-      $rowData = json_encode($ticket);
-
-      echo "<tr class='clickable-row' data-rowdata='$rowData'>";
-      // Display the visible ticket count in the "No." column
-      echo "<td>" . $visibleTicketCount . "</td>";
-      // Add the columns from the fetched data
-      echo "<td>" . $ticket['driver_name'] . "</td>";
-      echo "<td>" . $ticket['driver_license'] . "</td>";
-      echo "<td>" . $ticket['driver_address'] . "</td>";
-      echo "<td>" . $ticket['issuing_district'] . "</td>";
-      echo "<td>" . $ticket['reg_owner'] . "</td>";
-      echo "<td>" . $ticket['reg_owner_address'] . "</td>";
-      echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
-      echo "<td>" . $ticket['plate_no'] . "</td>";
-      echo "<td>" . $ticket['vehicle_type'] . "</td>";
-      // Inside the table loop
-      if (!empty($ticket['violations'])) {
-          echo "<td>" . $ticket['violations'] . "</td>";
-      } else {
-          echo "<td>Null</td>";
-      }
-      echo "<td>" . $ticket['date_time_violation'] . "</td>";
-      echo "<td>Settled</td>"; // Display "Settled" for is_settled = 1
+      echo "<td>" . ($ticket['is_settled'] == 0 ? 'No' : 'Yes') . "</td>";
       echo "</tr>";
   }
-}
             ?>
         </tbody>
     </table>
+</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
     <script>
-      // Function to show or hide the "Generate PDF" button and table
-    function togglePDFButtonAndTableVisibility(show) {
-        var generatePDFButton = document.querySelector('button[name="generate_pdf"]');
-        var tableContainer = document.querySelector('.table-container');
-        
-        if (show) {
-            generatePDFButton.style.display = 'block';
-            tableContainer.style.display = 'block';
-        } else {
-            generatePDFButton.style.display = 'none';
-            tableContainer.style.display = 'none';
+     const yearSelect = document.getElementById("year");
+        const currentYear = new Date().getFullYear();
+        const yearsPast = 50;
+        const yearsFuture = 50;
+        const startYear = currentYear - yearsPast;
+        const endYear = currentYear + yearsFuture;
+
+        for (let year = startYear; year <= endYear; year++) {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
         }
-    }
+
+        // Set the default value to the current year
+        yearSelect.value = currentYear;
+     
+    // Add a click event listener to the "Generate PDF" button
+document.querySelector('[name="generate_pdf"]').addEventListener('click', function() {
+  // Get the filtered data as JSON
+  var filteredData = JSON.stringify(filteredData);
+
+  // Set the value of the hidden input field
+  document.getElementById('filtered-data').value = filteredData;
+});
+
+    // Function to toggle the visibility of the table and "Generate PDF" button container
+  function toggleTableAndPDFVisibility(show) {
+    var container = document.querySelector('.container');
+    var generatePDFButton = document.querySelector('[name="generate_pdf"]');
     
-// Define an event listener for the filter button
-document.getElementById('filter-button').addEventListener('click', function() {
+    if (show) {
+      container.style.display = 'block';
+      generatePDFButton.style.display = 'block';
+    } else {
+      container.style.display = 'none';
+      generatePDFButton.style.display = 'none';
+    }
+  }
+
+  // Add a click event listener to the filter button
+  document.getElementById('filter-button').addEventListener('click', function() {
     // Get the selected start month, end month, and year
     var startMonth = document.getElementById('start-month').value;
     var endMonth = document.getElementById('end-month').value;
@@ -327,86 +347,95 @@ document.getElementById('filter-button').addEventListener('click', function() {
 
     // Check if the start month is after the end month
     if (year == '' || startMonth > endMonth) {
-        alert('Invalid date range. Please select a valid date range.');
-        return; // Exit the function without filtering the table
+      alert('Invalid date range. Please select a valid date range.');
+      return; // Exit the function without filtering the table
     }
 
     // Filter the table based on the selected date range
     filterTableByDate(startMonth, endMonth, year);
+  });
 
-    // Show the "Generate PDF" button and table
-    togglePDFButtonAndTableVisibility(true);
-});
-// Function to filter the table based on the selected date range
-function filterTableByDate(startMonth, endMonth, year) {
+  // Function to filter the table based on the selected date range
+  function filterTableByDate(startMonth, endMonth, year) {
     var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+    var dataFound = false; // Flag to track if data is found
+
     rows.forEach(function(row) {
-        var rowData = JSON.parse(row.getAttribute('data-rowdata'));
-        var ticketDateStr = rowData['date_time_violation'];
-        var ticketDate = new Date(ticketDateStr);
+      var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+      var ticketDateStr = rowData['date_time_violation'];
+      var ticketDate = new Date(ticketDateStr);
 
-        var ticketMonth = String(ticketDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-based
-        var ticketYear = String(ticketDate.getFullYear());
+      var ticketMonth = String(ticketDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-based
+      var ticketYear = String(ticketDate.getFullYear());
 
-        if (
-            (ticketYear < year) || // Ticket year is less than the selected year
-            (ticketYear === year && ticketMonth >= startMonth && ticketMonth <= endMonth)
-        ) {
-            row.style.display = ''; // Show the row if it partially matches the filter
-        } else {
-            row.style.display = 'none'; // Hide the row if it doesn't match the filter
-        }
+      if (
+        (ticketYear == year) &&
+        (ticketMonth >= startMonth) &&
+        (ticketMonth <= endMonth)
+      ) {
+        row.style.display = ''; // Show the row if it matches the filter
+        dataFound = true; // Data is found
+      } else {
+        row.style.display = 'none'; // Hide the row if it doesn't match the filter
+      }
     });
-}
 
+    // Toggle visibility of table and "Generate PDF" button based on dataFound
+    toggleTableAndPDFVisibility(dataFound);
 
+    // Display alert if no data is found
+    if (!dataFound) {
+      alert('No Tickets found in the specified date.');
+    }
+  }
 
-// Function to populate the month options
-function populateMonthOptions() {
+  // Function to populate the month options
+  function populateMonthOptions() {
     var startMonthSelect = document.getElementById('start-month');
     var endMonthSelect = document.getElementById('end-month');
 
     // Define an array of month names
     var monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     // Populate start and end month options
     for (var i = 1; i <= 12; i++) {
-        var monthValue = String(i).padStart(2, '0'); // Add leading zero if needed
-        var monthName = monthNames[i - 1];
+      var monthValue = String(i).padStart(2, '0'); // Add leading zero if needed
+      var monthName = monthNames[i - 1];
 
-        // Create option elements and add them to the selects
-        var startOption = document.createElement('option');
-        startOption.value = monthValue;
-        startOption.textContent = monthName;
-        startMonthSelect.appendChild(startOption);
+      // Create option elements and add them to the selects
+      var startOption = document.createElement('option');
+      startOption.value = monthValue;
+      startOption.textContent = monthName;
+      startMonthSelect.appendChild(startOption);
 
-        var endOption = document.createElement('option');
-        endOption.value = monthValue;
-        endOption.textContent = monthName;
-        endMonthSelect.appendChild(endOption);
+      var endOption = document.createElement('option');
+      endOption.value = monthValue;
+      endOption.textContent = monthName;
+      endMonthSelect.appendChild(endOption);
     }
-}
+  }
 
-// Call the function to populate month options when the page loads
-window.addEventListener('load', populateMonthOptions);
-      // Add a click event listener to the logout button
-document.getElementById('logout-button').addEventListener('click', function() {
-        // Perform logout actions here, e.g., clearing session, redirecting to logout.php
-        // You can use JavaScript to redirect to the logout.php page.
-        window.location.href = 'php/logout.php';
-    });
+  // Call the function to populate month options when the page loads
+  window.addEventListener('load', populateMonthOptions);
 
-    // Check if the user is logged in and update the welcome message
-    <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
-        var role = '<?php echo $_SESSION['role']; ?>';
-        var firstName = '<?php echo $_SESSION['first_name']; ?>';
-        var lastName = '<?php echo $_SESSION['last_name']; ?>';
+  // Add a click event listener to the logout button
+  document.getElementById('logout-button').addEventListener('click', function() {
+    // Perform logout actions here, e.g., clearing session, redirecting to logout.php
+    // You can use JavaScript to redirect to the logout.php page.
+    window.location.href = 'php/logout.php';
+  });
 
-        document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
-    <?php } ?>
+  // Check if the user is logged in and update the welcome message
+  <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+    var role = '<?php echo $_SESSION['role']; ?>';
+    var firstName = '<?php echo $_SESSION['first_name']; ?>';
+    var lastName = '<?php echo $_SESSION['last_name']; ?>';
+
+    document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+  <?php } ?>
     </script>
 
 </body>

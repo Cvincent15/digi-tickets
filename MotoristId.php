@@ -68,13 +68,13 @@ if (isset($_SESSION['email'])) {
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="#">LTO Official Page</a>
+            <a class="nav-link" href="https://portal.lto.gov.ph/">LTO Official Page</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
+            <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="motoristlogin.php">Dashboard</a>
+            <!-- <a class="nav-link" href="motoristlogin.php">Dashboard</a> -->
           </li>
         </ul>
         <div class="dropdown">
@@ -83,8 +83,6 @@ if (isset($_SESSION['email'])) {
   </a>
 
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="#">Action</a></li>
-    <li><a class="dropdown-item" href="#">Another action</a></li>
     <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
   </ul>
 </div>

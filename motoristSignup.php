@@ -64,7 +64,7 @@ if (isset($_SESSION['email'])) {
             <a class="nav-link" href="#">LTO Official Page</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
+            <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
         </ul>
         <button type="button" class="btn class=btn btn-primary active" style="margin-right: 20px;" onclick="redirectToRegister()">Register</button>

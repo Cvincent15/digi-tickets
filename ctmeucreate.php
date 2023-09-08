@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
   // Redirect the user to the greeting page if they are already logged in
   header("Location: index.php");
   exit();
-} 
+}
 
 // Function to count the number of super administrators
 function countSuperAdmins($conn) {
@@ -130,22 +130,30 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   </div>
   
   <div class="navbar-inner">
-  <div class="navbar-right">
-    <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out</button>
-    <a href="ctmeupage.php" class="link">Records</a>
-    <a href="ctmeurecords.php" class="link">Reports</a>
-    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
-    <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" class="link"><b>Create Accounts</b></a>
-    <a href="ctmeuusers.php" class="link">User Account</a>
-  </div>
+    <div class="navbar-right">
+      <h5 id="welcome-text"></h5>
+      <button class="btn btn-primary" id="logout-button">Log out</button>
+      <a href="ctmeupage.php" class="link">Records</a>
+      <?php
+      // Check if the user role is "IT Administrator"
+      if ($_SESSION['role'] === 'IT Administrator') {
+          // Do not display the "Create Accounts" link
+      } else {
+          // Display the "Create Accounts" link
+          echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+      }
+      ?>
+      <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
+      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
+      <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
+      <a href="ctmeuusers.php" class="link">User Account</a>
+    </div>
   </div>
 </nav>
 <div class="container">
     <div class="form-container">
     <form method="POST" action="register.php" id="registration-form">
+    <input type="hidden" id="userCtmeuId" name="userCtmeuId">
     <label for="firstName">First Name:</label>
     <input type="text" id="firstName" name="firstName" required><br>
 
@@ -191,13 +199,12 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
     <input type="hidden" id="password" name="password" readonly>
 
-    
-    <button type="button" id="delete-button" style="display:none;">Delete Account</button>
-    <button type="submit" id="create-button">Create Account</button>
-    <button type="submit" id="update-button">Update Account</button>
-    <button type="reset" id="reset-button">Clear</button>
-    
-    <button type="button" id="reset-password-button" style="display: none;">Reset Password</button>
+    <button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>
+<button type="submit" id="create-button" class="btn btn-success">Create Account</button>
+<button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
+<div style="margin-top: 20px;"></div> <!-- Add space above the Reset Password button -->
+<button type="submit" id="update-button" class="btn btn-success">Update Account</button>
+<button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
 <!-- Add a new button for deleting the account -->
 </form>
     </div>
@@ -210,7 +217,7 @@ function fetchUserData($conn) {
     $userData = array();
 
     // Prepare and execute an SQL statement to retrieve data from the users table
-    $sql = "SELECT first_name, last_name, username, password, role FROM users";
+    $sql = "SELECT first_name, last_name, username, password, role, user_ctmeu_id FROM users";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -251,10 +258,15 @@ function countUsersByRole($conn, $role) {
 }
 
 // Function to check if a user with the same first name, last name, and role exists
-function userExists($conn, $firstName, $lastName, $role) {
-  $sql = "SELECT COUNT(*) as count FROM users WHERE first_name = ? AND last_name = ? AND role = ?";
+function userExists($conn, $firstName, $lastName, $role, $userCtmeuId) {
+  // Check if userCtmeuId is empty
+  if (empty($userCtmeuId)) {
+      return false;
+  }
+  
+  $sql = "SELECT COUNT(*) as count FROM users WHERE first_name = ? AND last_name = ? AND role = ? AND user_ctmeu_id = ?";
   $stmt = $conn->prepare($sql);
-  $stmt->bind_param("sss", $firstName, $lastName, $role);
+  $stmt->bind_param("sssi", $firstName, $lastName, $role, $userCtmeuId);
   $stmt->execute();
   $result = $stmt->get_result();
   $row = $result->fetch_assoc();
@@ -332,6 +344,7 @@ function generatePassword() {
             echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
             echo "<td class='clickable-cell'>" . $user['username'] . "</td>";
             echo "<td class='clickable-cell'>" . $user['role'] . "</td>";
+            echo "<td class='user-ctmeu-id' style='display:none;'>" . $user['user_ctmeu_id'] . "</td>";
             echo "</tr>";
         }
         ?>
@@ -346,18 +359,21 @@ document.getElementById('reset-button').addEventListener('click', function() {
     // Reload the current page when the Clear button is clicked
     location.reload();
 });
-  // Function to handle row selection and show/hide the "Reset Password" button
+  // Function to handle row selection and populate form fields with data
 function handleRowSelection(row) {
-    if (selectedRow === row) {
-        // Clear the form fields and hide the "Reset Password" button
-        clearFormFields();
-        document.getElementById('reset-password-button').style.display = 'none';
-    } else {
-        // Populate form fields with the selected row data
-        populateFormFields(row);
-        selectedRow = row;
-        document.getElementById('reset-password-button').style.display = 'inline-block';
-    }
+    // Get the data associated with the clicked row
+    const firstName = row.cells[0].textContent;
+    const lastName = row.cells[1].textContent;
+    const username = row.cells[2].textContent;
+    const role = row.cells[3].textContent;
+    const userCtmeuId = row.cells[4].textContent; // Get the user_ctmeu_id
+
+    // Populate form fields with the data
+    document.getElementById('firstName').value = firstName;
+    document.getElementById('lastName').value = lastName;
+    document.getElementById('username').value = username;
+    document.getElementById('role').value = role;
+    document.getElementById('userCtmeuId').value = userCtmeuId; // Set the user_ctmeu_id in a hidden input field
 }
 
 // Add a click event listener to the table rows to handle row selection
@@ -522,10 +538,9 @@ document.getElementById('logout-button').addEventListener('click', function() {
   if (selectedRow !== row) {
     populateFormFields(row);
     selectedRow = row;
-    document.getElementById("create-button").textContent = "Update";
+    document.getElementById("update-button").style.display = "inline-block";
     document.getElementById("delete-button").style.display = "inline-block";
   } else {
-    clearFormFields();
     document.getElementById("delete-button").style.display = "none";
   }
 });
@@ -666,14 +681,49 @@ document.getElementById('update-button').addEventListener('click', function() {
         return;
     }
 
-    // Optionally, add validation checks for the input data
+    // Get the user_ctmeu_id from the hidden input field
+    const userCtmeuIdToUpdate = document.getElementById('userCtmeuId').value;
 
-    // Send an update request to the server using AJAX or redirect to a PHP script for updating
-    // You can use a similar approach as shown in the "Delete Account" button click event
-    // ...
+    // Create an object with the data to be updated
+    const userDataToUpdate = {
+        firstName: firstNameToUpdate,
+        lastName: lastNameToUpdate,
+        role: roleToUpdate,
+        userCtmeuId: userCtmeuIdToUpdate
+    };
 
-    // After the update is successful, you can show a success message and reload the user table or perform other actions
+    // Ask for confirmation before updating
+    const confirmation = confirm("Are you sure you want to update this account?");
+    if (!confirmation) {
+        return; // User canceled the update
+    }
+
+    // Send an AJAX request to update the user data
+    fetch('php/update_user.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userDataToUpdate),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update successful
+            alert('User data updated successfully.');
+            location.reload(); // Reload the page or update the table as needed
+        } else {
+            // Update failed
+            alert('Failed to update user data.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating user data.');
+    });
 });
+
+
 function checkExistingData() {
   const firstName = document.getElementById('firstName').value.trim();
   const lastName = document.getElementById('lastName').value.trim();
@@ -709,8 +759,8 @@ function checkExistingData() {
     updateButton.style.display = 'inline-block';
   } else {
     // If no match is found, show the Create button and hide the Update button
-    createButton.style.display = 'inline-block';
-    updateButton.style.display = 'none';
+    createButton.style.display = 'none';
+    updateButton.style.display = 'inline-block';
   }
 }
 

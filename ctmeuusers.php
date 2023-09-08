@@ -85,7 +85,12 @@ $status = $user['role'];
         } else {
             // For other roles, show the other links
             echo '<a href="ctmeupage.php" class="link">Records</a>';
-            echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            if ($_SESSION['role'] === 'IT Administrator') {
+                // Do not display the "Create Accounts" link
+            } else {
+                // Display the "Create Accounts" link
+                echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';

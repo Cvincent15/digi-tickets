@@ -19,6 +19,22 @@ function fetchIsSettled($ticketId, $conn) {
     }
 }
 
+// Function to fetch is_settled, first_name, and last_name based on ticket_id
+function fetchTicketDetails($ticketId, $conn) {
+    $query = "SELECT vt.is_settled, u.first_name, u.last_name
+              FROM violation_tickets vt
+              INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
+              WHERE vt.ticket_id = $ticketId";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row;
+    } else {
+        return null;
+    }
+}
+
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
     // Redirect the user to the login page if they are not logged in
@@ -31,7 +47,14 @@ if (isset($_GET['data'])) {
     // Decode the JSON data passed in the URL
     $rowData = json_decode(urldecode($_GET['data']), true);
 
-    // You can now use $rowData to populate your form fields for editing
+    // Fetch ticket details including is_settled, first_name, and last_name
+    $ticketDetails = fetchTicketDetails($rowData['ticket_id'], $conn);
+
+    if (!$ticketDetails) {
+        // Handle the case where ticket details are not found
+        echo "Error: Ticket details not found.";
+        exit();
+    }
 } else {
     // If no data parameter is set, handle it accordingly (e.g., show an error message)
     echo "Error: Row data not found.";
@@ -117,7 +140,7 @@ if (isset($_GET['data'])) {
         <!-- Add more rows for additional fields as needed -->
         <tr>
             <td><label for="cor_no">COR No.:</label></td>
-            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
+            <td><input class="readonly-input" type="number" id="cor_no" name="cor_no" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
             
             <td><label for="place_issued">Place Issued:</label></td>
             <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" value="<?php echo $rowData['place_issued']; ?>" readonly></td>
@@ -140,7 +163,7 @@ if (isset($_GET['data'])) {
         </tr>
         <tr>
             <td><label for="is_settled">Account Status:</label></td>
-            <td colspan="3">
+            <td>
                 <?php
                 // Check if is_settled key exists in rowData
                 $isSettled = isset($rowData['is_settled']) ? $rowData['is_settled'] : null;
@@ -158,6 +181,13 @@ if (isset($_GET['data'])) {
                 echo '<span id="is_settled">' . $accountStatus . '</span>';
                 ?>
             </td>
+            <td><label for="enforcer_name">Issued by:</label></td>
+            <td>
+            <?php
+            $enforcerName = $ticketDetails['first_name'] . ' ' . $ticketDetails['last_name'];
+            echo '<p>' . $enforcerName . '</p>';
+            ?>
+    </td>
         </tr>
         <!-- Add more rows for additional fields as needed -->
         <tr id="edit-row">
