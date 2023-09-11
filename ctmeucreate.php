@@ -156,10 +156,10 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     <form method="POST" action="register.php" id="registration-form">
     <input type="hidden" id="userCtmeuId" name="userCtmeuId">
     <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName" required><br>
+    <input type="text" id="firstName" name="firstName" required minlength="10" maxlength="15"><br>
 
     <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required><br>
+    <input type="text" id="lastName" name="lastName" required minlength="10" maxlength="15"><br>
 
     <label for="role">Role:</label>
     <select id="role" name="role" required>

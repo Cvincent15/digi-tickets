@@ -36,6 +36,18 @@ if (isset($_SESSION['email'])) {
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
+    <div class="d-flex">
+        <ul class="navbar-nav me-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">LTO Official Page</a>
+          </li>
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </li>
+        </ul>
+        <button type="button" class="btn transparent-btn btn-outline-primary" style="margin-right: 20px;" onclick="redirectToRegister()">Register</button>
+        <button type="button" class="btn transparent-btn btn-outline-primary" onclick="redirectToLogin()">Log In</button>
+    </div>
     </div>
   </div>
 </nav>

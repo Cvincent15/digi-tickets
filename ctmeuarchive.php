@@ -172,7 +172,7 @@ foreach ($violationTickets as $index => $ticket) {
 
         echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
         // Display the visible ticket count in the "No." column
-        echo "<td>" . $visibleTicketCount . "</td>";
+        echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
         // Wrap the name in a clickable <td>
         echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
         // Wrap the license in a clickable <td>
@@ -200,7 +200,7 @@ foreach ($violationTickets as $index => $ticket) {
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
-  // Add a click event listener to the clickable cells
+ // Add a click event listener to the clickable cells
 document.querySelectorAll('.clickable-cell').forEach(function(cell) {
     cell.addEventListener('click', function() {
         // Get the row data JSON string from the clicked cell's data-rowdata attribute
@@ -213,6 +213,16 @@ document.querySelectorAll('.clickable-cell').forEach(function(cell) {
         window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
     });
 });
+  function rowClick(row) {
+    // Get the row data JSON string
+    var rowData = row.getAttribute('data-rowdata');
+    
+    // Redirect to the details page with the row data as a query parameter
+    // Exclude the bx-archive-in button from the row data
+    var parsedRowData = JSON.parse(rowData);
+    delete parsedRowData.is_settled; // Remove the is_settled property
+    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+}
 
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {

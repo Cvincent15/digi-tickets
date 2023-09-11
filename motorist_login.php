@@ -74,7 +74,7 @@ if (isset($_SESSION['email'])) {
                             </div>
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
-<p>Dont Have an Account? <a href="motoristSignup.php">Create One</a></p>
+<p class="mt-3">Dont Have an Account? <a href="motoristSignup.php">Create One</a></p>
             </div>
   </div>
         </div>
@@ -82,7 +82,7 @@ if (isset($_SESSION['email'])) {
 </div>
     <script>
     function redirectToRegister() {
-      window.location.href = 'MotoristRegistration.php';
+      window.location.href = 'motoristSignup.php';
     }
 
     function redirectToLogin() {

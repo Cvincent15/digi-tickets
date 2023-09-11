@@ -31,7 +31,7 @@ if (isset($_SESSION['email'])) {
   $stmt->close();
 } else {
   // Redirect the user to the login page if not logged in
-  header("Location: ../motoristlogin.php");
+  header("Location: ./motoristlogin.php");
   exit();
 }
 ?>
@@ -94,7 +94,7 @@ if (isset($_SESSION['email'])) {
 <div class="container min-vh-100 text-center justify-content-center align-items-center">
 <div class="row min-vh-100 justify-content-center align-items-center">
   <div class="col">
-    <h1 style="font-size:60px;">Welcome, User</h1></br>
+    <h1 style="font-size:60px;">Welcome, <?php echo "".$driverFirstName;  ?></h1></br>
     <h2>What would you like to do?</h2> </br>
     <button type="button" class="btn btn-light btn-lg main" onclick="redirectToProfile()"><img src="./images/Vector.png"></br>Profile</button>
     <button type="button" class="btn btn-light btn-lg main" onclick="redirectToId()"><img src="./images/alternatecard.png"></br>Digital ID</button>

@@ -120,7 +120,7 @@ if (isset($_SESSION['email'])) {
               <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="10" maxlength="20"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="date" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Expiry Date" name="expiry">
+              <input type="date" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Expiry Date" name="expiry" max="9999-12-31" min="1970-01-01">
             </div>
           </div>
           <div class="row">
@@ -175,7 +175,10 @@ if (isset($_SESSION['email'])) {
               <input type="date" class="form-control" id="datepicker2" oninput="this.className = ''" placeholder="Date of Birth" name="birthday">
             </div>
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Gender" name="gender" minlength="4" maxlength="10">
+              <select class="form-control" id="gender" name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
             </div>
           </div>
         </div>
@@ -214,7 +217,7 @@ if (isset($_SESSION['email'])) {
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="number" class="form-control"  oninput="this.className = ''" placeholder="Mobile Phone" name="phone" minlength="11" maxlength="11">
+              <input type="number" class="form-control"  oninput="this.className = ''" placeholder="Mobile Phone" name="phone" min="11" max="11">
             </div>
         </div>
         <div class="row">

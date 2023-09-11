@@ -48,6 +48,7 @@ $violationTickets = fetchViolationTickets();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.0.9/css/boxicons.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -130,52 +131,53 @@ $violationTickets = fetchViolationTickets();
 <div class="table-container">
     <form id="archive-form" action="php/archiverow.php" method="POST">
         <button type="submit" class="btn btn-primary" id="archive-button"><i class='bx bx-archive-in'></i></button>
-        <table class="mt-3">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th><input type="checkbox" id="select-all-checkbox"></th>
-                    <th>Name</th>
-                    <th>License No.</th>
-                    <th>Vehicle</th>
-                    <th>Place of Occurrence</th>
-                </tr>
-            </thead>
-            <tbody id="ticket-table-body">
-            <?php
-            $visibleTicketCount = 0; // Initialize a counter for visible tickets
+        <table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th><input type="checkbox" id="select-all-checkbox"></th>
+            <th>Name</th>
+            <th>License No.</th>
+            <th>Vehicle</th>
+            <th>Place of Occurrence</th>
+            
+        </tr>
+    </thead>
+    <tbody id="ticket-table-body">
+    <?php
+$visibleTicketCount = 0; // Initialize a counter for visible tickets
 
-            // Loop through the fetched violation ticket data and populate the table rows
-            foreach ($violationTickets as $index => $ticket) {
-                // Check if the is_settled value is 0 before making the row clickable
-                if ($ticket['is_settled'] == 0) {
-                    $visibleTicketCount++; // Increment the visible ticket counter
+// Loop through the fetched violation ticket data and populate the table rows
+foreach ($violationTickets as $index => $ticket) {
+    // Check if the is_settled value is 0 before making the row clickable
+    if ($ticket['is_settled'] == 0) {
+        $visibleTicketCount++; // Increment the visible ticket counter
 
-                    // Convert the row data to a JSON string
-                    $rowData = json_encode($ticket);
+        // Convert the row data to a JSON string
+        $rowData = json_encode($ticket);
 
-                    echo "<tr>";
-                    // Display the visible ticket count in the "No." column
-                    echo "<td>" . $visibleTicketCount . "</td>";
-                    // Add a checkbox for archiving
-                    echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
-                    // Wrap the name in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
-                    // Wrap the license in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
-                    // Wrap the address in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+        echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
+        // Display the visible ticket count in the "No." column
+        echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
+        // Add a checkbox for archiving
+        echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
+        // Wrap the name in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+        // Wrap the license in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+        // Wrap the address in a clickable <td>
+        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
                     // Wrap the district in a clickable <td>
                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
-                    echo "</tr>";
-                } else {
-                    // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
-                    // Example: Display a message or simply don't include them in the table.
-                }
-            }
-            ?>
-            </tbody>
-        </table>
+        echo "</tr>";
+    } else {
+        // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+        // Example: Display a message or simply don't include them in the table.
+    }
+}
+?>
+    </tbody>
+</table>
     </form>
 </div>
 
