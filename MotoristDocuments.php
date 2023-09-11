@@ -48,6 +48,10 @@ $result = mysqli_query($conn, $sql);
   </a>
 
   <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="MotoristProfile.php">Profile</a></li>
+    <li><a class="dropdown-item" href="MotoristId.php">Digital ID</a></li>
+    <li><a class="dropdown-item" href="MotoristID.php">Transaction</a></li>
+    <li><a class="dropdown-item" href="MotoristViolations.php">Violations</a></li>
     <li><a class="dropdown-item" href="#">Log-out</a></li>
   </ul>
 </div>

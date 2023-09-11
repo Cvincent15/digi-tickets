@@ -83,6 +83,83 @@ $violationTickets = fetchViolationTickets();
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.11.14/dist/js/bootstrap-datepicker.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
+
+/* table */
+.table-container {
+  margin: 0 auto;
+  max-width: 1200px;
+  min-width: 800px;
+  margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden; /* Ensures that rounded corners are applied */
+}
+
+th {
+  background-color: maroon;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: rgb(209, 209, 209);
+}
+
+tr:nth-child(odd) {
+  background-color: white;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.pagination {
+  display: inline-block;
+  margin: auto;
+  text-align: right;
+}
+
+.pagination button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
+}
+
+.pagination button.disabled {
+  background-color: #ddd;
+  color: #b8b8b8;
+  cursor: not-allowed;
+}
+
+.table-info {
+  text-align: center;
+  margin-bottom: 10px;
+  color: white;
+}
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+}
+
+.seek{
+  border-radius: 10px;
+  background-color: red;
+}
+
+
   .clickable-cell {
     cursor: pointer;
   }
@@ -147,6 +224,10 @@ $violationTickets = fetchViolationTickets();
   </a>
 
   <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="MotoristProfile.php">Profile</a></li>
+    <li><a class="dropdown-item" href="MotoristID.php">Digital ID</a></li>
+    <li><a class="dropdown-item" href="MotoristTransaction.php">Transactions</a></li>
+    <li><a class="dropdown-item" href="MotoristDocuments.php">Documents</a></li>
     <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
   </ul>
 </div>
@@ -160,17 +241,18 @@ $violationTickets = fetchViolationTickets();
 <form id="profileForm" action="#!">
   <div class="row d-flex justify-content-center align-items-center"><div class="col-md-auto mb-4"><h1 class="reg"><img src="./images/alternateinvoice.png" style="margin-right: 10px;">Violations</h1></div></div>
   <ul class="nav nav-pills ms-4">
-    <li class="nav-item me-4">
-        <!-- Add an onclick attribute to toggle visibility of 'unsettled' div -->
-        <a class="nav-link active" aria-current="page" href="javascript:void(0);" onclick="toggleUnsettled()">Demerit Points</a>
-    </li>
-    <li class="nav-item me-4">
-        <!-- Add an onclick attribute to hide 'unsettled' and show 'demerit' div -->
-        <a class="nav-link" href="javascript:void(0);" onclick="showDemerit()">Unsettled</a>
-    </li>
-    <li class="nav-item me-4">
-        <a class="nav-link" href="#unsettled">History</a>
-    </li>
+    <!-- Update the "Demerit Points" tab -->
+<li class="nav-item me-4">
+    <a class="nav-link active" aria-current="page" href="javascript:void(0);" onclick="showDemerit()">Demerit Points</a>
+</li>
+
+<!-- Update the "Unsettled" and "History" links to call JavaScript functions -->
+<li class="nav-item me-4">
+    <a class="nav-link" href="javascript:void(0);" onclick="toggleTable('unsettled')">Unsettled</a>
+</li>
+<li class="nav-item me-4">
+    <a class="nav-link" href="javascript:void(0);" onclick="toggleTable('history')">History</a>
+</li>
 </ul>
 <div class="row" id="demerit">
     <div class="col">
@@ -178,7 +260,7 @@ $violationTickets = fetchViolationTickets();
     </div>
 </div>
 <div class="row" id="unsettled" style="display: none;">
-    <div class="col">
+    <div class="col"><br>
     <table>
             <thead>
                 <tr>
@@ -225,6 +307,54 @@ $violationTickets = fetchViolationTickets();
     </div>
 </div>
 
+<div class="row" id="history" style="display: none;">
+<div class="col"><br>
+    <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Name</th>
+                    <th>License No.</th>
+                    <th>Vehicle</th>
+                    <th>Place of Occurrence</th>
+                </tr>
+            </thead>
+            <tbody id="ticket-table-body2">
+            <?php
+            $visibleTicketCount = 0; // Initialize a counter for visible tickets
+
+            // Loop through the fetched violation ticket data and populate the table rows
+            foreach ($violationTickets as $index => $ticket) {
+                // Check if the is_settled value is 0 before making the row clickable
+                if ($ticket['is_settled'] == 1) {
+                    $visibleTicketCount++; // Increment the visible ticket counter
+
+                    // Convert the row data to a JSON string
+                    $rowData = json_encode($ticket);
+
+                    echo "<tr>";
+                    // Display the visible ticket count in the "No." column
+                    echo "<td>" . $visibleTicketCount . "</td>";
+                    // Wrap the name in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+                    // Wrap the license in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+                    // Wrap the address in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                    // Wrap the district in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
+                    echo "</tr>";
+                } else {
+                    // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+                    // Example: Display a message or simply don't include them in the table.
+                }
+            }
+            ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="row">
     <div class="col">
     <button type="button" class="btn btn-lg btn-danger ms-4 mt-5" onclick="redirectToMain()">Close</button>
@@ -234,26 +364,40 @@ $violationTickets = fetchViolationTickets();
    </section>
 </div>
     <script>
-      // Function to toggle visibility of 'unsettled' div
-    function toggleUnsettled() {
-        var unsettledDiv = document.getElementById("unsettled");
-        if (unsettledDiv.style.display === "none") {
-            unsettledDiv.style.display = "block";
+      // Function to toggle visibility of table sections
+    function toggleTable(tableId) {
+        var tableDiv = document.getElementById(tableId);
+        var demeritDiv = document.getElementById("demerit");
+
+        // Hide all table divs except the selected one
+        if (tableId === 'unsettled') {
+            demeritDiv.style.display = "none";
+            document.getElementById("history").style.display = "none";
+        } else if (tableId === 'history') {
+            demeritDiv.style.display = "none";
+            document.getElementById("unsettled").style.display = "none";
+        }
+
+        // Toggle the visibility of the selected table
+        if (tableDiv.style.display === "none") {
+            tableDiv.style.display = "block";
         } else {
-            unsettledDiv.style.display = "none";
+            tableDiv.style.display = "none";
         }
     }
 
-    // Function to hide 'unsettled' and show 'demerit' div
+    // Function to show "Demerit Points" and hide other tables
     function showDemerit() {
-        var unsettledDiv = document.getElementById("unsettled");
         var demeritDiv = document.getElementById("demerit");
+        var unsettledDiv = document.getElementById("unsettled");
+        var historyDiv = document.getElementById("history");
 
-        // Hide 'unsettled' div
-        unsettledDiv.style.display = "none";
-
-        // Show 'demerit' div
+        // Show "Demerit Points" div
         demeritDiv.style.display = "block";
+
+        // Hide "Unsettled" and "History" tables
+        unsettledDiv.style.display = "none";
+        historyDiv.style.display = "none";
     }
     function redirectToRegister() {
       window.location.href = 'motoristSignup.php';
@@ -267,11 +411,5 @@ $violationTickets = fetchViolationTickets();
       window.location.href = 'MotoristMain.php';
     }
   </script>
-  <script>
-    $(document).ready(function() {
-      $('#datepicker').datepicker();
-    });
-  </script>
-  <script src="./js/stepper.js"></script>
 </body>
 </html>

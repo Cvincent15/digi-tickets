@@ -159,7 +159,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     <input type="text" id="firstName" name="firstName" required minlength="10" maxlength="15"><br>
 
     <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required minlength="10" maxlength="15"><br>
+    <input type="text" id="lastName" name="lastName" required minlength="5" maxlength="15"><br>
 
     <label for="role">Role:</label>
     <select id="role" name="role" required>
@@ -298,6 +298,13 @@ if (userExists($conn, $firstName, $lastName, $role)) {
   $firstName = $existingUserData['first_name'];
   $lastName = $existingUserData['last_name'];
   $role = $existingUserData['role'];
+
+  // Check if the userCtmeuId is empty, and update the "Create Account" button's display
+  if (empty($existingUserData['user_ctmeu_id'])) {
+      echo 'document.getElementById("create-button").style.display = "inline-block";';
+  } else {
+      echo 'document.getElementById("create-button").style.display = "none";';
+  }
 } else {
   // Check the role limits
   $superAdminLimit = 2;
@@ -315,8 +322,10 @@ if (userExists($conn, $firstName, $lastName, $role)) {
   } else {
       // Generate a new password for creating a new user
       $password = generatePassword(); // Implement a function to generate a random password
+      echo 'document.getElementById("update-button").style.display = "inline-block";'; // Show the "Create Account" button
   }
 }
+
 }
 
 // Function to generate a random password (customize this function as needed)
@@ -431,32 +440,44 @@ function resetPassword(username) {
         popup.style.display = 'none';
     }
 
-    // Function to set the username and generate a random password
-    function setCredentials() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const role = document.getElementById('role').value.trim();
-        let username = '';
+   // Function to set the username and generate a random password
+function setCredentials() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const role = document.getElementById('role').value.trim();
+    let username = '';
 
-        // Generate the username based on the role and camel-casing
-        if (role === 'Super Administrator') {
-            username = 'sua' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-        } else if (role === 'IT Administrator') {
-            username = 'its' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-        } else if (role === 'Enforcer') {
-            username = 'enf' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-        }
-
-        // Set the username and password fields
-        document.getElementById('username').value = username;
+    // Generate the username based on the role and camel-casing
+    if (role === 'Super Administrator') {
+        username = 'sua' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    } else if (role === 'IT Administrator') {
+        username = 'its' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    } else if (role === 'Enforcer') {
+        username = 'enf' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
     }
 
-    // Add an event listener to the registration form to set the credentials
-    document.getElementById('registration-form').addEventListener('submit', setCredentials);
+    // Set the username and password fields
+    document.getElementById('username').value = username;
+
+    // Check if userCtmeuId is empty, and update the "Update Account" button's display
+    const userCtmeuId = document.getElementById('userCtmeuId').value.trim();
+    if (userCtmeuId === '') {
+        document.getElementById('update-button').style.display = 'inline-block';
+    } else {
+        document.getElementById('update-button').style.display = 'none';
+    }
+}
+
+// Add an event listener to the registration form to set the credentials
+document.getElementById('registration-form').addEventListener('submit', setCredentials);
+
 </script>
   
   <script>
-    
+    // Add a new JavaScript function to disable the role dropdown
+  function disableRoleDropdown() {
+    document.getElementById('role').disabled = true;
+  }
 
     // Function to populate form fields with the selected row data
   function populateFormFields(row) {
@@ -468,6 +489,9 @@ function resetPassword(username) {
 
     document.getElementById('firstName').value = firstName;
     document.getElementById('lastName').value = lastName;
+
+    // Disable the role dropdown when an existing user is selected
+    disableRoleDropdown();
 
     // Set the selected value in the dropdown list based on the status of the row
     const roleDropdown = document.getElementById('role');
@@ -526,6 +550,10 @@ document.getElementById('logout-button').addEventListener('click', function() {
     document.getElementById("create-button").style.display = "inline-block";
     document.getElementById("update-button").style.display = "none";
     document.getElementById("delete-button").style.display = "none";
+
+    // Enable the role dropdown when the form is cleared
+    document.getElementById('role').disabled = false;
+
   }
 
   document.getElementById('reset-button').addEventListener('click', function (event) {
@@ -539,7 +567,7 @@ document.getElementById('logout-button').addEventListener('click', function() {
   if (selectedRow !== row) {
     populateFormFields(row);
     selectedRow = row;
-    document.getElementById("update-button").style.display = "inline-block";
+    document.getElementById("create-button").style.display = "inline-block";
     document.getElementById("delete-button").style.display = "inline-block";
   } else {
     document.getElementById("delete-button").style.display = "none";
@@ -724,51 +752,59 @@ document.getElementById('update-button').addEventListener('click', function() {
     });
 });
 
-
+// JavaScript code: Check if there is an existing user with the same data
 function checkExistingData() {
-  const firstName = document.getElementById('firstName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  const role = document.getElementById('role').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const role = document.getElementById('role').value.trim();
+    const userCtmeuId = document.getElementById('userCtmeuId').value.trim(); // Get userCtmeuId
 
-  // Get all the rows in the user table
-  const tableRows = document.querySelectorAll('#user-table tbody tr');
+    // Get all the rows in the user table
+    const tableRows = document.querySelectorAll('#user-table tbody tr');
 
-  // Variable to track if a match is found
-  let matchFound = false;
+    // Variable to track if a match is found
+    let matchFound = false;
 
-  // Loop through the table rows and compare data
-  for (const row of tableRows) {
-    const rowFirstName = row.cells[0].textContent.trim();
-    const rowLastName = row.cells[1].textContent.trim();
-    const rowRole = row.cells[3].textContent.trim();
+    // Loop through the table rows and compare data
+    for (const row of tableRows) {
+        const rowFirstName = row.cells[0].textContent.trim();
+        const rowLastName = row.cells[1].textContent.trim();
+        const rowRole = row.cells[3].textContent.trim();
+        const rowUserCtmeuId = row.querySelector('.user-ctmeu-id').textContent.trim(); // Get user_ctmeu_id
 
-    // Check if there is a match
-    if (rowFirstName === firstName && rowLastName === lastName && rowRole === role) {
-      // Match found, set the matchFound flag to true
-      matchFound = true;
-      break; // No need to continue checking
+        // Check if there is a match based on firstName, lastName, role, and userCtmeuId
+        if (rowFirstName === firstName && rowLastName === lastName && rowRole === role && rowUserCtmeuId === userCtmeuId) {
+            // Match found, set the matchFound flag to true
+            matchFound = true;
+            break; // No need to continue checking
+        }
     }
-  }
 
-  // Get the Create and Update buttons
-  const createButton = document.getElementById('create-button');
-  const updateButton = document.getElementById('update-button');
+    // Get the Create and Update buttons
+    const createButton = document.getElementById('create-button');
+    const updateButton = document.getElementById('update-button');
 
-  // If a match is found, hide the Create button and show the Update button
-  if (matchFound) {
-    createButton.style.display = 'none';
-    updateButton.style.display = 'inline-block';
-  } else {
-    // If no match is found, show the Create button and hide the Update button
-    createButton.style.display = 'none';
-    updateButton.style.display = 'inline-block';
-  }
+    // If a match is found and userCtmeuId is not empty, show the Update button; otherwise, hide it
+    if (matchFound || userCtmeuId !== '') {
+        createButton.style.display = 'none';
+        updateButton.style.display = 'inline-block';
+    } else {
+        // If no match is found or userCtmeuId is empty, show the Create button and hide the Update button
+        createButton.style.display = 'inline-block';
+        updateButton.style.display = 'none';
+    }
 }
 
-// Add an input event listener to each input field
+// Add an input event listener to each input field and userCtmeuId field
 document.getElementById('firstName').addEventListener('input', checkExistingData);
 document.getElementById('lastName').addEventListener('input', checkExistingData);
 document.getElementById('role').addEventListener('input', checkExistingData);
+document.getElementById('userCtmeuId').addEventListener('input', checkExistingData);
+
+// Initial check to hide the Update button if there is no matching user or userCtmeuId is empty
+checkExistingData();
+
+
   </script>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>

@@ -80,8 +80,6 @@ if (isset($_SESSION['email'])) {
   </a>
 
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="#">Action</a></li>
-    <li><a class="dropdown-item" href="#">Another action</a></li>
     <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
   </ul>
 </div>

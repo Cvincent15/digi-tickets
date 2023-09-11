@@ -98,6 +98,10 @@ if (isset($_SESSION['email'])) {
   </a>
 
   <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="MotoristID.php">Digital ID</a></li>
+    <li><a class="dropdown-item" href="MotoristTransaction.php">Transactions</a></li>
+    <li><a class="dropdown-item" href="MotoristViolations.php">Violations</a></li>
+    <li><a class="dropdown-item" href="MotoristDocuments.php">Documents</a></li>
     <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
   </ul>
 </div>
