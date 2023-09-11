@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if (mysqli_query($conn, $query)) {
     // Redirect to a success page or perform any other actions as needed
-    header("Location: ../ctmeuopage.php");
+    header("Location: ../ctmeupage.php");
     exit();
   } else {
     // Handle the database insert error
