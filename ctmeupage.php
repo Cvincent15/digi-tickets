@@ -126,6 +126,7 @@ $violationTickets = fetchViolationTickets();
     <option value="vehicle">Vehicle</option>
     <option value="place of occurrence">Place of Occurrence</option>
   </select>
+  
 </div>
 
 <div class="table-container">
@@ -134,13 +135,13 @@ $violationTickets = fetchViolationTickets();
     // Check if the user is a Super Administrator
     if ($_SESSION['role'] === 'Super Administrator') {
         // Show the archive button and checkboxes
-        echo '<button type="submit" class="btn btn-primary" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+        echo '<button type="submit" class="btn btn-primary mb-3" id="archive-button"><i class="bx bx-archive-in"></i></button>';
     }
 
     ?>
-        <table>
+        <table class="mb-5">
     <thead>
-        <tr>
+        <tr class="align-items-center">
             <th class="sortable" data-column="0">No.</th>
             <?php
             // Check if the user is a Super Administrator

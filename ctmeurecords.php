@@ -213,7 +213,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </nav>
 
 
-<div class="card">
+<div class="card align-items-center">
     <div class="date-filter-container">
   <label for="start-month">Start Month:</label>
   <select id="start-month">
@@ -229,13 +229,13 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </div>
 </div>
 
-<div class="container" style="display: none;">
+<div class="container mt-1" style="display: none;">
 <form method="post">
   <input type="hidden" id="filtered-data" name="filtered-data" value="">
   <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
 </form>
 
-<div class="table-container">
+<div class="table-container mb-5" style="overflow-x: auto; overflow-y: auto; max-height: 600px; max-width: 100%;">
 <table>
         <thead>
             <tr>
@@ -254,7 +254,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
                 <th>Account Status</th>
             </tr>
         </thead>
-        <tbody id="ticket-table-body">
+        <tbody class="w-75" id="ticket-table-body">
             <?php
             $visibleTicketCount = 0; // Initialize a counter for visible tickets
 

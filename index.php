@@ -37,13 +37,16 @@ if (isset($_SESSION['username'])) {
                                 <p style="text-align:center;">Sign in to start your session</p>
                             </section>
                             <div class="card-body">
-            <form  method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
-              <div class="mb-3">
-                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required type="text" class="form-control" id="username" name="username" required>
+            <form class="form-floating mb-3" method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
+              <div class="form-floating mb-3">
+                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required type="text" id="username" name="username" required>
+                <label for="username" class="form-label">Username</label>
               </div>
-              <div class="mb-3">
+              <div class="form-floating mb-3">
                 <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-4" maxlength="20" required>
-              </div>
+                <label for="password" class="form-label">Password</label>
+                <button type="button" id="togglePassword" class="btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">Show</button>
+            </div>
               <div class="d-flex justify-content-center">
               <button type="submit" name="loginButton" value="Log In" id="loginButton"  class="btn btn-primary rounded-5" style="background: linear-gradient(to bottom, #46A6FF, #0047FF); width: 100px;">Log In</button>
               </div>
@@ -69,6 +72,19 @@ if (isset($_SESSION['username'])) {
                 e.target.value = sanitizedValue;
             });
         });
+
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.getElementById('togglePassword');
+
+    toggleButton.addEventListener('click', function () {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.textContent = 'Show';
+        }
+    });
     </script>
     
 </body>
