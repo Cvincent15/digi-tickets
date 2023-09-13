@@ -63,15 +63,16 @@ if (isset($_SESSION['email'])) {
 <div class="col login rounded-4">         
   <div class="mb-3 mt-3">
   <div class="toplayer login-card-body p-5 rounded-4">
-  <form method="POST" action="./php/motoristlogin.php">
-                            <div class="mb-3">
+  <form class="form-floating mb-3" method="POST" action="./php/motoristlogin.php">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="email" placeholder="email" name="email" required maxlength="50">
                                 <label for="email" class="form-label">E-Mail</label>
-                                <input type="text" class="form-control" id="email" name="email" required maxlength="20">
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required maxlength="20">
-                            </div>
+                            <div class="form-floating mb-3" style="position: relative;">
+    <input type="password" class="form-control" id="password" placeholder="password" name="password" required maxlength="20">
+    <label for="password" class="form-label">Password</label>
+    <button type="button" id="togglePassword" class="btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">Show</button>
+</div>
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
 <p class="mt-3">Dont Have an Account? <a href="motoristSignup.php">Create One</a></p>
@@ -88,6 +89,20 @@ if (isset($_SESSION['email'])) {
     function redirectToLogin() {
       window.location.href = 'motorist_login.php';
     }
+
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.getElementById('togglePassword');
+
+    toggleButton.addEventListener('click', function () {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.textContent = 'Show';
+        }
+    });
+
   </script>
 </body>
 </html>
