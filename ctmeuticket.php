@@ -8,6 +8,23 @@ if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 }
+
+// Fetch user data based on the logged-in user's username
+$username = $_SESSION['username'];
+$query = "SELECT * FROM users WHERE username = '$username'";
+$result = mysqli_query($conn, $query);
+
+if (!$result) {
+    // Handle the database query error
+    die("Database query failed: " . mysqli_error($conn));
+}
+
+// Fetch the user's data
+$user = mysqli_fetch_assoc($result);
+$firstName = $user['first_name'];
+$lastName = $user['last_name'];
+$status = $user['role'];
+$user_ctmeu_id = $user['user_ctmeu_id'];
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -108,6 +125,8 @@ $status = $user['role'];
     <h3>Input Ticket Info</h3>
 
     <form class="form-floating mb-3" method="post" action="./php/submit_ticket.php">
+        <!-- Add a hidden input field for user_ctmeu_id -->
+        <input type="hidden" name="user_ctmeu_id" value="<?php echo $user_ctmeu_id; ?>">
 <div class="row">
     <div class="col">
     <div class="form-floating mb-3">

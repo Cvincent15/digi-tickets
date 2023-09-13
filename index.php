@@ -39,10 +39,10 @@ if (isset($_SESSION['username'])) {
                             <div class="card-body">
             <form  method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
               <div class="mb-3">
-                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="50" size="50" autocomplete="off" class="form-control" required type="text" class="form-control" id="username" name="username" required>
+                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required type="text" class="form-control" id="username" name="username" required>
               </div>
               <div class="mb-3">
-                <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-4" required>
+                <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-4" maxlength="20" required>
               </div>
               <div class="d-flex justify-content-center">
               <button type="submit" name="loginButton" value="Log In" id="loginButton"  class="btn btn-primary rounded-5" style="background: linear-gradient(to bottom, #46A6FF, #0047FF); width: 100px;">Log In</button>
@@ -57,6 +57,19 @@ if (isset($_SESSION['username'])) {
     </div>
     <script src="js/script.js"></script>
     <script src="js/jquery-3.6.4.js"></script>
+    <script>
+        // Apply symbol restriction to all text input fields
+    const form = document.getElementById('login-form');
+        const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function (e) {
+                const inputValue = e.target.value;
+                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
+                e.target.value = sanitizedValue;
+            });
+        });
+    </script>
     
 </body>
 </html>

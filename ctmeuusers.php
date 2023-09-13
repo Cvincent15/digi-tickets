@@ -90,10 +90,10 @@ $status = $user['role'];
             } else {
                 // Display the "Create Accounts" link
                 echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+                echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';    
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>';
             echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
@@ -144,6 +144,18 @@ $status = $user['role'];
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
+
+    // Apply symbol restriction to all text input fields
+    const form = document.getElementById('passwordChangeForm');
+        const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function (e) {
+                const inputValue = e.target.value;
+                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
+                e.target.value = sanitizedValue;
+            });
+        });
 
 $(document).ready(function () {
     // Add a click event listener to the Change Password button

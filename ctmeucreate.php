@@ -141,10 +141,10 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
       } else {
           // Display the "Create Accounts" link
           echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+          echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
       }
       ?>
       <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
       <a href="ctmeucreate.php" id="noEnforcers" class="link" style="font-weight: bolder;">Create Accounts</a>
       <a href="ctmeuticket.php" class="link">Issue Ticket</a>
       <a href="ctmeuusers.php" class="link">User Account</a>
@@ -156,13 +156,13 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     <form method="POST" action="register.php" id="registration-form">
     <input type="hidden" id="userCtmeuId" name="userCtmeuId">
     <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName" required minlength="10" maxlength="15"><br>
+    <input type="text" id="firstName" name="firstName" required minlength="10" maxlength="25"><br>
 
     <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required minlength="5" maxlength="15"><br>
+    <input type="text" id="lastName" name="lastName" required minlength="5" maxlength="25"><br>
 
     <label for="role">Role:</label>
-    <select id="role" name="role" required>
+<select id="role" name="role" required>
     <option value="Enforcer">Enforcer</option>
     <?php
     // Call countSuperAdmins function to get the count of super administrators
@@ -172,18 +172,25 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
     // Check if the IT admin limit has been reached (e.g., limit is 4)
     if ($itAdminCount < 4) {
-      echo '<option value="IT Administrator">IT Admin</option>';
-  } else {
-      echo '<option value="IT Administrator" disabled>IT Admin (Limit Reached)</option>';
-  }
+        echo '<option value="IT Administrator">IT Admin</option>';
+    } else {
+        echo '<option value="IT Administrator" disabled>IT Admin (Limit Reached)</option>';
+    }
 
-    if ($superAdminCount < 2) {
-      echo '<option value="Super Administrator">Super Admin</option>';
-  } else {
-      echo '<option value="Super Administrator" disabled>Super Admin (Limit Reached)</option>';
-  }
-  ?>
+    // Check if the selected role is "IT Administrator" and disable "Super Administrator" if true
+    if ($_POST['role'] === 'IT Administrator') {
+        echo '<option value="Super Administrator" disabled>Super Admin (Disabled for IT Admin)</option>';
+    } elseif ($superAdminCount < 2) {
+        echo '<option value="Super Administrator">Super Admin</option>';
+    } else {
+        echo '<option value="Super Administrator" disabled>Super Admin (Limit Reached)</option>';
+    }
+    ?>
 </select><br>
+
+
+  <label for="email">E-Mail:</label>
+  <input type="text" id="email" name="email" required minlength="10" maxlength="30"><br>
 <!--
     <div class="ticket-container" style="display: none;">
   <label for="startTicket">Start Ticket:</label>
@@ -200,7 +207,13 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
     <input type="hidden" id="password" name="password" readonly>
 
-    <button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>
+<?php
+// Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
+if ($_SESSION['role'] === 'Super Administrator') {
+    echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>';
+}
+?>
+
 <button type="submit" id="create-button" class="btn btn-success">Create Account</button>
 <button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
 <div style="margin-top: 20px;"></div> <!-- Add space above the Reset Password button -->
@@ -364,6 +377,19 @@ function generatePassword() {
   </div>
  
   <script>
+
+    // Apply symbol restriction to all text input fields
+const form = document.getElementById('registration-form');
+const inputs = form.querySelectorAll('input[type="text"]');
+
+inputs.forEach(input => {
+    input.addEventListener('input', function (e) {
+        const inputValue = e.target.value;
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @\-]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
+        e.target.value = sanitizedValue;
+    });
+});
+
     
 document.getElementById('reset-button').addEventListener('click', function() {
     // Reload the current page when the Clear button is clicked
@@ -651,49 +677,57 @@ document.getElementById('user-table').addEventListener('click', function (event)
     }
 });
 
-// Add an event listener to the "Delete Account" button
-document.getElementById('delete-button').addEventListener('click', function() {
-    // Get the user information from the form fields
-    const firstNameToDelete = document.getElementById('firstName').value;
-    const lastNameToDelete = document.getElementById('lastName').value;
-    const roleToDelete = document.getElementById('role').value;
+<?php
+// Check if the logged-in user has the "Super Administrator" role
+if ($_SESSION['role'] === 'Super Administrator') {
+    echo '
+    // Add an event listener to the "Delete Account" button
+    document.getElementById(\'delete-button\').addEventListener(\'click\', function() {
+        // Get the user information from the form fields
+        const firstNameToDelete = document.getElementById(\'firstName\').value;
+        const lastNameToDelete = document.getElementById(\'lastName\').value;
+        const roleToDelete = document.getElementById(\'role\').value;
 
-    // Check if the user is trying to delete themselves
-    if (firstNameToDelete === '<?php echo $_SESSION['first_name']; ?>' &&
-        lastNameToDelete === '<?php echo $_SESSION['last_name']; ?>' &&
-        roleToDelete === '<?php echo $_SESSION['role']; ?>') {
-        alert("You cannot delete yourself.");
-        return;
-    }
+        // Check if the user is trying to delete themselves
+        if (firstNameToDelete === \'' . $_SESSION['first_name'] . '\' &&
+            lastNameToDelete === \'' . $_SESSION['last_name'] . '\' &&
+            roleToDelete === \'' . $_SESSION['role'] . '\') {
+            alert("You cannot delete yourself.");
+            return;
+        }
 
-    // Confirm the deletion with the user
-    if (confirm("Are you sure you want to delete this user account?")) {
-        // Perform the delete action here using an AJAX request or redirect to a PHP script that handles the deletion
-        // You can use the following code to send an AJAX request to a PHP script for deletion:
+        // Confirm the deletion with the user
+        if (confirm("Are you sure you want to delete this user account?")) {
+            // Perform the delete action here using an AJAX request or redirect to a PHP script that handles the deletion
+            // You can use the following code to send an AJAX request to a PHP script for deletion:
 
-        
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'php/deleteaccount.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                // Handle the response here, e.g., show a success message
-                alert("Deleted Successfully");
-                location.reload();
-                // Optionally, reload the user table or perform other actions
-            }
-        };
-        xhr.send('firstName=' + encodeURIComponent(firstNameToDelete) +
-                 '&lastName=' + encodeURIComponent(lastNameToDelete) +
-                 '&role=' + encodeURIComponent(roleToDelete));
-        
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open(\'POST\', \'php/deleteaccount.php\', true);
+            xhr.setRequestHeader(\'Content-Type\', \'application/x-www-form-urlencoded\');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Handle the response here, e.g., show a success message
+                    alert("Deleted Successfully");
+                    location.reload();
+                    // Optionally, reload the user table or perform other actions
+                }
+            };
+            xhr.send(\'firstName=\' + encodeURIComponent(firstNameToDelete) +
+                    \'&lastName=\' + encodeURIComponent(lastNameToDelete) +
+                    \'&role=\' + encodeURIComponent(roleToDelete));
+            
 
-        // Alternatively, you can redirect to a PHP script that handles the deletion
-        // window.location.href = 'delete_user.php?firstName=' + encodeURIComponent(firstNameToDelete) +
-        //                        '&lastName=' + encodeURIComponent(lastNameToDelete) +
-        //                        '&role=' + encodeURIComponent(roleToDelete);
-    }
-});
+            // Alternatively, you can redirect to a PHP script that handles the deletion
+            // window.location.href = \'delete_user.php?firstName=\' + encodeURIComponent(firstNameToDelete) +
+            //                        \'&lastName=\' + encodeURIComponent(lastNameToDelete) +
+            //                        \'&role=\' + encodeURIComponent(roleToDelete);
+        }
+    });
+    ';
+}
+?>
+
 
 // JavaScript code: Add a click event listener to the "Update Account" button
 document.getElementById('update-button').addEventListener('click', function() {

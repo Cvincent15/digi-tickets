@@ -112,7 +112,7 @@ if (isset($_GET['data'])) {
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Ticket Details</h5>
-            <form method="POST" action="php/editDetails.php">
+            <form id="details" method="POST" action="php/editDetails.php">
                 <input type="hidden" name="ticket_id" value="<?php echo $rowData['ticket_id']; ?>">
                 
                 <table>
@@ -140,7 +140,7 @@ if (isset($_GET['data'])) {
         <!-- Add more rows for additional fields as needed -->
         <tr>
             <td><label for="cor_no">COR No.:</label></td>
-            <td><input class="readonly-input" type="number" id="cor_no" name="cor_no" minlength="10" maxlength="20" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" minlength="10" maxlength="20" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
             
             <td><label for="place_issued">Place Issued:</label></td>
             <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" minlength="10" maxlength="20" value="<?php echo $rowData['place_issued']; ?>" readonly></td>
@@ -207,6 +207,26 @@ if (isset($_GET['data'])) {
 
 <script src="js/jquery-3.6.4.js"></script>
 <script>
+    
+  // Add a click event listener to the logout button
+document.getElementById('logout-button').addEventListener('click', function() {
+        // Perform logout actions here, e.g., clearing session, redirecting to logout.php
+        // You can use JavaScript to redirect to the logout.php page.
+        window.location.href = 'php/logout.php';
+    });
+
+    // Apply symbol restriction to all text input fields
+    const form = document.getElementById('details');
+        const inputs = form.querySelectorAll('input[type="text"]');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function (e) {
+                const inputValue = e.target.value;
+                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
+                e.target.value = sanitizedValue;
+            });
+        });
+
     <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
     var role = '<?php echo $_SESSION['role']; ?>';
     var firstName = '<?php echo $_SESSION['first_name']; ?>';

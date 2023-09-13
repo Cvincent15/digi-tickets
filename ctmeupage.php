@@ -14,7 +14,7 @@ function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
 
   // Write a SQL query to fetch data from the violation_tickets table
-  $sql = "SELECT * FROM violation_tickets"; // Modify this query as needed
+  $sql = "SELECT * FROM violation_tickets WHERE user_ctmeu_id IS NOT NULL"; // Modify this query as needed
 
   // Execute the query
   $result = mysqli_query($conn, $sql);
@@ -109,10 +109,10 @@ $violationTickets = fetchViolationTickets();
       } else {
           // Display the "Create Accounts" link
           echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+          echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
       }
       ?>
       <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
-      <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
       <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
       <a href="ctmeuusers.php" class="link">User Account</a>
     </div>
@@ -130,53 +130,71 @@ $violationTickets = fetchViolationTickets();
 
 <div class="table-container">
     <form id="archive-form" action="php/archiverow.php" method="POST">
-        <button type="submit" class="btn btn-primary" id="archive-button"><i class='bx bx-archive-in'></i></button>
+    <?php
+    // Check if the user is a Super Administrator
+    if ($_SESSION['role'] === 'Super Administrator') {
+        // Show the archive button and checkboxes
+        echo '<button type="submit" class="btn btn-primary" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+    }
+
+    ?>
         <table>
     <thead>
         <tr>
-            <th>No.</th>
-            <th><input type="checkbox" id="select-all-checkbox"></th>
-            <th>Name</th>
-            <th>License No.</th>
-            <th>Vehicle</th>
-            <th>Place of Occurrence</th>
-            
+            <th class="sortable" data-column="0">No.</th>
+            <?php
+            // Check if the user is a Super Administrator
+            if ($_SESSION['role'] === 'Super Administrator') {
+                // Show the archive button and checkboxes
+                echo '<th><input type="checkbox" id="select-all-checkbox"></th>';
+            }
+
+            ?>
+            <th class="sortable" data-column="2">Name <span class="sort-arrow"></span></th>
+            <th class="sortable" data-column="3">License No. <span class="sort-arrow"></span></th>
+            <th class="sortable" data-column="4">Vehicle <span class="sort-arrow"></span></th>
+            <th class="sortable" data-column="5">Place of Occurrence <span class="sort-arrow"></span></th>
         </tr>
     </thead>
     <tbody id="ticket-table-body">
-    <?php
-$visibleTicketCount = 0; // Initialize a counter for visible tickets
+            <?php
+            $visibleTicketCount = 0; // Initialize a counter for visible tickets
 
-// Loop through the fetched violation ticket data and populate the table rows
-foreach ($violationTickets as $index => $ticket) {
-    // Check if the is_settled value is 0 before making the row clickable
-    if ($ticket['is_settled'] == 0) {
-        $visibleTicketCount++; // Increment the visible ticket counter
+            // Loop through the fetched violation ticket data and populate the table rows
+            foreach ($violationTickets as $index => $ticket) {
+                // Check if the is_settled value is 0 before making the row clickable
+                if ($ticket['is_settled'] == 0) {
+                    $visibleTicketCount++; // Increment the visible ticket counter
 
-        // Convert the row data to a JSON string
-        $rowData = json_encode($ticket);
+                    // Convert the row data to a JSON string
+                    $rowData = json_encode($ticket);
 
-        echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
-        // Display the visible ticket count in the "No." column
-        echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
-        // Add a checkbox for archiving
-        echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
-        // Wrap the name in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
-        // Wrap the license in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
-        // Wrap the address in a clickable <td>
-        echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                    echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
+                    // Display the visible ticket count in the "No." column
+                    echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
+
+                    // Check the user's role to decide whether to show checkboxes
+                    if ($_SESSION['role'] === 'Super Administrator') {
+                        // Add a checkbox for archiving
+                        echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
+                    }
+
+                    // Wrap the name in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+                    // Wrap the license in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+                    // Wrap the address in a clickable <td>
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
                     // Wrap the district in a clickable <td>
                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
-        echo "</tr>";
-    } else {
-        // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
-        // Example: Display a message or simply don't include them in the table.
-    }
-}
-?>
-    </tbody>
+                    echo "</tr>";
+                } else {
+                    // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
+                    // Example: Display a message or simply don't include them in the table.
+                }
+            }
+            ?>
+        </tbody>
 </table>
     </form>
 </div>
@@ -184,13 +202,109 @@ foreach ($violationTickets as $index => $ticket) {
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
-document.getElementById('select-all-checkbox').addEventListener('change', function () {
-        var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-        checkboxes.forEach(function (checkbox) {
-            checkbox.checked = document.getElementById('select-all-checkbox').checked;
+  // Apply symbol restriction to all text input fields
+  const form = document.getElementById('search-bar');
+        const inputs = form.querySelectorAll('input[type="text"]');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function (e) {
+                const inputValue = e.target.value;
+                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
+                e.target.value = sanitizedValue;
+            });
+        });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.getElementById("ticket-table-body");
+    const headers = document.querySelectorAll(".sortable");
+    let currentColumn = null;
+    let isAscending = true;
+
+    // Function to compare two table cells based on their content
+    function compareCells(a, b) {
+        const aValue = a.textContent || a.innerText;
+        const bValue = b.textContent || b.innerText;
+        return aValue.localeCompare(bValue, undefined, { numeric: true });
+    }
+
+    // Function to sort the table rows
+    function sortTable(column, order) {
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        rows.sort((rowA, rowB) => {
+            const cellA = rowA.querySelectorAll("td")[column];
+            const cellB = rowB.querySelectorAll("td")[column];
+
+            if (order === "asc") {
+                return compareCells(cellA, cellB);
+            } else {
+                return compareCells(cellB, cellA);
+            }
+        });
+
+        tableBody.innerHTML = "";
+        rows.forEach((row) => {
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Function to update the arrow icons
+function updateArrowIcons() {
+    headers.forEach((header) => {
+        header.classList.remove("asc", "desc");
+        const arrowIcon = header.querySelector(".sort-arrow");
+
+        // Check if arrowIcon is not null before updating its innerHTML
+        if (arrowIcon) {
+            arrowIcon.innerHTML = "";
+        }
+    });
+}
+
+
+    // Event listener for header clicks
+    headers.forEach((header, index) => {
+        header.addEventListener("click", () => {
+            const column = parseInt(header.getAttribute("data-column"));
+
+            if (column === currentColumn) {
+                // If clicked on the same column, toggle the sorting order
+                isAscending = !isAscending;
+            } else {
+                // If clicked on a different column, set it as the current column and sort in ascending order
+                currentColumn = column;
+                isAscending = true;
+                updateArrowIcons(); // Clear arrow icons in other headers
+            }
+
+            // Update the arrow icons and CSS class
+            header.classList.add(isAscending ? "asc" : "desc");
+            const arrowIcon = header.querySelector(".sort-arrow");
+            arrowIcon.innerHTML = isAscending ? "&#9650;" : "&#9660;"; // Unicode symbols for up and down arrows
+
+            // Sort the table
+            sortTable(column, isAscending ? "asc" : "desc");
         });
     });
+});
+</script>
 
+<script>
+  
+  <?php
+            // Check if the user is a Super Administrator
+            if ($_SESSION['role'] === 'Super Administrator') {
+                // Show the archive button and checkboxes
+                echo `document.getElementById('select-all-checkbox').addEventListener('change', function () {
+                  var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                  checkboxes.forEach(function (checkbox) {
+                      checkbox.checked = document.getElementById('select-all-checkbox').checked;
+                  });
+              });
+          `;
+            }
+
+            ?> 
   // Add a click event listener to the clickable cells
 document.querySelectorAll('.clickable-cell').forEach(function(cell) {
     cell.addEventListener('click', function() {
