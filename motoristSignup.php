@@ -209,10 +209,10 @@ if (isset($_SESSION['email'])) {
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Email Address" name="email" minlength="10" maxlength="25" >
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Email Address" name="email" minlength="10" maxlength="50" >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Email Address" name="email2" minlength="10" maxlength="25"  >
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Email Address" name="email2" minlength="10" maxlength="50"  >
             </div>
           </div>
           <div class="row">
@@ -222,10 +222,10 @@ if (isset($_SESSION['email'])) {
         </div>
         <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Password" name="password" minlength="8" maxlength="25"  >
+              <input type="password" class="form-control"  oninput="this.className = ''" placeholder="Password" name="password" minlength="8" maxlength="25"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Password" name="password2" minlength="8" maxlength="25"  >
+              <input type="password" class="form-control"  oninput="this.className = ''" placeholder="Confirm Password" name="password2" minlength="8" maxlength="25"  >
             </div>
           </div>
       </div>

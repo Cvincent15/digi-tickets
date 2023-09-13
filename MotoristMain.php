@@ -74,7 +74,7 @@ if (isset($_SESSION['email'])) {
             <!-- <a class="nav-link" href="motoristlogin.php">Dashboard</a> -->
           </li>
         </ul>
-      <div class="dropdown">
+      <div class="dropstart">
   <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <img src="./images/Icon.png" style="margin-right: 10px;"><?php echo "".$driverFirstName;  ?>
   </a>
