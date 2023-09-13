@@ -17,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $issuingDistrict = filter_input(INPUT_POST, 'issuing_district', FILTER_SANITIZE_STRING);
     $vehicleType = filter_input(INPUT_POST, 'vehicle_type', FILTER_SANITIZE_STRING);
     $plateNo = filter_input(INPUT_POST, 'plate_no', FILTER_SANITIZE_STRING);
-    $corNo = isset($_POST['cor_no']) ? filter_input(INPUT_POST, 'cor_no', FILTER_SANITIZE_STRING) : null;
-    $placeIssued = isset($_POST['place_issued']) ? filter_input(INPUT_POST, 'place_issued', FILTER_SANITIZE_STRING) : null;
+    $corNo = filter_input(INPUT_POST, 'cor_no', FILTER_SANITIZE_STRING);
+    $placeIssued = filter_input(INPUT_POST, 'place_issued', FILTER_SANITIZE_STRING);
     $regOwner = filter_input(INPUT_POST, 'reg_owner', FILTER_SANITIZE_STRING);
     $regOwnerAddress = filter_input(INPUT_POST, 'reg_owner_address', FILTER_SANITIZE_STRING);
     $dateTimeViolation = filter_input(INPUT_POST, 'date_time_violation', FILTER_SANITIZE_STRING);
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ticketId = intval($_POST['ticket_id']); // Convert to an integer
 
     // Validate if necessary (e.g., minimum length for specific fields)
-    if (strlen($driverName) < 2 || strlen($driverLicense) < 2) {
+    if (strlen($driverName) < 2 || strlen($driverLicense) < 2 || empty($corNo) || empty($placeIssued)) {
         echo "InvalidInput";
         exit();
     }
@@ -39,60 +39,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 issuing_district = ?,
                 vehicle_type = ?,
                 plate_no = ?,
+                cor_no = ?,
+                place_issued = ?,
                 reg_owner = ?,
                 reg_owner_address = ?,
                 date_time_violation = ?,
-                place_of_occurrence = ?";
+                place_of_occurrence = ?
+            WHERE ticket_id = ?"; // Add WHERE clause to specify which record to update
 
     // Prepare the statement
-$stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare($sql);
 
-if ($stmt) {
-    // Define all parameters and their types
-    $paramTypes = "ssssssssssii"; // Base types for all parameters
-    $params = [
-        &$driverName,
-        &$driverAddress,
-        &$driverLicense,
-        &$issuingDistrict,
-        &$vehicleType,
-        &$plateNo,
-        &$regOwner,
-        &$regOwnerAddress,
-        &$dateTimeViolation,
-        &$placeOfOccurrence,
-        &$ticketId,
-    ];
+    if ($stmt) {
+        // Define all parameters and their types in a single array
+        $params = [
+            "ssssssssssssi", // Types for all parameters (i for integer)
+            &$driverName,
+            &$driverAddress,
+            &$driverLicense,
+            &$issuingDistrict,
+            &$vehicleType,
+            &$plateNo,
+            &$corNo,
+            &$placeIssued,
+            &$regOwner,
+            &$regOwnerAddress,
+            &$dateTimeViolation,
+            &$placeOfOccurrence,
+            &$ticketId,
+        ];
 
-    // Conditionally add cor_no and place_issued to the parameters and types
-    if (!empty($corNo)) {
-        $paramTypes .= "s";
-        $params[] = &$corNo;
+        // Use call_user_func_array to bind parameters dynamically
+        call_user_func_array([$stmt, 'bind_param'], $params);
+
+        // Execute the SQL query
+        if ($stmt->execute()) {
+            // The update was successful
+            // Redirect to a success page or back to the details page
+            header("Location: ../ctmeupage.php");
+            exit();
+        } else {
+            // Handle the error, e.g., display an error message
+            echo "Error: " . $stmt->error;
+        }
+
+        // Close the prepared statement
+        $stmt->close();
     }
-
-    if (!empty($placeIssued)) {
-        $paramTypes .= "s";
-        $params[] = &$placeIssued;
-    }
-
-    // Use call_user_func_array to bind parameters dynamically
-    $bindParams = array_merge([$paramTypes], ...$params);
-    call_user_func_array([$stmt, 'bind_param'], $bindParams);
-
-    // Execute the SQL query
-    if ($stmt->execute()) {
-        // The update was successful
-        // Redirect to a success page or back to the details page
-        header("Location: ../ctmeupage.php");
-        exit();
-    } else {
-        // Handle the error, e.g., display an error message
-        echo "Error: " . $stmt->error;
-    }
-
-    // Close the prepared statement
-    $stmt->close();
-}
 
 } else {
     // If the request is not a POST request, redirect to an error page or handle it accordingly
