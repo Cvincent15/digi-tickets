@@ -53,6 +53,20 @@ $violationTickets = fetchViolationTickets();
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+  .pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+#page-info {
+    font-weight: bold;
+}
   .clickable-cell {
     cursor: pointer;
   }
@@ -114,6 +128,8 @@ $violationTickets = fetchViolationTickets();
       ?>
       <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a>-->
       <a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>
+      
+      <a href="ctmeuticket.php" class="link">Ticket</a>
       <a href="ctmeuusers.php" class="link">User Account</a>
     </div>
   </div>
@@ -147,7 +163,7 @@ $violationTickets = fetchViolationTickets();
             // Check if the user is a Super Administrator
             if ($_SESSION['role'] === 'Super Administrator') {
                 // Show the archive button and checkboxes
-                echo '<th><input type="checkbox" id="select-all-checkbox"></th>';
+                echo "<th><input type='checkbox' id='select-all-checkbox'></th>";
             }
 
             ?>
@@ -197,8 +213,15 @@ $violationTickets = fetchViolationTickets();
             ?>
         </tbody>
 </table>
-    </form>
+
+<!--
+<div class="pagination">
+    <button type="button" id="prev-page">Previous</button>
+    <span id="page-info">Page 1 of 1</span>
+    <button type="button" id="next-page">Next</button>
 </div>
+    </form>
+</div> -->
 
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
@@ -291,43 +314,93 @@ function updateArrowIcons() {
 </script>
 
 <script>
+  /* // JavaScript code
+document.addEventListener("DOMContentLoaded", function () {
+    const rowsPerPage = 10; // Number of rows to show per page
+    const tableBody = document.getElementById("ticket-table-body");
+    const rows = tableBody.querySelectorAll("tr");
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+    let currentPage = 1;
+
+    // Function to show the rows for the current page
+    function showPage(page) {
+        const startIdx = (page - 1) * rowsPerPage;
+        const endIdx = startIdx + rowsPerPage;
+        
+        rows.forEach((row, index) => {
+            if (index >= startIdx && index < endIdx) {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        });
+        
+        document.getElementById("page-info").textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    // Show the first page initially
+    showPage(currentPage);
+
+    // Event listener for the "Next" button
+    document.getElementById("next-page").addEventListener("click", function () {
+        if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    // Event listener for the "Previous" button
+    document.getElementById("prev-page").addEventListener("click", function () {
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+}); */
+
   
   <?php
             // Check if the user is a Super Administrator
             if ($_SESSION['role'] === 'Super Administrator') {
                 // Show the archive button and checkboxes
-                echo `document.getElementById('select-all-checkbox').addEventListener('change', function () {
-                  var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                echo "document.getElementById('select-all-checkbox').addEventListener('change', function () {
+                  var checkboxes = document.querySelectorAll('tbody input[type="."checkbox"."]');
                   checkboxes.forEach(function (checkbox) {
                       checkbox.checked = document.getElementById('select-all-checkbox').checked;
                   });
               });
-          `;
+          ";
             }
 
             ?> 
-  // Add a click event listener to the clickable cells
-document.querySelectorAll('.clickable-cell').forEach(function(cell) {
-    cell.addEventListener('click', function() {
+  document.querySelectorAll('.clickable-cell').forEach(function (cell) {
+    cell.addEventListener('click', function () {
         // Get the row data JSON string from the clicked cell's data-rowdata attribute
         var rowData = cell.getAttribute('data-rowdata');
-        
+
         // Redirect to the details page with the row data as a query parameter
         // Exclude the bx-archive-in button from the row data
         var parsedRowData = JSON.parse(rowData);
         delete parsedRowData.is_settled; // Remove the is_settled property
-        window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+        var queryString = 'data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+        
+        // Redirect to the details page
+        window.location.href = 'detailarch.php?' + queryString;
     });
 });
-  function rowClick(row) {
+
+function rowClick(row) {
     // Get the row data JSON string
     var rowData = row.getAttribute('data-rowdata');
-    
+
     // Redirect to the details page with the row data as a query parameter
     // Exclude the bx-archive-in button from the row data
     var parsedRowData = JSON.parse(rowData);
     delete parsedRowData.is_settled; // Remove the is_settled property
-    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+    var queryString = 'data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+    
+    // Redirect to the details page
+    window.location.href = 'detailarch.php?' + queryString;
 }
 
   // Add a click event listener to the logout button

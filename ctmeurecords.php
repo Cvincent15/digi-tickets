@@ -107,14 +107,26 @@ function generatePDF($data) {
     
     $ticketNumber++; // Increment ticket number
   }
+
+  
   
   $tbl .= '</table>';
-  
+
   // Output the table to the PDF
-  $pdf->writeHTML($tbl, true, false, false, false, '');
-  
-  // Output the PDF as a download
-  $pdf->Output('violation_tickets.pdf', 'D');
+$pdf->writeHTML($tbl, true, false, false, false, '');
+
+// Add a row for signatures at the bottom of the table
+$tblSignatures = '<table width="100%" cellspacing="0" cellpadding="8">';
+$tblSignatures .= '<tr>';
+$tblSignatures .= '<td colspan="4">Administrator\'s Signature: ____________________________</td>';
+$tblSignatures .= '<td colspan="4">Chief\'s Signature: ____________________________</td>';
+$tblSignatures .= '</tr>';
+$tblSignatures .= '</table>';
+
+$pdf->writeHTML($tblSignatures, true, false, false, false, '');
+
+// Output the PDF as a download
+$pdf->Output('violation_tickets.pdf', 'D');
 }
 
 
@@ -207,6 +219,8 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
     <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" id="noEnforcers"class="link">Create Accounts</a>
+    
+      <a href="ctmeuticket.php" class="link">Ticket</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
   </div>
   </div>
@@ -286,7 +300,7 @@ foreach ($violationTickets as $index => $ticket) {
           echo "<td>Null</td>";
       }
       echo "<td>" . $ticket['date_time_violation'] . "</td>";
-      echo "<td>" . ($ticket['is_settled'] == 0 ? 'No' : 'Yes') . "</td>";
+      echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
       echo "</tr>";
   }
             ?>

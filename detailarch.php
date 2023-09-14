@@ -2,6 +2,7 @@
 session_start();
 include 'php/database_connect.php'; // Include your database connection code here
 
+
 // Function to fetch is_settled based on ticket_id
 function fetchIsSettled($ticketId, $conn) {
     // Perform a database query to fetch is_settled based on ticket_id
@@ -19,12 +20,14 @@ function fetchIsSettled($ticketId, $conn) {
     }
 }
 
-// Function to fetch is_settled, first_name, and last_name based on ticket_id
+// Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
-    $query = "SELECT vt.is_settled, u.first_name, u.last_name
+    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violation_names
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
-              WHERE vt.ticket_id = $ticketId";
+              LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
+              WHERE vt.ticket_id = $ticketId
+              GROUP BY vt.ticket_id";
     $result = mysqli_query($conn, $query);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -60,6 +63,7 @@ if (isset($_GET['data'])) {
     echo "Error: Row data not found.";
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -102,6 +106,8 @@ if (isset($_GET['data'])) {
     <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
     <!-- firebase only super admin can access this -->
     <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
+    
+    <a href="ctmeuticket.php" class="link">Ticket</a>
     <a href="ctmeuusers.php" class="link">User Account</a>
   </div>
   </div>
@@ -118,48 +124,50 @@ if (isset($_GET['data'])) {
                 <table>
         <tr>
             <td><label for="driver_name">Driver Name:</label></td>
-            <td><input class="readonly-input" type="text" id="driver_name" name="driver_name" minlength="10" maxlength="30" value="<?php echo $rowData['driver_name']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="driver_name" name="driver_name" minlength="10" maxlength="30" value="<?php echo $rowData['driver_name']; ?>" readonly required></td>
             
             <td><label for="driver_address">Driver Address:</label></td>
-            <td><input class="readonly-input" type="text" id="driver_address" name="driver_address" minlength="10" maxlength="40" value="<?php echo $rowData['driver_address']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="driver_address" name="driver_address" minlength="10" maxlength="40" value="<?php echo $rowData['driver_address']; ?>" readonly required></td>
         </tr>
         <tr>
             <td><label for="driver_license">Driver License No.:</label></td>
-            <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" minlength="13" maxlength="13" value="<?php echo $rowData['driver_license']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" minlength="13" maxlength="13" value="<?php echo $rowData['driver_license']; ?>" readonly required></td>
             
             <td><label for="issuing_district">Issuing District:</label></td>
-            <td><input class="readonly-input" type="text" id="issuing_district" name="issuing_district" minlength="10" maxlength="20" value="<?php echo $rowData['issuing_district']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="issuing_district" name="issuing_district" minlength="10" maxlength="20" value="<?php echo $rowData['issuing_district']; ?>" readonly required></td>
         </tr>
         <tr>
             <td><label for="vehicle_type">Vehicle Type:</label></td>
-            <td><input class="readonly-input" type="text" id="vehicle_type" name="vehicle_type" minlength="3" maxlength="20" value="<?php echo $rowData['vehicle_type']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="vehicle_type" name="vehicle_type" minlength="3" maxlength="20" value="<?php echo $rowData['vehicle_type']; ?>" readonly required></td>
             
             <td><label for="plate_no">Plate No.:</label></td>
-            <td><input class="readonly-input" type="text" id="plate_no" name="plate_no" minlength="6" maxlength="6" value="<?php echo $rowData['plate_no']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="plate_no" name="plate_no" minlength="6" maxlength="7" value="<?php echo $rowData['plate_no']; ?>" readonly required></td>
         </tr>
         <!-- Add more rows for additional fields as needed -->
         <tr>
             <td><label for="cor_no">COR No.:</label></td>
-            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" minlength="10" maxlength="20" value="<?php echo $rowData['cor_no']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" minlength="10" maxlength="20" value="<?php echo $rowData['cor_no']; ?>" readonly required></td>
             
             <td><label for="place_issued">Place Issued:</label></td>
-            <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" minlength="10" maxlength="20" value="<?php echo $rowData['place_issued']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" minlength="10" maxlength="20" value="<?php echo $rowData['place_issued']; ?>" readonly required></td>
         </tr>
         <!-- Add more rows for additional fields as needed -->
         <tr>
             <td><label for="reg_owner">Registered Owner:</label></td>
-            <td><input class="readonly-input" type="text" id="reg_owner" name="reg_owner" minlength="10" maxlength="20" value="<?php echo $rowData['reg_owner']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="reg_owner" name="reg_owner" minlength="10" maxlength="20" value="<?php echo $rowData['reg_owner']; ?>" readonly required></td>
             
             <td><label for="reg_owner_address">Registered Owner Address:</label></td>
-            <td><input class="readonly-input" type="text" id="reg_owner_address" name="reg_owner_address" minlength="10" maxlength="30" value="<?php echo $rowData['reg_owner_address']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="reg_owner_address" name="reg_owner_address" minlength="10" maxlength="30" value="<?php echo $rowData['reg_owner_address']; ?>" readonly required></td>
         </tr>
         <!-- Add more rows for additional fields as needed -->
         <tr>
-            <td><label for="date_time_violation">Date and Time of Violation:</label></td>
-            <td><input class="readonly-input" type="datetime-local" id="date_time_violation" name="date_time_violation" min="9999-01-01" max="1970-12-31" value="<?php echo $rowData['date_time_violation']; ?>" readonly></td>
+        <td><label for="date_time_violation">Date and Time of Violation:</label></td>
+<td><input class="readonly-input" type="datetime-local" id="date_time_violation" value="<?php echo $rowData['date_time_violation']; ?>" name="date_time_violation" onclick="clearInput()" readonly required></td>
+
+
             
             <td><label for="place_of_occurrence">Place of Occurrence:</label></td>
-            <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" minlength="10" maxlength="30" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly></td>
+            <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" minlength="10" maxlength="50" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly required></td>
         </tr>
         <tr>
             <td><label for="is_settled">Account Status:</label></td>
@@ -189,6 +197,19 @@ if (isset($_GET['data'])) {
             ?>
     </td>
         </tr>
+        <tr>
+        <td><label for="violation_names">Violations:</label></td>
+        <td colspan="3">
+        <?php
+        // Encode the entire concatenated violation names string
+        $encodedViolationNames = htmlspecialchars($ticketDetails['violation_names']);
+
+        // Display the encoded string as a single list item
+        echo '<p>' . $encodedViolationNames . '</p>';
+        ?>
+</td>
+
+    </tr>
         <!-- Add more rows for additional fields as needed -->
         <tr id="edit-row">
             <td></td>
@@ -206,6 +227,31 @@ if (isset($_GET['data'])) {
 </div>
 
 <script src="js/jquery-3.6.4.js"></script>
+
+<script>
+     function clearInput() {
+    document.getElementById("date_time_violation").value = "";
+  }
+  // Get the input element by ID
+  const dateTimeInput = document.getElementById("date_time_violation");
+
+  // Set the maximum and minimum date values
+  dateTimeInput.max = "2050-12-31T23:59";
+  dateTimeInput.min = "1970-01-01T00:00";
+
+  // Add an event listener to check the value when it changes
+  dateTimeInput.addEventListener("change", function() {
+    const selectedDateTime = new Date(this.value).getTime();
+    const minDateTime = new Date(this.min).getTime();
+    const maxDateTime = new Date(this.max).getTime();
+
+    if (selectedDateTime < minDateTime || selectedDateTime > maxDateTime) {
+      alert("Please enter a valid date and time within the specified range.");
+      this.value = ""; // Clear the input value
+    }
+  });
+</script>
+
 <script>
     
   // Add a click event listener to the logout button

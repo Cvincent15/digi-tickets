@@ -82,6 +82,8 @@ $status = $user['role'];
         // Show the "User Account" link only for Enforcer users
         if ($userRole === 'Enforcer') {
             echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
+            
+            echo '<a href="ctmeuticket.php" class="link">Ticket</a>';
         } else {
             // For other roles, show the other links
             echo '<a href="ctmeupage.php" class="link">Records</a>';
@@ -96,6 +98,8 @@ $status = $user['role'];
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>';
+            
+            echo '<a href="ctmeuticket.php" class="link">Ticket</a>';
             echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
         }
     }
