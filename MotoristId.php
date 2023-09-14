@@ -59,8 +59,8 @@ if (isset($_SESSION['email'])) {
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
   <a class="navbar-brand" href="motoristlogin.php">
-  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
-  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
+  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;">Motorist Portal</span>
 </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
       <span class="navbar-toggler-icon"></span>
@@ -68,7 +68,7 @@ if (isset($_SESSION['email'])) {
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://portal.lto.gov.ph/">LTO Official Page</a>
+            <a class="nav-link" href="https://portal.lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
           </li>
           <li class="nav-item">
             <!-- <a class="nav-link" href="#">Contact</a> -->
@@ -84,10 +84,10 @@ if (isset($_SESSION['email'])) {
 
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" href="MotoristProfile.php">Profile</a></li>
-    <li><a class="dropdown-item" href="MotoristID.php">Transaction</a></li>
+    <li><a class="dropdown-item" href="MotoristTransaction.php">Transaction</a></li>
     <li><a class="dropdown-item" href="MotoristViolations.php">Violations</a></li>
-    <li><a class="dropdown-item" href="MotoristDocuments">Documents</a></li>
-    <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button">Logout?</a></li>
+    <li><a class="dropdown-item" href="MotoristDocuments.php">Documents</a></li>
+    <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button"><img src="./images/icon _logout_.png"> Log Out</a></li>
   </ul>
 </div>
     </div>

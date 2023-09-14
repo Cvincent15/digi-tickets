@@ -34,6 +34,7 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     <title>CTMEU Data Hub</title>
 </head>
 <style>
@@ -100,51 +101,99 @@ $status = $user['role'];
 
 
 ?>
-
-<nav class="navbar">
-  <div class="logo">
-    <img src="images/logo-ctmeu.png" alt="Logo">
-  </div>
-  <div class="navbar-text">
-    <h2>City Traffic Management and Enforcement Unit</h1>
-    <h1><b>Traffic Violation Data Hub</b></h2>
-  </div>
-  
-  <div class="navbar-inner">
-  <div class="navbar-right">
-    <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out?</button>
-    
-    <?php
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
+  <div class="container-fluid">
+  <a class="navbar-brand" href="motoristlogin.php">
+  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="d-flex">
+        <ul class="navbar-nav me-2">
+          <?php
     // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
     if (isset($_SESSION['role'])) {
         $userRole = $_SESSION['role'];
         
         // Show the "User Account" link only for Enforcer users
         if ($userRole === 'Enforcer') {
-            echo '<a href="ctmeuusers.php" class="link">User Account</a>';
-            echo '<a href="ctmeuticket.php" class="link"><b>Ticket</b></a>';
+            echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600; color: #1D3DD1;">Ticket</a>
+          </li>';
         } else {
             // For other roles, show the other links
-            echo '<a href="ctmeupage.php" class="link">Records</a>';
             if ($_SESSION['role'] === 'IT Administrator') {
                 // Do not display the "Create Accounts" link
             } else {
                 // Display the "Create Accounts" link
-                echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+
+
+            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+
+            echo '<li class="nav-item">
+          <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+        </li>';
+
+
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
-            // Uncomment this line to show "Create Accounts" to other roles
-            echo '<a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>';
+            echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+          </li>';
+
+
+
+        echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600; color: #1D3DD1;">Ticket</a>
+          </li>';
             
-            echo '<a href="ctmeuticket.php" class="link"><b>Ticket</b></a>';
-            echo '<a href="ctmeuusers.php" class="link">User Account</a>';
+            
         }
     }
     ?>
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </li>
+        </ul>
+        <div class="dropdown-center">
+  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+  </button>
+  <ul class="dropdown-menu">
+  <?php
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+        } else {
+            // For other roles, show the other links
+            if ($_SESSION['role'] === 'IT Administrator') {
+                // Do not display the "Create Accounts" link
+            } else {
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            }
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+            // Uncomment this line to show "Create Accounts" to other roles
+            echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            
+        }
+    }
+    ?>
+    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+  </ul>
 </div>
+    </div>
+    </div>
   </div>
 </nav>
 
@@ -343,7 +392,7 @@ document.getElementById('logout-button').addEventListener('click', function() {
         var firstName = '<?php echo $_SESSION['first_name']; ?>';
         var lastName = '<?php echo $_SESSION['last_name']; ?>';
 
-        document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+        document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
     <?php } ?>
 </script>
 </body>

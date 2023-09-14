@@ -1,3 +1,42 @@
+<?php
+session_start();
+include 'php/database_connect.php';
+
+if (isset($_SESSION['email'])) {
+  // Retrieve the session email
+  $email = $_SESSION['email'];
+
+  // Prepare a query to fetch user information based on the session email
+  $stmt = $conn->prepare("SELECT * FROM users_motorists WHERE driver_email = ?");
+  $stmt->bind_param("s", $email);
+  $stmt->execute();
+
+  // Get the result
+  $result = $stmt->get_result();
+  
+  // Check if a row with the session email exists
+  if ($result->num_rows > 0) {
+      // Fetch the user's information
+      $user = $result->fetch_assoc();
+      $driverFirstName = $user['driver_first_name'];
+
+      // Now, you can access the user's information, e.g., $user['driver_name'], $user['driver_age'], etc.
+  } else {
+      // User not found in the database
+      echo "User not found in the database.";
+  }
+
+  // Close the statement
+  $stmt->close();
+} else {
+  // Redirect the user to the login page if not logged in
+  header("Location: ../motoristlogin.php");
+  exit();
+}
+
+$sql = "SELECT document_id, license_type, expiry_date, status FROM motorist_documents";
+$result = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,18 +69,18 @@
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="#">LTO Official Page</a>
+          <a class="nav-link" href="https://portal.lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
+           <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Dashboard</a>
+          <!--  <a class="nav-link" href="#">Dashboard</a> -->
           </li>
         </ul>
-        <div class="dropdown">
+        <div class="dropstart">
   <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <img src="./images/Icon.png" style="margin-right: 10px;">Jak Roberto
+  <img src="./images/Icon.png" style="margin-right: 10px;"><?php echo "".$driverFirstName;  ?>
   </a>
 
   <ul class="dropdown-menu">
@@ -49,7 +88,7 @@
     <li><a class="dropdown-item" href="MotoristID.php">Digital ID</a></li>
     <li><a class="dropdown-item" href="MotoristViolations.php">Violations</a></li>
     <li><a class="dropdown-item" href="MotoristDocuments.php">Documents</a></li>
-    <li><a class="dropdown-item" href="#">Something else here</a></li>
+    <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button"><img src="./images/icon _logout_.png"> Log Out</a></li>
   </ul>
 </div>
     </div>
