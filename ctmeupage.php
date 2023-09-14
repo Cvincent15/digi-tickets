@@ -150,20 +150,21 @@ $violationTickets = fetchViolationTickets();
     <?php
     // Check if the user is a Super Administrator
     if ($_SESSION['role'] === 'Super Administrator') {
-        // Show the archive button and checkboxes
-        echo '<button type="submit" class="btn btn-primary mb-3" id="archive-button"><i class="bx bx-archive-in"></i></button>';
-    }
+      // Show the archive button, count, and "records are selected"
+      echo '<div style="display: inline-block; background-color: white; padding: 2px 6px; border-radius: 4px;"><span id="checkbox-count">0</span> records are selected</div>';
+      echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+  }
 
     ?>
         <table class="mb-5">
     <thead>
         <tr class="align-items-center">
-            <th class="sortable" data-column="0">No.</th>
+            <th class="sortable-no" data-column="0">No.</th>
             <?php
             // Check if the user is a Super Administrator
             if ($_SESSION['role'] === 'Super Administrator') {
                 // Show the archive button and checkboxes
-                echo "<th><input type='checkbox' id='select-all-checkbox'></th>";
+                echo '<th><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>';
             }
 
             ?>
@@ -173,7 +174,7 @@ $violationTickets = fetchViolationTickets();
             <th class="sortable" data-column="5">Place of Occurrence <span class="sort-arrow"></span></th>
         </tr>
     </thead>
-    <tbody id="ticket-table-body">
+    <tbody class="text-center" id="ticket-table-body">
             <?php
             $visibleTicketCount = 0; // Initialize a counter for visible tickets
 
@@ -188,12 +189,12 @@ $violationTickets = fetchViolationTickets();
 
                     echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
                     // Display the visible ticket count in the "No." column
-                    echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
+                    echo "<td class='td-count'>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
 
                     // Check the user's role to decide whether to show checkboxes
                     if ($_SESSION['role'] === 'Super Administrator') {
                         // Add a checkbox for archiving
-                        echo "<td><input type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
+                        echo "<td><input class='form-check-input' type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
                     }
 
                     // Wrap the name in a clickable <td>
@@ -213,7 +214,6 @@ $violationTickets = fetchViolationTickets();
             ?>
         </tbody>
 </table>
-
 <!--
 <div class="pagination">
     <button type="button" id="prev-page">Previous</button>
@@ -462,6 +462,20 @@ document.getElementById('filter-select').addEventListener('change', filterTable)
 document.getElementById('search-bar').addEventListener('input', filterTable);
 
 </script>
+<script>
+$(document).ready(function () {
+  // Function to update the checkbox count
+  function updateCheckboxCount() {
+    const checkedCheckboxes = $('input[type="checkbox"]:checked').length;
+    $('#checkbox-count').text(checkedCheckboxes);
+  }
 
+  // Attach a change event handler to checkboxes to update the count
+  $('input[type="checkbox"]').change(updateCheckboxCount);
+
+  // Call the function initially to set the count to the initial state
+  updateCheckboxCount();
+});
+</script>
 </body>
 </html>
