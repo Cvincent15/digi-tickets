@@ -9,6 +9,13 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
+// Check the user's role
+if ($_SESSION['role'] === 'Enforcer') {
+  // Redirect the user to ctmeutickets.php if their role is Enforcer
+  header("Location: ctmeuticket.php");
+  exit();
+}
+
 // Define a function to fetch data from the violation_tickets table
 function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
@@ -105,7 +112,7 @@ $violationTickets = fetchViolationTickets();
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="ctmeupage.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
 </a>
@@ -195,6 +202,7 @@ $violationTickets = fetchViolationTickets();
     <tbody class="text-center" id="ticket-table-body">
             <?php
             $visibleTicketCount = 0; // Initialize a counter for visible tickets
+            $emptyResult = true;
 
             // Loop through the fetched violation ticket data and populate the table rows
             foreach ($violationTickets as $index => $ticket) {
@@ -229,6 +237,7 @@ $violationTickets = fetchViolationTickets();
                     // Example: Display a message or simply don't include them in the table.
                 }
             }
+            
             ?>
         </tbody>
 </table>

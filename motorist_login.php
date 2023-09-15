@@ -63,7 +63,7 @@ if (isset($_SESSION['email'])) {
 <div class="col login rounded-4">         
   <div class="mb-3 mt-3">
   <div class="toplayer login-card-body p-5 rounded-4">
-  <form class="form-floating mb-3" method="POST" action="./php/motoristlogin.php">
+  <form class="form-floating mb-3" method="POST" action="./php/motoristlogin.php" id="loginM">
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" id="email" placeholder="email" name="email" required maxlength="50">
                                 <label for="email" class="form-label">E-Mail</label>
@@ -82,6 +82,18 @@ if (isset($_SESSION['email'])) {
     </div>
 </div>
     <script>
+      // Apply symbol restriction to all text input fields
+const form = document.getElementById('loginM');
+const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+
+inputs.forEach(input => {
+    input.addEventListener('input', function (e) {
+        const inputValue = e.target.value;
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @.\-]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
+        e.target.value = sanitizedValue;
+    });
+});
+
     function redirectToRegister() {
       window.location.href = 'motoristSignup.php';
     }

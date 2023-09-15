@@ -103,7 +103,7 @@ foreach ($violationTickets as $ticket) {
 <body style="height: auto;">
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="ctmeupage.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
 </a>
@@ -185,6 +185,7 @@ if ($hasArchivedData) {
             // Check if the is_settled value is 1 before making the row clickable
             if ($ticket['is_settled'] == 1) {
                 $visibleTicketCount++; // Increment the visible ticket counter
+                $emptyResult = true;
 
                 // Convert the row data to a JSON string
                 $rowData = json_encode($ticket);
@@ -206,7 +207,8 @@ if ($hasArchivedData) {
                 // Example: Display a message or simply don't include them in the table.
             }
         }
-        ?>
+        
+      ?>
     </tbody>
 </table>
 

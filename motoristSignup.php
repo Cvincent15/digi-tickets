@@ -89,7 +89,7 @@ if (isset($_SESSION['email'])) {
     
         <!-- step one -->
         <div class="step">
-            <p class="text-center mb-4"><img src="./images/Sample License.png"></br><a href="#" style="text-decoration: none;">Show Backside</a></br>Do you have a Philippine Driver's License or Conductor's License?</p>
+            <p class="text-center mb-4"><img src="./images/Sample License.png"></br><!--<a href="#" style="text-decoration: none;">Show Backside</a></br> -->Do you have a Philippine Driver's License or Conductor's License?</p>
             <div class="row d-flex justify-content-center">
             <div class="col-md-auto mb-4">
             <input type="checkbox" class="btn-check" id="btn-check-outlined-1" autocomplete="off">
@@ -112,7 +112,7 @@ if (isset($_SESSION['email'])) {
               <h2 class="h3 field mb-4">Complete all applicable fields</h2>
         </div>
         <div class="row">
-              <h2 class="h2 field mb-4">Driver's License</h2>
+              <h2 class="h2 field mb-4">Input your License</h2>
         </div>
         <div class="container">
           <div class="row">
@@ -120,7 +120,8 @@ if (isset($_SESSION['email'])) {
               <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="10" maxlength="20"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="date" class="form-control" id="datepicker" oninput="this.className = ''" placeholder="Expiry Date" name="expiry" max="9999-12-31" min="1970-01-01">
+              <div class="date-input-overlay"></div>
+              <input type="date" class="form-control" id="datepicker" readonly placeholder="Expiry Date" name="expiry" pattern="\d{4}-\d{2}-\d{2}" title="Enter a date in the format YYYY-MM-DD" required>
             </div>
           </div>
           <div class="row">
@@ -172,7 +173,7 @@ if (isset($_SESSION['email'])) {
           <div class="row">
           <h2 class="h3 field mb-4">Birthdate</h2>
           <div class="col-md-6 mb-3">
-              <input type="date" class="form-control" id="datepicker2" oninput="this.className = ''" placeholder="Date of Birth" name="birthday">
+              <input type="date" class="form-control" id="datepicker2" oninput="this.className = ''" readonly placeholder="Date of Birth" name="birthday">
             </div>
             <div class="col-md-6">
               <select class="form-control" id="gender" name="gender" required>
@@ -216,10 +217,15 @@ if (isset($_SESSION['email'])) {
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-5">
-              <input type="number" class="form-control"  oninput="this.className = ''" placeholder="Mobile Phone" name="phone" min="11" max="11">
-            </div>
+    <div class="col-md-6 mb-5">
+        <div class="input-group">
+            <span class="input-group-text">+639</span>
+            <input type="text" class="form-control" id="phoneInput" placeholder="Mobile Phone" minlength="9" maxlength="9" name="phone">
+
+
         </div>
+    </div>
+</div>
         <div class="row">
             <div class="col-md-6">
               <input type="password" class="form-control"  oninput="this.className = ''" placeholder="Password" name="password" minlength="8" maxlength="25"  >
@@ -240,6 +246,12 @@ if (isset($_SESSION['email'])) {
     </form>
    </section>
 </div>
+
+<!-- Include the flatpickr library -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
     <script>
     function redirectToRegister() {
       window.location.href = 'motoristSignup.php';
@@ -253,6 +265,143 @@ if (isset($_SESSION['email'])) {
 
   
 <script>
+  // Get the input element by its ID
+const phoneInput = document.getElementById('phoneInput');
+
+// Add an input event listener to the phone input field
+phoneInput.addEventListener('input', function (e) {
+    const inputValue = e.target.value;
+    const sanitizedValue = inputValue.replace(/\D/g, ''); // Remove non-digit characters
+    e.target.value = sanitizedValue;
+});
+
+
+
+  // Get all text input fields
+  var textInputs2 = document.querySelectorAll('input[type="text"]');
+
+  // Get the "Next" button element
+  var nextButton = document.getElementById('nextBtn');
+
+  // Function to check input fields and enable/disable the "Next" button
+  function checkInputFields() {
+    var isAnyInputWithOneChar = false;
+
+    textInputs2.forEach(function (input) {
+      if (input.value.length === 1) {
+        isAnyInputWithOneChar = true;
+      }
+    });
+
+    // Disable the "Next" button if any input field has one character, otherwise enable it
+    nextButton.disabled = isAnyInputWithOneChar;
+  }
+
+  // Attach an input event listener to all text input fields
+  textInputs2.forEach(function (input) {
+    input.addEventListener('input', checkInputFields);
+  });
+
+  // Initially check the input fields when the page loads
+  checkInputFields();
+
+// Get the current date
+const currentDate = new Date();
+
+// Format the current date as 'YYYY-MM-DD'
+const currentYear2 = currentDate.getFullYear();
+const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+const currentDay = String(currentDate.getDate()).padStart(2, '0');
+const formattedCurrentDate = `${currentYear2}-${currentMonth}-${currentDay}`;
+
+// Initialize flatpickr date picker with updated minimum date
+flatpickr('#datepicker', {
+    dateFormat: 'Y-m-d', // Set the desired date format
+    maxDate: '2050-12-31', // Set the maximum selectable date
+    minDate: formattedCurrentDate, // Set the minimum selectable date to today
+});
+
+// Calculate the minimum and maximum birth years based on age
+const currentYear = new Date().getFullYear();
+const minBirthYear = currentYear - 90; // Maximum age of 90 years
+const maxBirthYear = currentYear - 18; // Minimum age of 18 years
+
+// Initialize flatpickr date picker with dynamic minimum and maximum dates
+flatpickr('#datepicker2', {
+    dateFormat: 'Y-m-d', // Set the desired date format
+    maxDate: `${maxBirthYear}-12-31`, // Maximum birth date
+    minDate: `${minBirthYear}-01-01`, // Minimum birth date
+});
+
+  // Apply symbol restriction to all text input fields
+const textInputs = document.querySelectorAll('input[type="text"]');
+
+textInputs.forEach(input => {
+    input.addEventListener('input', function (e) {
+        const inputValue = e.target.value;
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 .+\-]/g, ''); // Allow letters, numbers, spaces, hyphens
+        e.target.value = sanitizedValue;
+    });
+});
+
+// Date validation function
+function validateDate(dateString) {
+    const date = new Date(dateString);
+    return date >= new Date('1970-01-01') && date <= new Date('2050-12-31');
+}
+
+// Function to validate email and email confirmation
+function validateEmail() {
+    const emailInput = document.querySelector('input[name="email"]');
+    const emailConfirmInput = document.querySelector('input[name="email2"]');
+    const emailValue = emailInput.value;
+    const emailConfirmValue = emailConfirmInput.value;
+
+    if (emailValue === emailConfirmValue) {
+        return true; // Email addresses match
+    } else {
+        return false; // Email addresses do not match
+    }
+}
+
+// Function to validate password and password confirmation
+function validatePassword() {
+    const passwordInput = document.querySelector('input[name="password"]');
+    const passwordConfirmInput = document.querySelector('input[name="password2"]');
+    const passwordValue = passwordInput.value;
+    const passwordConfirmValue = passwordConfirmInput.value;
+
+    if (passwordValue === passwordConfirmValue) {
+        return true; // Passwords match
+    } else {
+        return false; // Passwords do not match
+    }
+}
+
+// Add event listeners to the email and password fields
+const emailInput = document.querySelector('input[name="email"]');
+const emailConfirmInput = document.querySelector('input[name="email2"]');
+const passwordInput = document.querySelector('input[name="password"]');
+const passwordConfirmInput = document.querySelector('input[name="password2"]');
+
+emailInput.addEventListener('input', validateEmail);
+emailConfirmInput.addEventListener('input', validateEmail);
+passwordInput.addEventListener('input', validatePassword);
+passwordConfirmInput.addEventListener('input', validatePassword);
+
+
+// Add event listener to the date input
+const dateInput = document.querySelector('input[name="birthday"]');
+
+dateInput.addEventListener('input', function (e) {
+    const inputValue = e.target.value;
+    if (!validateDate(inputValue)) {
+        e.target.setCustomValidity('Invalid date. Date must be between 01/01/1970 and 12/31/2050.');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+
     const yesButton = document.getElementById('btn-check-outlined-1');
     const noButton = document.getElementById('btn-check-outlined-2');
     const licenseOptions = document.getElementById('license-options');
@@ -303,41 +452,9 @@ if (isset($_SESSION['email'])) {
                 input.disabled = !enable;
             });
         }
+        const form = document.getElementById('signUpForm'); // Get the form by its id
+        // Function to validate email and password confirmation
 
-        // Add event listeners for email and password confirm fields
-const emailInput = document.querySelector('input[name="email"]');
-const emailConfirmInput = document.querySelector('input[name="email2"]');
-const passwordInput = document.querySelector('input[name="password"]');
-const passwordConfirmInput = document.querySelector('input[name="password2"]');
-
-emailInput.addEventListener('input', validateEmailMatch);
-emailConfirmInput.addEventListener('input', validateEmailMatch);
-passwordInput.addEventListener('input', validatePasswordMatch);
-passwordConfirmInput.addEventListener('input', validatePasswordMatch);
-
-// Function to validate email fields
-function validateEmailMatch() {
-    const emailValue = emailInput.value;
-    const emailConfirmValue = emailConfirmInput.value;
-
-    if (emailValue !== emailConfirmValue) {
-        emailConfirmInput.setCustomValidity("Email addresses do not match");
-    } else {
-        emailConfirmInput.setCustomValidity('');
-    }
-}
-
-// Function to validate password fields
-function validatePasswordMatch() {
-    const passwordValue = passwordInput.value;
-    const passwordConfirmValue = passwordConfirmInput.value;
-
-    if (passwordValue !== passwordConfirmValue) {
-        passwordConfirmInput.setCustomValidity("Passwords do not match");
-    } else {
-        passwordConfirmInput.setCustomValidity('');
-    }
-}
 </script>
   <script src="./js/stepper.js"></script>
   <script src="js/jquery-3.6.4.js"></script>

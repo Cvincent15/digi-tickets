@@ -87,29 +87,53 @@ if (isset($_GET['data'])) {
 </style>
 <body>
 
-<nav class="navbar">
-  <div class="logo">
-    <img src="images/logo-ctmeu.png" alt="Logo">
-  </div>
-  <div class="navbar-text">
-    <h2>City Traffic Management and Enforcement Unit</h1>
-    <h1><b>Traffic Violation Data Hub</b></h2>
-  </div>
-  
-  <div class="navbar-inner">
-  <div class="navbar-right">
-    <h5 id="welcome-text"></h5>
-    <button class="btn btn-primary" id="logout-button">Log out?</button>
-    <a href="ctmeupage.php" class="link noEnforcers">Records</a>
-    <a href="ctmeurecords.php" class="link noEnforcers">Reports</a>
-    <!--<a href="ctmeuactlogs.php" class="link">Activity Logs</a> -->
-    <a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>
-    <!-- firebase only super admin can access this -->
-    <a href="ctmeucreate.php" class="link noEnforcers">Create Accounts</a>
-    
-    <a href="ctmeuticket.php" class="link">Ticket</a>
-    <a href="ctmeuusers.php" class="link">User Account</a>
-  </div>
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
+  <div class="container-fluid">
+  <a class="navbar-brand" href="ctmeupage.php">
+  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="d-flex">
+        <ul class="navbar-nav me-2">
+          <li class="nav-item">
+            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600;">Records</a>
+          </li>
+          <?php
+      // Check if the user role is "IT Administrator"
+      if ($_SESSION['role'] === 'IT Administrator') {
+          // Do not display the "Create Accounts" link
+      } else {
+          // Display the "Create Accounts" link
+          echo '<li class="nav-item">
+          <a class="nav-link" href="ctmeurecords.php" style="font-weight: 600;">Reports</a>
+        </li>';
+          echo '<li class="nav-item">
+          <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+        </li>';
+      }
+      ?>
+          <li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </li>
+        </ul>
+        <div class="dropdown-center">
+  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>
+    <li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>
+    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+  </ul>
+</div>
+    </div>
+    </div>
   </div>
 </nav>
 
@@ -278,7 +302,7 @@ document.getElementById('logout-button').addEventListener('click', function() {
     var firstName = '<?php echo $_SESSION['first_name']; ?>';
     var lastName = '<?php echo $_SESSION['last_name']; ?>';
 
-    document.getElementById('welcome-text').textContent = 'Welcome, ' + role + ' ' + firstName + ' ' + lastName;
+    document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
     <?php } ?>
 
     // Add a click event listener to the "Edit Information" button

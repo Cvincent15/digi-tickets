@@ -14,7 +14,7 @@ if (isset($_SESSION['email'])) {
 
   // Get the result
   $result = $stmt->get_result();
-  
+
   // Check if a row with the session email exists
   if ($result->num_rows > 0) {
       // Fetch the user's information
@@ -34,13 +34,46 @@ if (isset($_SESSION['email'])) {
       $email = $user["driver_email"];
       $phone = $user["driver_phone"];
       $password = $user["driver_password"];
+      
+      // Fetch the users_motorists_info_id
+      $usersMotoristsInfoId = $user["user_id"];
 
+      // Check if there is data in the motorist_info table for this user
+    $stmt = $conn->prepare("SELECT * FROM motorist_info WHERE users_motorists_info_id = ?");
+    $stmt->bind_param("i", $usersMotoristsInfoId);
+    $stmt->execute();
+    $motoristInfoResult = $stmt->get_result();
+
+    if ($motoristInfoResult->num_rows > 0) {
+        // Fetch the data from motorist_info
+        $motoristInfo = $motoristInfoResult->fetch_assoc();
+        
+        // Populate the required input fields with data from motorist_info
+        $civilStatus = $motoristInfo['civil_status'];
+        $birthplace = $motoristInfo['birthplace'];
+        $bloodType = $motoristInfo['blood_type'];
+        $complexion = $motoristInfo['complexion'];
+        $eyeColor = $motoristInfo['eye_color'];
+        $hairColor = $motoristInfo['hair_color'];
+        $weight = $motoristInfo['weight'];
+        $height = $motoristInfo['height'];
+        $organDonor = $motoristInfo['organ_donor'];
+        
+        // You can also populate other required fields here
+
+        // You can also set a flag to indicate that data was found in motorist_info
+        $motoristInfoExists = true;
+    } else {
+        // Data not found in motorist_info, set the flag to false
+        $motoristInfoExists = false;
+    }
 
       // Now, you can access the user's information, e.g., $user['driver_name'], $user['driver_age'], etc.
   } else {
       // User not found in the database
       echo "User not found in the database.";
   }
+
 
   // Close the statement
   $stmt->close();
@@ -112,7 +145,7 @@ if (isset($_SESSION['email'])) {
 
 <div class="masthead" style="background-image: url('./images/mainbg.png'); padding-top: 60px; padding-bottom: 60px;" >
 <section class="container bg-white w-75 text-dark mx-auto p-2 rounded-5">
-<form id="profileForm" action="#!">
+<form id="profileForm" action="php/process_profile.php" method="post">
   <div class="row d-flex justify-content-center align-items-center"><div class="col-md-auto mb-4"><h1 class="reg"><img src="./images/Vector.png" style="margin-right: 10px;">Profile</h1></div></div>
   <ul class="nav nav-pills ms-4">
   <li class="nav-item me-4">
@@ -140,6 +173,8 @@ if (isset($_SESSION['email'])) {
         <div class="row">
               <h2 class="h2 field mb-0 mt-4 mb-2">Account</h2>
         </div>
+        <input type="hidden" name="users_motorists_info_id" value="<?php echo $usersMotoristsInfoId; ?>">
+
           <div class="row">
             <div class="col-md-6 mb-3">
               <input type="text" class="form-control" id="input1" value="<?php echo "".$driverFirstName." ".$driverMname." ".$driverLname;  ?>" name="fullname" readonly>
@@ -147,15 +182,15 @@ if (isset($_SESSION['email'])) {
           </div>
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input2"  value="<?php echo "".$driverFirstName;  ?>" name="dfname">
+              <input type="text" class="form-control" id="input2"  value="<?php echo "".$driverFirstName;  ?>" name="dfname" readonly>
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="input3"  value="<?php echo "".$driverLname;  ?>" name="dlname">
+              <input type="text" class="form-control" id="input3"  value="<?php echo "".$driverLname;  ?>" name="dlname" readonly>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input4"  value="<?php echo "".$driverMname;  ?>" name="dmname">
+              <input type="text" class="form-control" id="input4"  value="<?php echo "".$driverMname;  ?>" name="dmname" readonly>
             </div>   
           </div>
           </div>
@@ -165,13 +200,13 @@ if (isset($_SESSION['email'])) {
         </div>
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input5"  value="<?php echo "".$email;  ?>" name="demail">
+              <input type="text" class="form-control" id="input5"  value="<?php echo "".$email;  ?>" name="demail" readonly>
             </div>
             <div class="col-md-3 mb-3">
-              <input type="text" class="form-control" id="input6"  placeholder="Area Code" name="dacode">
+              <input type="text" class="form-control" id="input6"  placeholder="Area Code" name="dacode" minlength="4" maxlength="4" required>
             </div>
             <div class="col-md-3 mb-3">
-              <input type="text" class="form-control" id="input7"  value="<?php echo "".$phone;  ?>" name="dmobile">
+              <input type="text" class="form-control" id="input7"  value="<?php echo "".$phone;  ?>" name="dmobile" readonly>
             </div>
         </div>
         </div>
@@ -181,18 +216,18 @@ if (isset($_SESSION['email'])) {
         </div>
           <div class="row">
           <div class="col-md-6">
-            <input type="text" class="form-control" id="input1"  value="<?php echo ($citizenship == 1) ? 'Filipino' : 'Non-Filipino'; ?>" name="citizenship">
+            <input type="text" class="form-control" id="input1"  value="<?php echo ($citizenship == 1) ? 'Filipino' : 'Non-Filipino'; ?>" name="citizenship" readonly>
           </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Civil Status" name="civilstatus">
+              <input type="text" class="form-control" id="datepicker"  placeholder="Civil Status" minlength="5" maxlength="20" value="<?php echo isset($motoristInfo['civil_status']) ? $motoristInfo['civil_status'] : ''; ?>" name="civilstatus" required>
             </div>
         </div>
         <div class="row">
         <div class="col-md-6">
-              <input type="date" class="form-control" id="input1"  value="<?php echo $birthday;  ?>" name="birthday">
+              <input type="date" class="form-control" id="input1"  value="<?php echo $birthday;  ?>" name="birthday" readonly>
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Birthplace" name="birthplace">
+              <input type="text" class="form-control" id="datepicker"  placeholder="Birthplace" value="<?php echo isset($motoristInfo['birthplace']) ? $motoristInfo['birthplace'] : ''; ?>" maxlength="20" minlength="5" name="birthplace" required>
             </div> 
           </div>
           </div>
@@ -201,72 +236,76 @@ if (isset($_SESSION['email'])) {
         </div>
         <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1"  value="<?php echo "".$gender;  ?>" name="gender">
+              <input type="text" class="form-control" id="input1"  value="<?php echo "".$gender;  ?>" name="gender" readonly>
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Blood Type" name="bloodtype">
+              <input type="text" class="form-control" id="datepicker" value="<?php echo isset($motoristInfo['blood_type']) ? $motoristInfo['blood_type'] : ''; ?>"  placeholder="Blood Type" minlength="1" maxlength="3" name="bloodtype" required>
             </div>
         </div>
         <div class="row">
         <div class="col-md-6">
-              <input type="text" class="form-control" id="input1"  placeholder="Complexion" name="complexion">
+              <input type="text" class="form-control" id="input1"  placeholder="Complexion" value="<?php echo isset($motoristInfo['complexion']) ? $motoristInfo['complexion'] : ''; ?>" maxlength="15" minlength="5" name="complexion" required>
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="input1"  placeholder="Organ Donor" name="organdonor">
+              <input type="text" class="form-control" id="input1"  placeholder="Organ Donor" minlength="4" maxlength="20" name="organdonor" required>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="input1"  placeholder="Eye Color" name="eyecolor">
+              <input type="text" class="form-control" id="input1"  placeholder="Eye Color" value="<?php echo isset($motoristInfo['eye_color']) ? $motoristInfo['eye_color'] : ''; ?>" maxlength="10" minlength="3" name="eyecolor" required>
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Hair Color" name="haircolor">
+              <input type="text" class="form-control" id="datepicker"  placeholder="Hair Color" value="<?php echo isset($motoristInfo['hair_color']) ? $motoristInfo['hair_color'] : ''; ?>" maxlength="10" minlength="3" name="haircolor" required>
             </div>
         </div>
         <div class="row">
         <div class="col-md-6">
-              <input type="number" class="form-control" id="input1"  placeholder="60" name="weight">
-            </div>
-            <div class="col-md-6 mb-3">
-              <input type="number" class="form-control" id="datepicker"  placeholder="167.64" name="height">
-            </div> 
+  <input type="number" class="form-control" id="input1" placeholder="60" value="<?php echo isset($motoristInfo['weight']) ? $motoristInfo['weight'] : ''; ?>" name="weight" required
+    min="20" max="300">
+</div>
+
+<div class="col-md-6 mb-3">
+  <input type="number" class="form-control" id="datepicker" placeholder="167.64" value="<?php echo isset($motoristInfo['height']) ? $motoristInfo['height'] : ''; ?>" name="height" required
+    min="150" max="250">
+</div>
+
           </div>
           <div id="Emergency">
-          <div class="row">
-              <h2 class="h2 field mb-0 mt-4 mb-2">Emergency Contact</h2>
+    <div class="row">
+        <h2 class="h2 field mb-0 mt-4 mb-2">Emergency Contact</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="input1" value="<?php echo isset($motoristInfo['em_name']) ? $motoristInfo['em_name'] : ''; ?>" placeholder="Name" maxlength="30" minlength="5" name="emname" required>
         </div>
-          <div class="row">
-            <div class="col-md-6">
-              <input type="text" class="form-control" id="input1"  placeholder="Name" name="emname">
-            </div>
-            <div class="col-md-3 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Intl. Area Code" name="emareacode">
-            </div>
-            <div class="col-md-3 mb-3">
-              <input type="text" class="form-control" id="datepicker"  placeholder="Mobile Number" name="emmobile">
-            </div>
+        <div class="col-md-3 mb-3">
+            <input type="text" class="form-control" id="datepicker" value="<?php echo isset($motoristInfo['em_area_code']) ? $motoristInfo['em_area_code'] : ''; ?>" placeholder="Intl. Area Code" maxlength="4" minlength="4" name="emareacode" required>
         </div>
-        <div class="row">
-            <div class="col">
-              <input type="text" class="form-control" id="input1"  placeholder="Address" name="emaddress">
-            </div>   
-          </div>
-          </div>
+        <div class="col-md-3 mb-3">
+            <input type="text" class="form-control" id="datepicker" value="<?php echo isset($motoristInfo['em_mobile']) ? $motoristInfo['em_mobile'] : ''; ?>" placeholder="Mobile Number" minlength="13" maxlength="13" name="emmobile" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="text" class="form-control" id="input1" value="<?php echo isset($motoristInfo['em_address']) ? $motoristInfo['em_address'] : ''; ?>" placeholder="Address" minlength="5" maxlength="20" name="emaddress" required>
+        </div>
+    </div>
+</div>
           <div id="Address">
-          <div class="row">
-              <h2 class="h2 field mb-0 mt-4 mb-2">Registered Address</h2>
+    <div class="row">
+        <h2 class="h2 field mb-0 mt-4 mb-2">Registered Address</h2>
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="text" class="form-control" id="input1" value="<?php echo isset($motoristInfo['address']) ? $motoristInfo['address'] : ''; ?>" placeholder="Address" name="address" required>
         </div>
-          <div class="row">
-            <div class="col">
-              <input type="text" class="form-control" id="input1"  placeholder="Address" name="address">
-            </div>
-        </div>
-        </div>
+    </div>
+</div>
       </div>
         <!-- start previous / next buttons -->
         <div class="form-footer d-flex justify-content-between">
     <button class="btn btn-danger ms-4" type="button" id="prevBtn" onclick="redirectToMain()">Cancel</button>
-    <button class="btn btn-outline-primary me-4" type="button" id="nextBtn" onclick="nextPrev(1)">Save Changes</button>
+    <button class="btn btn-outline-primary me-4" type="submit" id="submitBtn">Save Changes</button>
 </div>
         <!-- end previous / next buttons -->
     </form>
