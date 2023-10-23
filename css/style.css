@@ -67,84 +67,17 @@
 }
 
 /* for ctmeupage */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  height: 100px;
-  background-color: #ffffff;
-}
-
-.navbar-inner {
-  display: flex;
-  align-items: right;
-  justify-content: right;
-  margin-left: auto;
-  height: 100px;
-  margin-right:5px;
-}
-
-.logo {
-  margin-right: 20px;
-}
-
-.logo img {
-  height: 70px;
-  width: 70px;
-}
-
-.navbar-text {
-  text-align: left;
-}
-
-.navbar-text h1 {
-  font-size: 30px;
-  margin: 0;
-  padding: 0;
-  color: black;
-}
-
-.navbar-text h2 {
-  font-size: 20px;
-  margin: 0;
-  padding: 0;
-  color: maroon;
-}
-
-.navbar-right {
-  align-items: center;
-  margin-top:10px;
-}
-
-.navbar-right h3 {
-  margin-right: 10px;
-}
-
-.navbar-right a {
-  margin-right: 10px;
-  text-decoration: none;
-  color: #333;
-}
-
-.navbar-right a:hover {
-  text-decoration: underline;
-}
-
-a.link{
-  font-size: 20px;
-  color: #243489;
-  margin-left:10px;
-}
 
 body{
   background: #243489; /* fallback for old browsers */
+  font-family: 'Inter';
 }
 
 /* table */
 .table-container {
   margin: 0 auto;
-  max-width: 1200px;
-  min-width: 800px;
+  max-width: 90%;
+  min-width: 50%;
   margin-top: 10px;
 }
 
@@ -228,4 +161,38 @@ thead {
 
 .button-container button {
   margin-left: 10px;
+}
+
+.td-count, .sortable-no {
+  text-align: center !important;
+}
+
+.dropdown-menu.lefty {
+  right: auto;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.modal-content {
+  width: fit-content;
+}
+
+.requirement-indicator {
+  display: inline-flex;
+  align-items: center;
+}
+
+.indicator-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.red-circle {
+  background-color: red;
+}
+
+.green-circle {
+  background-color: green;
 }
