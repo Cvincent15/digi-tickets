@@ -123,7 +123,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 ?>
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
+  <a class="navbar-brand" href="motoristlogin.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
 </a>
@@ -132,26 +132,50 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     </button>
     <div class="d-flex">
         <ul class="navbar-nav me-2">
-          <li class="nav-item">
-            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
-          </li>
           <?php
-      // Check if the user role is "IT Administrator"
-      if ($_SESSION['role'] === 'IT Administrator') {
-          // Do not display the "Create Accounts" link
-      } else {
-          // Display the "Create Accounts" link
-          echo '<li class="nav-item">
-          <a class="nav-link" href="ctmeurecords.php" style="font-weight: 600;">Reports</a>
-        </li>';
-          echo '<li class="nav-item">
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+        } else {
+            // For other roles, show the other links
+            if ($_SESSION['role'] === 'IT Administrator') {
+                // Do not display the "Create Accounts" link
+            } else {
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+
+
+            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+
+            echo '<li class="nav-item">
           <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
         </li>';
-      }
-      ?>
-          <li class="nav-item">
+
+       /* echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>
+          </li>'; */
+
+            }
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+          </li>';
+
+
+
+        
+            
+            
+        }
+    }
+    ?>
           <li class="nav-item">
             <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
@@ -161,8 +185,31 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>
-    <li><a class="dropdown-item active" href="ctmeucreate.php" >Create Account</a></li>
+  <?php
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+        } else {
+            // For other roles, show the other links
+            if ($_SESSION['role'] === 'IT Administrator') {
+                // Do not display the "Create Accounts" link
+            } else {
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+            }
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+            // Uncomment this line to show "Create Accounts" to other roles
+            echo '<li><a class="dropdown-item active" href="ctmeucreate.php">Create Account</a></li>';
+            
+        }
+    }
+    ?>
     <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
   </ul>
 </div>
@@ -207,9 +254,9 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     ?>
 </select><br>
 
-
+<!--
   <label for="email">E-Mail:</label>
-  <input type="text" id="email" name="email" required minlength="10" maxlength="30"><br>
+  <input type="text" id="email" name="email" required minlength="10" maxlength="30"><br> -->
 <!--
     <div class="ticket-container" style="display: none;">
   <label for="startTicket">Start Ticket:</label>
@@ -395,6 +442,7 @@ function generatePassword() {
   </div>
   </div>
  
+  
   <script>
 
     // Apply symbol restriction to all text input fields
@@ -404,7 +452,7 @@ const inputs = form.querySelectorAll('input[type="text"]');
 inputs.forEach(input => {
     input.addEventListener('input', function (e) {
         const inputValue = e.target.value;
-        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @\-]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @\-ñÑ]/g, ''); // Allow letters, numbers, spaces, @ symbol, hyphens, ñ, and Ñ
         e.target.value = sanitizedValue;
     });
 });

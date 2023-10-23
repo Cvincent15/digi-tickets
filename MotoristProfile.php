@@ -116,7 +116,7 @@ if (isset($_SESSION['email'])) {
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://portal.lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
+            <a class="nav-link" href="https://lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
           </li>
           <li class="nav-item">
             <!-- <a class="nav-link" href="#">Contact</a> -->
@@ -147,10 +147,10 @@ if (isset($_SESSION['email'])) {
 <section class="container bg-white w-75 text-dark mx-auto p-2 rounded-5">
 <form id="profileForm" action="php/process_profile.php" method="post">
   <div class="row d-flex justify-content-center align-items-center"><div class="col-md-auto mb-4"><h1 class="reg"><img src="./images/Vector.png" style="margin-right: 10px;">Profile</h1></div></div>
-  <ul class="nav nav-pills ms-4">
-  <li class="nav-item me-4">
+  <ul class="nav nav-pills ms-4 justify-content-center align-items-center">
+  <!--<li class="nav-item me-4">
     <a class="nav-link active" aria-current="page" href="#ShowAll">Show All</a>
-  </li>
+  </li> -->
   <li class="nav-item me-4">
     <a class="nav-link" href="#Account">Account</a>
   </li>

@@ -120,7 +120,7 @@ th, td {
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-          <a class="nav-link" href="https://portal.lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
+          <a class="nav-link" href="https://lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
           </li>
           <li class="nav-item">
            <!-- <a class="nav-link" href="#">Contact</a> -->

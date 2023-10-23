@@ -74,7 +74,6 @@ if (isset($_SESSION['email'])) {
 /* table */
 .table-container {
   margin: 0 auto;
-  max-width: 1200px;
   min-width: 800px;
   margin-top: 10px;
 }
@@ -146,11 +145,11 @@ thead {
   background-color: red;
 }
 
-
+/*
   .clickable-cell {
     cursor: pointer;
   }
-
+*/
   .hidden {
   display: none;
   margin: auto;
@@ -196,7 +195,7 @@ thead {
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://portal.lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
+            <a class="nav-link" href="https://lto.gov.ph/" style="font-weight: 600;">LTO Official Page</a>
           </li>
           <li class="nav-item">
             <!-- <a class="nav-link" href="#">Contact</a> -->
@@ -247,10 +246,24 @@ $zeroPointsCount = 0; // Initialize a counter for violations with 0 points
 // Loop through the fetched violation ticket data and populate the counters
 foreach ($violationTickets as $index => $ticket) {
     if ($ticket['is_settled'] == 0) {
-        $zeroPointsCount++; // Increment the count for violations with is_settled = 0
+        // Get the ticket_id of the current violation
+        $ticketId = $ticket['ticket_id'];
+
+        // Query to count violations for the current ticket_id
+        $countStmt = $conn->prepare("SELECT COUNT(*) as count FROM violations WHERE ticket_id_violations = ?");
+        $countStmt->bind_param("i", $ticketId);
+        $countStmt->execute();
+        $countResult = $countStmt->get_result();
+        $countData = $countResult->fetch_assoc();
+
+        // Check if the count is greater than 0, indicating there are violations for this ticket
+        if ($countData['count'] > 0) {
+            $zeroPointsCount += $countData['count'];
+        }
     }
 }
 ?>
+
 <div class="row" id="demerit">
     <div class="col">
     <button type="button" class="btn btn-lg btn-primary ms-4 mt-5"><?php echo $zeroPointsCount; ?> Points</button>

@@ -103,7 +103,7 @@ $status = $user['role'];
 ?>
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
+  <a class="navbar-brand" href="motoristlogin.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
 </a>
@@ -120,7 +120,7 @@ $status = $user['role'];
         // Show the "User Account" link only for Enforcer users
         if ($userRole === 'Enforcer') {
             echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600; color: #1D3DD1;">Ticket</a>
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
         } else {
             // For other roles, show the other links
@@ -137,6 +137,9 @@ $status = $user['role'];
           <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
         </li>';
 
+       /* echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>'; */
 
             }
             // Uncomment this line to show "Activity Logs" to other roles
@@ -147,9 +150,7 @@ $status = $user['role'];
 
 
 
-        echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600; color: #1D3DD1;">Ticket</a>
-          </li>';
+        
             
             
         }
@@ -171,7 +172,7 @@ $status = $user['role'];
         
         // Show the "User Account" link only for Enforcer users
         if ($userRole === 'Enforcer') {
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+            echo '<li><a class="dropdown-item active" href="ctmeuusers.php">User Account</a></li>';
         } else {
             // For other roles, show the other links
             if ($_SESSION['role'] === 'IT Administrator') {
@@ -182,7 +183,7 @@ $status = $user['role'];
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+            echo '<li><a class="dropdown-item active" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
             

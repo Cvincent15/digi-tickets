@@ -65,13 +65,13 @@ if (isset($_SESSION['username'])) {
     const form = document.getElementById('login-form');
         const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
 
-        inputs.forEach(input => {
-            input.addEventListener('input', function (e) {
-                const inputValue = e.target.value;
-                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
-                e.target.value = sanitizedValue;
-            });
-        });
+    //    inputs.forEach(input => {
+     //       input.addEventListener('input', function (e) {
+     //           const inputValue = e.target.value;
+      //          const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, and hyphens
+       //         e.target.value = sanitizedValue;
+       //     });
+      //  });
 
     const passwordInput = document.getElementById('password');
     const toggleButton = document.getElementById('togglePassword');
