@@ -32,14 +32,14 @@ function countSuperAdmins($conn) {
     .clickable-cell {
       cursor: pointer;
     }
-    .container {
+  /*  .container {
       margin-top:10px;
       border-radius:10px;
       display: flex;
       justify-content: space-between;
       background-color: white;
       min-width: auto; 
-    }
+    }*/ 
 
     .form-container {
       flex-basis: 50%;
@@ -75,14 +75,14 @@ function countSuperAdmins($conn) {
       box-sizing: border-box;
     }
 
-    button {
+   /* button {
       background-color: #4CAF50;
       color: white;
       padding: 14px 20px;
       margin-right: 10px;
       border: none;
       cursor: pointer;
-    }
+    } */
 
     button[type="submit"] {
       background-color: #4CAF50;
@@ -91,6 +91,17 @@ function countSuperAdmins($conn) {
     button[type="reset"] {
       background-color: #f44336;
     }
+
+.search-container {
+  text-align: center;
+}
+
+#search-bar {
+  padding: 10px;
+  width: 60%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
     
 
   </style>
@@ -217,6 +228,84 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     </div>
   </div>
 </nav>
+<div class="container bg-transparent mt-5" style="max-width: 90%;">
+  <div class="row">
+    <div class="col">
+      <img src="./images/account.png" class="img-fluid">
+    </div>
+    <div class="col">
+      <div class="card mx-auto rounded-4" style="max-width: 80%;">
+        <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an account</h1>
+        <div class="form-floating mx-5 mb-3">
+  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+  <label for="floatingInput">First Name</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+  <label for="floatingInput">Middle Name</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+  <label for="floatingInput">Last Name</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+  <label for="floatingInput">Username</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+    <option selected>Choose a Role:</option>
+    <option value="1">Super Admin</option>
+    <option value="2">IT Admin</option>
+    <option value="3">Enforcer</option>
+  </select>
+  <label for="floatingSelect">Role</label>
+</div>
+<div class="d-grid mx-5 mb-3">
+  <button class="btn btn-primary" type="button">Create Account</button>
+</div>
+</div>
+      </div>
+    </div>
+</div>
+<div class="container justify-content-center bg-transparent justify-content-center">
+<div class="col">
+      <div class="card mx-auto rounded-4 text-center">
+        <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="mt-5">Select Account</h1>
+        <div class="search-container mt-2">
+  <input type="text" id="search-bar" placeholder="Search...">
+  
+</div>
+<div class="container text-center mt-3">
+  <div class="row mx-5" style="--bs-gap: 5rem;">
+  <div class="col mb-3">
+      <div class="card mt-5 text-start border-primary-subtle">
+        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
+        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
+        <h7 style="color: #122CA6;">IT Administrator</h3>
+      </div>
+    </div>
+    <div class="col mb-3">
+      <div class="card mt-5 text-start border-primary-subtle">
+        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
+        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
+        <h7 style="color: #122CA6;">IT Administrator</h3>
+      </div>
+    </div>
+    <div class="col mb-3">
+      <div class="card mt-5 text-start border-primary-subtle">
+        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
+        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
+        <h7 style="color: #122CA6;">IT Administrator</h3>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+    </div>
+
+
 <div class="container mt-5">
     <div class="form-container">
     <form method="POST" action="register.php" id="registration-form">
@@ -441,6 +530,8 @@ function generatePassword() {
 </table>
   </div>
   </div>
+
+  
  
   
   <script>
