@@ -23,6 +23,10 @@ function countSuperAdmins($conn) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
     <script src="./js/bootstrap.bundle.min.js"></script>
@@ -231,94 +235,25 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 <div class="container bg-transparent mt-5" style="max-width: 90%;">
   <div class="row">
     <div class="col">
-      <img src="./images/account.png" class="img-fluid">
+      <img src="./images/password illustration.png" class="img-fluid">
     </div>
     <div class="col">
+    <form method="POST" action="register.php" id="registration-form">
       <div class="card mx-auto rounded-4" style="max-width: 80%;">
         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an account</h1>
         <div class="form-floating mx-5 mb-3">
-  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-  <label for="floatingInput">First Name</label>
+        <input type="hidden" id="userCtmeuId" name="userCtmeuId">
+  <input type="text" class="form-control" id="firstName" placeholder="First Name" name="firstName" minlength="10" maxlength="25" required>
+  <label for="firstName">First Name:</label>
 </div>
 <div class="form-floating mx-5 mb-3">
-  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-  <label for="floatingInput">Middle Name</label>
+  <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" minlength="5" maxlength="25" required>
+  <label for="lastName">Last Name</label>
 </div>
+
 <div class="form-floating mx-5 mb-3">
-  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-  <label for="floatingInput">Last Name</label>
-</div>
-<div class="form-floating mx-5 mb-3">
-  <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-  <label for="floatingInput">Username</label>
-</div>
-<div class="form-floating mx-5 mb-3">
-  <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-    <option selected>Choose a Role:</option>
-    <option value="1">Super Admin</option>
-    <option value="2">IT Admin</option>
-    <option value="3">Enforcer</option>
-  </select>
-  <label for="floatingSelect">Role</label>
-</div>
-<div class="d-grid mx-5 mb-3">
-  <button class="btn btn-primary" type="button">Create Account</button>
-</div>
-</div>
-      </div>
-    </div>
-</div>
-<div class="container justify-content-center bg-transparent justify-content-center">
-<div class="col">
-      <div class="card mx-auto rounded-4 text-center">
-        <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="mt-5">Select Account</h1>
-        <div class="search-container mt-2">
-  <input type="text" id="search-bar" placeholder="Search...">
-  
-</div>
-<div class="container text-center mt-3">
-  <div class="row mx-5" style="--bs-gap: 5rem;">
-  <div class="col mb-3">
-      <div class="card mt-5 text-start border-primary-subtle">
-        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
-        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
-        <h7 style="color: #122CA6;">IT Administrator</h3>
-      </div>
-    </div>
-    <div class="col mb-3">
-      <div class="card mt-5 text-start border-primary-subtle">
-        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
-        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
-        <h7 style="color: #122CA6;">IT Administrator</h3>
-      </div>
-    </div>
-    <div class="col mb-3">
-      <div class="card mt-5 text-start border-primary-subtle">
-        <h5 class="ms-3 mt-3" style="font-weight: 800;">Zsyra Bea S. Almendral</h4>
-        <h7 class="ms-3 mb-3" style="font-weight: 600;">itsZAlmendral</h2></br>
-        <h7 style="color: #122CA6;">IT Administrator</h3>
-      </div>
-    </div>
-  </div>
-</div>
-      </div>
-    </div>
-    </div>
-
-
-<div class="container mt-5">
-    <div class="form-container">
-    <form method="POST" action="register.php" id="registration-form">
-    <input type="hidden" id="userCtmeuId" name="userCtmeuId">
-    <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName" required minlength="10" maxlength="25"><br>
-
-    <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required minlength="5" maxlength="25"><br>
-
-    <label for="role">Role:</label>
-<select id="role" name="role" required>
-    <option value="Enforcer">Enforcer</option>
+  <select class="form-select" id="role" name="role" aria-label="Floating label select example" required>
+  <option value="Enforcer">Enforcer</option>
     <?php
     // Call countSuperAdmins function to get the count of super administrators
     $superAdminCount = countSuperAdmins($conn);
@@ -341,44 +276,40 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
         echo '<option value="Super Administrator" disabled>Super Admin (Limit Reached)</option>';
     }
     ?>
-</select><br>
-
-<!--
-  <label for="email">E-Mail:</label>
-  <input type="text" id="email" name="email" required minlength="10" maxlength="30"><br> -->
-<!--
-    <div class="ticket-container" style="display: none;">
-  <label for="startTicket">Start Ticket:</label>
-  <input type="number" id="startTicket" name="startTicket" maxlength="6"><br>
-</div>
-
-<div class="ticket-container" style="display: none;">
-  <label for="endTicket">End Ticket:</label>
-  <input type="number" id="endTicket" name="endTicket" maxlength="6"><br>
-</div>
--->
-    <!-- These fields will be automatically generated -->
-    <input type="hidden" id="username" name="username" readonly>
-
+  </select><br>
+  <input type="hidden" id="username" name="username" readonly>
     <input type="hidden" id="password" name="password" readonly>
 
+
+  <label for="role">Role</label>
+</div>
+<div class="d-grid mx-5 mb-3">
 <?php
 // Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
 if ($_SESSION['role'] === 'Super Administrator') {
-    echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>';
+    echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button><br>';
 }
 ?>
-
-<button type="submit" id="create-button" class="btn btn-success">Create Account</button>
-<button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
-<div style="margin-top: 20px;"></div> <!-- Add space above the Reset Password button -->
-<button type="submit" id="update-button" class="btn btn-success">Update Account</button>
-<button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
-<!-- Add a new button for deleting the account -->
+  <button class="btn btn-success" id="create-button" type="submit">Create Account</button>
+  <button type="submit" id="update-button" class="btn btn-success">Update Account</button><br>
+  <button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
+  <button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
+</div>
+</div>
 </form>
+      </div>
     </div>
-  <div class="table-container">
-  <?php
+</div>
+<div class="container justify-content-center bg-transparent justify-content-center">
+<div class="col">
+      <div class="card mx-auto rounded-4 text-center">
+        <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="mt-5">Select Account</h1>
+        <div class="search-container mt-2">
+  <!--<input type="text" id="search-bar" placeholder="Search...">
+-->
+</div>
+
+<?php
 
 // Function to fetch data from the users table
 function fetchUserData($conn) {
@@ -503,6 +434,31 @@ function generatePassword() {
 }
 ?>
 
+<div class="container text-center mt-3">
+  <div class="row mx-5" style="--bs-gap: 5rem;">
+  <?php
+    foreach ($userData as $user) {
+        echo '<div class="col mb-3">';
+        echo '<div class="card cardS mt-5 text-start border-primary-subtle">';
+        echo '<h5 class="ms-3 mt-3" style="font-weight: 800">' . $user['first_name'] . ' ' . $user['last_name'] . '</h5>';
+        echo '<h7 class="ms-3 mb-3" style="font-weight: 600">' . $user['username'] . '</h2><br>';
+        echo '<h7 style="color: #122CA6;">' . $user['role'] . '</h3>';
+        echo '</div>';
+        echo '</div>';
+    }
+    ?>
+  </div>
+</div>
+
+
+      </div>
+    </div>
+    </div>
+
+
+<div class="container mt-5">
+  <div class="table-container">
+  
 <!-- Add this part in your HTML to populate the table with the fetched data -->
 <table id="user-table">
     <thead>
