@@ -29,6 +29,9 @@ function countSuperAdmins($conn) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/boxicons.css">
+    <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <script src="./js/bootstrap.bundle.min.js"></script>
     <title>CTMEU Data Hub</title>
 </head>
@@ -284,25 +287,19 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <label for="role">Role</label>
 </div>
 <div class="d-grid mx-5 mb-3">
-<?php
-// Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
-if ($_SESSION['role'] === 'Super Administrator') {
-    echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button><br>';
-}
-?>
+
   <button class="btn btn-success" id="create-button" type="submit">Create Account</button>
   <button type="submit" id="update-button" class="btn btn-success">Update Account</button><br>
   <button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
   <button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
 </div>
 </div>
-</form>
       </div>
     </div>
 </div>
 <div class="container justify-content-center bg-transparent justify-content-center">
 <div class="col">
-      <div class="card mx-auto rounded-4 text-center">
+      <di v class="card mx-auto rounded-4 text-center">
         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="mt-5">Select Account</h1>
         <div class="search-container mt-2">
   <!--<input type="text" id="search-bar" placeholder="Search...">
@@ -447,10 +444,18 @@ function generatePassword() {
         echo '</div>';
     }
     ?>
+    
   </div>
 </div>
+<?php
+// Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
+if ($_SESSION['role'] === 'Super Administrator') {
+    echo '<button type="button" id="delete-button" style="display:none; margin-right: 30px;" class="btn btn-danger ms-auto">Delete Account</button>
+    <br>';
+}
+?><br>
 
-
+</form>
       </div>
     </div>
     </div>
