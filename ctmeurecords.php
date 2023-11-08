@@ -190,6 +190,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -325,6 +326,8 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </form>
 
 <div class="table-container mb-5" style="overflow-x: auto; overflow-y: auto; max-height: 600px; max-width: 100%;">
+<canvas id="pieChart" width="400" height="400"></canvas>
+
 <table>
         <thead>
             <tr>
@@ -385,6 +388,59 @@ foreach ($violationTickets as $index => $ticket) {
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script>
+// Function to generate a pie chart
+function generatePieChart(data) {
+  var ctx = document.getElementById('pieChart').getContext('2d');
+
+  var chartData = {
+    labels: ['Settled', 'Unsettled'],
+    datasets: [{
+      data: data,
+      backgroundColor: ['#36A2EB', '#FFCE56'],
+    }]
+  };
+
+  var chartOptions = {
+    responsive: true,
+  };
+
+  var pieChart = new Chart(ctx, {
+    type: 'pie',
+    data: chartData,
+    options: chartOptions
+  });
+}
+
+// Call this function to generate the initial pie chart
+generatePieChart([10, 20]); // Replace with your data
+
+// Function to update the pie chart with new data
+function updatePieChart(data) {
+  var pieChart = Chart.instances[0]; // Get the existing chart instance
+  pieChart.data.datasets[0].data = data; // Update the chart data
+  pieChart.update(); // Redraw the chart with updated data
+}
+
+// Add an event listener to the "Apply Filter" button
+document.getElementById('filter-button').addEventListener('click', function() {
+  var startMonth = document.getElementById('start-month').value;
+  var endMonth = document.getElementById('end-month').value;
+  var year = document.getElementById('year').value;
+
+  // Check if the start month is after the end month
+  if (year == '' || startMonth > endMonth) {
+    alert('Invalid date range. Please select a valid date range.');
+    return;
+  }
+
+  // Filter the table based on the selected date range (Replace with your own logic)
+  var filteredData = [10, 20]; // Replace with your data
+
+  // Update the pie chart with the filtered data
+  updatePieChart(filteredData);
+});
+</script>
 
     <script>
      const yearSelect = document.getElementById("year");
