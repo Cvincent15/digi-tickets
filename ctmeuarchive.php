@@ -67,6 +67,39 @@ foreach ($violationTickets as $ticket) {
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+  /* Centered Pagination styling */
+.pagination-container {
+    text-align: center; /* Center the pagination links */
+    margin-top: 20px;
+}
+
+.pagination {
+    display: inline-block;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination .current-page {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
   .clickable-cell {
     cursor: pointer;
   }
@@ -230,14 +263,28 @@ if ($hasArchivedData) {
     <tbody id="ticket-table-body">
         <?php
         $visibleTicketCount = 0; // Initialize a counter for visible tickets
+        $recordsPerPage = 10; // Number of records per page
 
-        // Loop through the fetched violation ticket data and populate the table rows
-        foreach ($violationTickets as $index => $ticket) {
-            // Check if the is_settled value is 1 before making the row clickable
-            if ($ticket['is_settled'] == 1) {
-                $visibleTicketCount++; // Increment the visible ticket counter
-                $emptyResult = true;
+        // Filter settled tickets
+        $settledTickets = array_filter($violationTickets, function ($ticket) {
+            return $ticket['is_settled'] == 1;
+        });
 
+        // Calculate the total number of pages
+        $totalPages = ceil(count($settledTickets) / $recordsPerPage);
+
+        // Get the current page from the URL (default to page 1)
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        // Calculate the starting index for the current page
+        $startIndex = ($currentPage - 1) * $recordsPerPage;
+
+        // Loop through the settled violation ticket data and populate the table rows
+        foreach ($settledTickets as $index => $ticket) {
+            $visibleTicketCount++; // Increment the visible ticket counter
+
+            // Only display rows within the current page's range
+            if ($visibleTicketCount > $startIndex && $visibleTicketCount <= ($startIndex + $recordsPerPage)) {
                 // Convert the row data to a JSON string
                 $rowData = json_encode($ticket);
 
@@ -253,15 +300,26 @@ if ($hasArchivedData) {
                 // Wrap the district in a clickable <td>
                 echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
                 echo "</tr>";
-            } else {
-                // For rows with is_settled value other than 1, you can choose to display them differently or exclude them from the table.
-                // Example: Display a message or simply don't include them in the table.
             }
         }
-        
-      ?>
+        ?>
     </tbody>
 </table>
+
+<!-- Pagination -->
+<div class="pagination-container">
+<div class="pagination">
+    <?php
+    for ($page = 1; $page <= $totalPages; $page++) {
+        if ($page == $currentPage) {
+            echo "<span class='current-page'>$page</span>";
+        } else {
+            echo "<a href='?page=$page'>$page</a>";
+        }
+    }
+    ?>
+</div>
+  </div>
 
 <?php
 } else {

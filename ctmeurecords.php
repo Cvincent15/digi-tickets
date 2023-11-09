@@ -195,12 +195,50 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+   /* Centered Pagination styling */
+.pagination-container {
+    text-align: center; /* Center the pagination links */
+    margin-top: 20px;
+}
+
+.pagination {
+    display: inline-block;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination .current-page {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
   .card {
         margin: 2.5% auto;
         width: 700px; /* Adjust the width as needed */
         height: auto; /* Adjust the height as needed */
         text-align: left;
     }
+    .table-container {
+  max-width: 100%; /* Allow horizontal scrolling within the container */
+  overflow-x: auto; /* Display horizontal scrollbar if needed */
+}
+
   
 </style>
 <body style="height: auto;">
@@ -325,65 +363,95 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
   <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
 </form>
 
-<div class="table-container mb-5" style="overflow-x: auto; overflow-y: auto; max-height: 600px; max-width: 100%;">
+<div class="table-container mb-5" style="overflow-x: auto; max-height: 600px;">
+
 <canvas id="pieChart" width="400" height="400"></canvas>
 
 <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>License No.</th>
-                <th>Address</th>
-                <th>District</th>
-                <th>Owner</th>
-                <th>Owner Address</th>
-                <th>Place Occurred</th>
-                <th>Plate</th>
-                <th>Vehicle</th>
-                <th>Violation</th>
-                <th>Date Occurred</th>
-                <th>Account Status</th>
-            </tr>
-        </thead>
-        <tbody class="w-75" id="ticket-table-body">
-            <?php
-            $visibleTicketCount = 0; // Initialize a counter for visible tickets
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>License No.</th>
+            <th>Address</th>
+            <th>District</th>
+            <th>Owner</th>
+            <th>Owner Address</th>
+            <th>Place Occurred</th>
+            <th>Plate</th>
+            <th>Vehicle</th>
+            <th>Violation</th>
+            <th>Date Occurred</th>
+            <th>Account Status</th>
+        </tr>
+    </thead>
+    <tbody class="w-75" id="ticket-table-body">
+        <?php
+        $recordsPerPage = 10; // Number of records per page
+        $visibleTicketCount = 0; // Initialize a counter for visible tickets
 
-            // Inside the loop that populates the table rows
-foreach ($violationTickets as $index => $ticket) {
-  // Check if the is_settled value is 0 before making the row clickable
-      $visibleTicketCount++; // Increment the visible ticket counter
+        // Calculate the total number of pages
+        $totalPages = ceil(count($violationTickets) / $recordsPerPage);
 
-      // Convert the row data to a JSON string
-      $rowData = json_encode($ticket);
+        // Get the current page from the URL (default to page 1)
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-      echo "<tr class='clickable-row' data-rowdata='$rowData'>";
-      // Display the visible ticket count in the "No." column
-      echo "<td>" . $visibleTicketCount . "</td>";
-      // Add the columns from the fetched data
-      echo "<td>" . $ticket['driver_name'] . "</td>";
-      echo "<td>" . $ticket['driver_license'] . "</td>";
-      echo "<td>" . $ticket['driver_address'] . "</td>";
-      echo "<td>" . $ticket['issuing_district'] . "</td>";
-      echo "<td>" . $ticket['reg_owner'] . "</td>";
-      echo "<td>" . $ticket['reg_owner_address'] . "</td>";
-      echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
-      echo "<td>" . $ticket['plate_no'] . "</td>";
-      echo "<td>" . $ticket['vehicle_type'] . "</td>";
-      // Inside the table loop
-      if (!empty($ticket['violations'])) {
-          echo "<td>" . $ticket['violations'] . "</td>";
-      } else {
-          echo "<td>Null</td>";
-      }
-      echo "<td>" . $ticket['date_time_violation'] . "</td>";
-      echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
-      echo "</tr>";
-  }
-            ?>
-        </tbody>
-    </table>
+        // Calculate the starting index for the current page
+        $startIndex = ($currentPage - 1) * $recordsPerPage;
+
+        // Loop through the fetched violation ticket data and populate the table rows
+        foreach ($violationTickets as $index => $ticket) {
+            // Check if the is_settled value is 0 before making the row clickable
+            $visibleTicketCount++; // Increment the visible ticket counter
+
+            // Only display rows within the current page's range
+            if ($visibleTicketCount > $startIndex && $visibleTicketCount <= ($startIndex + $recordsPerPage)) {
+                // Convert the row data to a JSON string
+                $rowData = json_encode($ticket);
+
+                echo "<tr class='clickable-row' data-rowdata='$rowData'>";
+                // Display the visible ticket count in the "No." column
+                echo "<td>" . $visibleTicketCount . "</td>";
+                // Add the columns from the fetched data
+                echo "<td>" . $ticket['driver_name'] . "</td>";
+                echo "<td>" . $ticket['driver_license'] . "</td>";
+                echo "<td>" . $ticket['driver_address'] . "</td>";
+                echo "<td>" . $ticket['issuing_district'] . "</td>";
+                echo "<td>" . $ticket['reg_owner'] . "</td>";
+                echo "<td>" . $ticket['reg_owner_address'] . "</td>";
+                echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
+                echo "<td>" . $ticket['plate_no'] . "</td>";
+                echo "<td>" . $ticket['vehicle_type'] . "</td>";
+                // Inside the table loop
+                if (!empty($ticket['violations'])) {
+                    echo "<td>" . $ticket['violations'] . "</td>";
+                } else {
+                    echo "<td>Null</td>";
+                }
+                echo "<td>" . $ticket['date_time_violation'] . "</td>";
+                echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
+                echo "</tr>";
+            }
+        }
+        ?>
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<div class="pagination-container">
+<div class="pagination">
+    <?php
+    for ($page = 1; $page <= $totalPages; $page++) {
+        if ($page == $currentPage) {
+            echo "<span class='current-page'>$page</span>";
+        } else {
+            echo "<a href='?page=$page'>$page</a>";
+        }
+    }
+    ?>
+</div>
+  </div>
+
 </div>
 </div>
 
@@ -413,7 +481,7 @@ function generatePieChart(data) {
 }
 
 // Call this function to generate the initial pie chart
-generatePieChart([10, 20]); // Replace with your data
+generatePieChart(calculateStatusCounts()); // Calculate data from the table
 
 // Function to update the pie chart with new data
 function updatePieChart(data) {
@@ -424,22 +492,31 @@ function updatePieChart(data) {
 
 // Add an event listener to the "Apply Filter" button
 document.getElementById('filter-button').addEventListener('click', function() {
-  var startMonth = document.getElementById('start-month').value;
-  var endMonth = document.getElementById('end-month').value;
-  var year = document.getElementById('year').value;
-
-  // Check if the start month is after the end month
-  if (year == '' || startMonth > endMonth) {
-    alert('Invalid date range. Please select a valid date range.');
-    return;
-  }
-
   // Filter the table based on the selected date range (Replace with your own logic)
-  var filteredData = [10, 20]; // Replace with your data
+  var filteredData = calculateStatusCounts(); // Calculate data from the table
 
   // Update the pie chart with the filtered data
   updatePieChart(filteredData);
 });
+
+// Function to calculate Settled and Unsettled counts from the table
+function calculateStatusCounts() {
+  var table = document.getElementById('ticket-table-body');
+  var rowCount = table.rows.length;
+  var settledCount = 0;
+  var unsettledCount = 0;
+
+  for (var i = 0; i < rowCount; i++) {
+    var statusCell = table.rows[i].cells[12].textContent; // Assuming the status is in the 13th cell (index 12)
+    if (statusCell === 'Settled') {
+      settledCount++;
+    } else if (statusCell === 'Unsettled') {
+      unsettledCount++;
+    }
+  }
+
+  return [settledCount, unsettledCount];
+}
 </script>
 
     <script>
@@ -483,22 +560,25 @@ document.querySelector('[name="generate_pdf"]').addEventListener('click', functi
     }
   }
 
-  // Add a click event listener to the filter button
-  document.getElementById('filter-button').addEventListener('click', function() {
-    // Get the selected start month, end month, and year
-    var startMonth = document.getElementById('start-month').value;
-    var endMonth = document.getElementById('end-month').value;
-    var year = document.getElementById('year').value;
+  // Add an event listener to the "Apply Filter" button
+document.getElementById('filter-button').addEventListener('click', function() {
+  // Get the selected start month, end month, and year
+  var startMonth = document.getElementById('start-month').value;
+  var endMonth = document.getElementById('end-month').value;
+  var year = document.getElementById('year').value;
 
-    // Check if the start month is after the end month
-    if (year == '' || startMonth > endMonth) {
-      alert('Invalid date range. Please select a valid date range.');
-      return; // Exit the function without filtering the table
-    }
+  // Check if the start month is after the end month
+  if (year == '' || startMonth > endMonth) {
+    alert('Invalid date range. Please select a valid date range.');
+    return; // Exit the function without filtering the table
+  }
 
-    // Filter the table based on the selected date range
-    filterTableByDate(startMonth, endMonth, year);
-  });
+  // Filter the table based on the selected date range
+  filteredData = filterTableByDate(startMonth, endMonth, year);
+
+  // Update the pie chart
+  updatePieChart(calculateStatusCounts());
+});
 
   // Function to filter the table based on the selected date range
   function filterTableByDate(startMonth, endMonth, year) {

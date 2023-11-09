@@ -117,7 +117,7 @@ if (isset($_SESSION['email'])) {
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="10" maxlength="20"  >
+              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="8" maxlength="8"  >
             </div>
             <div class="col-md-6 mb-3">
               <div class="date-input-overlay"></div>

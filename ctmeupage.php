@@ -65,15 +65,38 @@ $violationTickets = fetchViolationTickets();
     <title>CTMEU Data Hub</title>
 </head>
 <style>
-  .pagination {
-    text-align: center;
+  /* Centered Pagination styling */
+.pagination-container {
+    text-align: center; /* Center the pagination links */
     margin-top: 20px;
 }
 
-.pagination button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    cursor: pointer;
+.pagination {
+    display: inline-block;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination .current-page {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
 }
 
 #page-info {
@@ -232,7 +255,7 @@ $violationTickets = fetchViolationTickets();
   }
 
     ?>
-        <table class="mb-5">
+        <table class="mb-5"> <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
     <thead>
         <tr class="align-items-center">
             <th class="sortable-no" data-column="0">No.</th>
@@ -242,7 +265,6 @@ $violationTickets = fetchViolationTickets();
                 // Show the archive button and checkboxes
                 echo '<th><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>';
             }
-
             ?>
             <th class="sortable" data-column="2">Name <span class="sort-arrow"></span></th>
             <th class="sortable" data-column="3">License No. <span class="sort-arrow"></span></th>
@@ -251,16 +273,27 @@ $violationTickets = fetchViolationTickets();
         </tr>
     </thead>
     <tbody class="text-center" id="ticket-table-body">
-            <?php
-            $visibleTicketCount = 0; // Initialize a counter for visible tickets
-            $emptyResult = true;
+        <?php
+        $visibleTicketCount = 0; // Initialize a counter for visible tickets
+        $emptyResult = true;
 
-            // Loop through the fetched violation ticket data and populate the table rows
-            foreach ($violationTickets as $index => $ticket) {
-                // Check if the is_settled value is 0 before making the row clickable
-                if ($ticket['is_settled'] == 0) {
-                    $visibleTicketCount++; // Increment the visible ticket counter
+        // Define the number of records to display per page
+        $recordsPerPage = 10;
+        
+        // Get the current page from the URL (default to page 1)
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
+        // Calculate the starting index for the current page
+        $startIndex = ($currentPage - 1) * $recordsPerPage;
+
+        // Loop through the fetched violation ticket data and populate the table rows
+        foreach ($violationTickets as $index => $ticket) {
+            // Check if the is_settled value is 0 before making the row clickable
+            if ($ticket['is_settled'] == 0) {
+                $visibleTicketCount++; // Increment the visible ticket counter
+                
+                // Only display rows within the current page's range
+                if ($visibleTicketCount > $startIndex && $visibleTicketCount <= ($startIndex + $recordsPerPage)) {
                     // Convert the row data to a JSON string
                     $rowData = json_encode($ticket);
 
@@ -283,24 +316,30 @@ $violationTickets = fetchViolationTickets();
                     // Wrap the district in a clickable <td>
                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
                     echo "</tr>";
-                } else {
-                    // For rows with is_settled value other than 0, you can choose to display them differently or exclude them from the table.
-                    // Example: Display a message or simply don't include them in the table.
                 }
             }
-            
-            ?>
-        </tbody>
+        }
+        ?>
+    </tbody>
 </table>
-<!--
-<div class="pagination">
-    <button type="button" id="prev-page">Previous</button>
-    <span id="page-info">Page 1 of 1</span>
-    <button type="button" id="next-page">Next</button>
-</div>
-    </form>
-</div> -->
 
+<!-- Pagination -->
+<div class="pagination-container">
+<div class="pagination">
+    <?php
+    // Calculate the total number of pages
+    $totalPages = ceil($visibleTicketCount / $recordsPerPage);
+
+    for ($page = 1; $page <= $totalPages; $page++) {
+        if ($page == $currentPage) {
+            echo "<span class='current-page'>$page</span>";
+        } else {
+            echo "<a href='?page=$page'>$page</a>";
+        }
+    }
+    ?>
+</div>
+  </div>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
