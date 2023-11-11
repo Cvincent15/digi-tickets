@@ -432,11 +432,11 @@ function generatePassword() {
 ?>
 
 <div class="container text-center mt-3">
-  <div class="row mx-5" style="--bs-gap: 5rem;">
+  <div class="row mx-5 row-cols-3" style="--bs-gap: 5rem;">
   <?php
     foreach ($userData as $user) {
-        echo '<div class="col mb-3">';
-        echo '<div class="card cardS mt-5 text-start border-primary-subtle">';
+        echo '<div class="col">';
+        echo '<div class="card mt-3 text-start border-primary-subtle">';
         echo '<h5 class="ms-3 mt-3" style="font-weight: 800">' . $user['first_name'] . ' ' . $user['last_name'] . '</h5>';
         echo '<h7 class="ms-3 mb-3" style="font-weight: 600">' . $user['username'] . '</h2><br>';
         echo '<h7 style="color: #122CA6;">' . $user['role'] . '</h3>';
