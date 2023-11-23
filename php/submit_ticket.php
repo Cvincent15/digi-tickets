@@ -12,27 +12,22 @@ if (!isset($_SESSION['username'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and validate user inputs
     $driverName = filter_var($_POST['driver_name'], FILTER_SANITIZE_STRING);
-    $address = filter_var($_POST['driver_address'], FILTER_SANITIZE_STRING);
     $licenseNo = filter_var($_POST['driver_license'], FILTER_SANITIZE_STRING);
-    $issuingDistrict = filter_var($_POST['issuing_district'], FILTER_SANITIZE_STRING);
     $vehicleType = filter_var($_POST['vehicle_type'], FILTER_SANITIZE_STRING);
     $plateNo = filter_var($_POST['plate_no'], FILTER_SANITIZE_STRING);
-    $registrationNo = filter_var($_POST['cor_no'], FILTER_SANITIZE_STRING);
-    $placeissued = filter_var($_POST['place_issued'], FILTER_SANITIZE_STRING);
-    $registeredOwner = filter_var($_POST['reg_owner'], FILTER_SANITIZE_STRING);
-    $ownerAddress = filter_var($_POST['reg_owner_address'], FILTER_SANITIZE_STRING);
     $placeOfOccurrence = filter_var($_POST['place_of_occurrence'], FILTER_SANITIZE_STRING);
+    $date_time = filter_var($_POST['date_time'], FILTER_SANITIZE_STRING);
     $user_ctmeu_id = $_POST['user_ctmeu_id']; // Assuming this is an integer
 
     // Insert the form data into the violation_tickets table using prepared statements
-    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, cor_no, place_issued, reg_owner, reg_owner_address, place_of_occurrence)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_license, vehicle_type, plate_no, date_time_violation, place_of_occurrence)
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $insertTicketQuery);
 
     if ($stmt) {
         // Bind parameters and execute the statement
-        mysqli_stmt_bind_param($stmt, "isssssssssss", $user_ctmeu_id, $driverName, $address, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $registrationNo, $placeissued, $registeredOwner, $ownerAddress, $placeOfOccurrence);
+        mysqli_stmt_bind_param($stmt, "issssss", $user_ctmeu_id, $driverName, $licenseNo, $vehicleType, $plateNo, $date_time, $placeOfOccurrence);
 
         if (mysqli_stmt_execute($stmt)) {
             // Check if any rows were affected by the insertion
