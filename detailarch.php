@@ -199,15 +199,8 @@ if (isset($_GET['data'])) {
             <td><label for="driver_name">Driver Name:</label></td>
             <td><input class="readonly-input" type="text" id="driver_name" name="driver_name" minlength="10" maxlength="30" value="<?php echo $rowData['driver_name']; ?>" readonly required></td>
             
-            <td><label for="driver_address">Driver Address:</label></td>
-            <td><input class="readonly-input" type="text" id="driver_address" name="driver_address" minlength="10" maxlength="40" value="<?php echo $rowData['driver_address']; ?>" readonly required></td>
-        </tr>
-        <tr>
             <td><label for="driver_license">Driver License No.:</label></td>
             <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" minlength="13" maxlength="13" value="<?php echo $rowData['driver_license']; ?>" readonly required></td>
-            
-            <td><label for="issuing_district">Issuing District:</label></td>
-            <td><input class="readonly-input" type="text" id="issuing_district" name="issuing_district" minlength="10" maxlength="20" value="<?php echo $rowData['issuing_district']; ?>" readonly required></td>
         </tr>
         <tr>
             <td><label for="vehicle_type">Vehicle Type:</label></td>
@@ -216,22 +209,7 @@ if (isset($_GET['data'])) {
             <td><label for="plate_no">Plate No.:</label></td>
             <td><input class="readonly-input" type="text" id="plate_no" name="plate_no" minlength="6" maxlength="7" value="<?php echo $rowData['plate_no']; ?>" readonly required></td>
         </tr>
-        <!-- Add more rows for additional fields as needed -->
-        <tr>
-            <td><label for="cor_no">COR No.:</label></td>
-            <td><input class="readonly-input" type="text" id="cor_no" name="cor_no" minlength="10" maxlength="20" value="<?php echo $rowData['cor_no']; ?>" readonly required></td>
-            
-            <td><label for="place_issued">Place Issued:</label></td>
-            <td><input class="readonly-input" type="text" id="place_issued" name="place_issued" minlength="10" maxlength="20" value="<?php echo $rowData['place_issued']; ?>" readonly required></td>
-        </tr>
-        <!-- Add more rows for additional fields as needed -->
-        <tr>
-            <td><label for="reg_owner">Registered Owner:</label></td>
-            <td><input class="readonly-input" type="text" id="reg_owner" name="reg_owner" minlength="10" maxlength="20" value="<?php echo $rowData['reg_owner']; ?>" readonly required></td>
-            
-            <td><label for="reg_owner_address">Registered Owner Address:</label></td>
-            <td><input class="readonly-input" type="text" id="reg_owner_address" name="reg_owner_address" minlength="10" maxlength="30" value="<?php echo $rowData['reg_owner_address']; ?>" readonly required></td>
-        </tr>
+       
         <!-- Add more rows for additional fields as needed -->
         <tr>
         <td><label for="date_time_violation">Date and Time of Violation:</label></td>

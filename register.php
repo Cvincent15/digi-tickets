@@ -31,12 +31,14 @@ function userExists($firstName, $lastName) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve user input from the form and trim it
     $firstName = trim($_POST["firstName"]);
+    $middleName = trim($_POST["middleName"]);
     $lastName = trim($_POST["lastName"]);
+    $affixes = trim($_POST["affixes"]);
     $role = trim($_POST["role"]);
     $username = trim($_POST["username"]);
 
     // Set the default password for everyone
-    $password = "password123";
+    $password = trim($_POST["password"]);
 
     // Hash the password (for security)
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -57,10 +59,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header('Location: ctmeucreate.php');
         } else {
             // Prepare an SQL statement to insert the user data into the database
-            $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, role, username, password) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             // Bind the parameters to the statement
-            $stmt->bind_param("sssss", $firstName, $lastName, $role, $username, $hashedPassword);
+            $stmt->bind_param("sssssss", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword);
 
             // Execute the statement
             if ($stmt->execute()) {

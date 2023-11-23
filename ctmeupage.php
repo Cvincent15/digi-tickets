@@ -65,6 +65,21 @@ $violationTickets = fetchViolationTickets();
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+  table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:hover {
+            background-color: grey;
+        }
+    
   /* Centered Pagination styling */
 .pagination-container {
     text-align: center; /* Center the pagination links */

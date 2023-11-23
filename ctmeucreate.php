@@ -29,7 +29,6 @@ function countSuperAdmins($conn) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
-    <link rel="stylesheet" href="css/boxicons.css">
     <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <script src="./js/bootstrap.bundle.min.js"></script>
@@ -109,8 +108,27 @@ function countSuperAdmins($conn) {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-    
 
+.error {
+      color: red;
+      font-size: 14px;
+      margin-top: -8px;
+      margin-bottom: 16px;
+    }
+    table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:hover {
+            background-color: grey;
+        }
   </style>
 <body style="height: auto;">
 <?php
@@ -241,17 +259,35 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
       <img src="./images/password illustration.png" class="img-fluid">
     </div>
     <div class="col">
-    <form method="POST" action="register.php" id="registration-form">
+    <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
       <div class="card mx-auto rounded-4" style="max-width: 80%;">
         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an account</h1>
+        <div class="form-floating mx-5 mb-3">
+  <input type="text" class="form-control" id="username" name="username" placeholder="Username" minlength="5" maxlength="25" oninput="validateUsername()" required>
+  <label for="Username">Username:</label>
+  <div class="error" id="username-error"></div>
+</div>
         <div class="form-floating mx-5 mb-3">
         <input type="hidden" id="userCtmeuId" name="userCtmeuId">
   <input type="text" class="form-control" id="firstName" placeholder="First Name" name="firstName" minlength="10" maxlength="25" required>
   <label for="firstName">First Name:</label>
 </div>
 <div class="form-floating mx-5 mb-3">
+  <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name" minlength="5" maxlength="25" required>
+  <label for="lastName">Middle Name:</label>
+</div>
+<div class="form-floating mx-5 mb-3">
   <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" minlength="5" maxlength="25" required>
-  <label for="lastName">Last Name</label>
+  <label for="lastName">Last Name:</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <input type="text" class="form-control" id="affixes" name="affixes" placeholder="Affixes" minlength="2" maxlength="5">
+  <label for="lastName">Affixes (Optional):</label>
+</div>
+<div class="form-floating mx-5 mb-3">
+  <input type="password" class="form-control" id="password" name="password" placeholder="Last Name" minlength="5" maxlength="25" oninput="validatePassword()" required>
+  <label for="Password">Password:</label>
+  <div class="error" id="password-error"></div>
 </div>
 
 <div class="form-floating mx-5 mb-3">
@@ -280,9 +316,6 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     }
     ?>
   </select><br>
-  <input type="hidden" id="username" name="username" readonly>
-    <input type="hidden" id="password" name="password" readonly>
-
 
   <label for="role">Role</label>
 </div>
@@ -290,20 +323,19 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 
   <button class="btn btn-success" id="create-button" type="submit">Create Account</button>
   <button type="submit" id="update-button" class="btn btn-success">Update Account</button><br>
+  <?php
+// Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
+if ($_SESSION['role'] === 'Super Administrator') {
+    echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>
+    <br>';
+}
+?>
   <button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
   <button type="button" id="reset-password-button" class="btn btn-warning" style="display: none;">Reset Password</button>
 </div>
 </div>
       </div>
     </div>
-</div>
-<div class="container justify-content-center bg-transparent justify-content-center">
-<div class="col">
-      <di v class="card mx-auto rounded-4 text-center">
-        <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="mt-5">Select Account</h1>
-        <div class="search-container mt-2">
-  <!--<input type="text" id="search-bar" placeholder="Search...">
--->
 </div>
 
 <?php
@@ -314,7 +346,7 @@ function fetchUserData($conn) {
     $userData = array();
 
     // Prepare and execute an SQL statement to retrieve data from the users table
-    $sql = "SELECT first_name, last_name, username, password, role, user_ctmeu_id FROM users";
+    $sql = "SELECT first_name, middle_name, last_name, affixes, username, password, role, user_ctmeu_id FROM users";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -431,29 +463,7 @@ function generatePassword() {
 }
 ?>
 
-<div class="container text-center mt-3">
-  <div class="row mx-5 row-cols-3" style="--bs-gap: 5rem;">
-  <?php
-    foreach ($userData as $user) {
-        echo '<div class="col">';
-        echo '<div class="card mt-3 text-start border-primary-subtle">';
-        echo '<h5 class="ms-3 mt-3" style="font-weight: 800">' . $user['first_name'] . ' ' . $user['last_name'] . '</h5>';
-        echo '<h7 class="ms-3 mb-3" style="font-weight: 600">' . $user['username'] . '</h2><br>';
-        echo '<h7 style="color: #122CA6;">' . $user['role'] . '</h3>';
-        echo '</div>';
-        echo '</div>';
-    }
-    ?>
-    
-  </div>
-</div>
-<?php
-// Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
-if ($_SESSION['role'] === 'Super Administrator') {
-    echo '<button type="button" id="delete-button" style="display:none; margin-right: 30px;" class="btn btn-danger ms-auto">Delete Account</button>
-    <br>';
-}
-?><br>
+<br>
 
 </form>
       </div>
@@ -504,7 +514,7 @@ const inputs = form.querySelectorAll('input[type="text"]');
 inputs.forEach(input => {
     input.addEventListener('input', function (e) {
         const inputValue = e.target.value;
-        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @\-ñÑ]/g, ''); // Allow letters, numbers, spaces, @ symbol, hyphens, ñ, and Ñ
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @\.,\-ñÑ]/g, ''); // Allow letters, numbers, spaces, @ symbol, dots, commas, hyphens, ñ, and Ñ
         e.target.value = sanitizedValue;
     });
 });
@@ -585,37 +595,9 @@ function resetPassword(username) {
         popup.style.display = 'none';
     }
 
-   // Function to set the username and generate a random password
-function setCredentials() {
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const role = document.getElementById('role').value.trim();
-    let username = '';
-
-    // Generate the username based on the role and camel-casing
-    if (role === 'Super Administrator') {
-        username = 'sua' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-    } else if (role === 'IT Administrator') {
-        username = 'its' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-    } else if (role === 'Enforcer') {
-        username = 'enf' + firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-    }
-
-    // Set the username and password fields
-    document.getElementById('username').value = username;
-
-    // Check if userCtmeuId is empty, and update the "Update Account" button's display
-    const userCtmeuId = document.getElementById('userCtmeuId').value.trim();
-    if (userCtmeuId === '') {
-        document.getElementById('update-button').style.display = 'inline-block';
-    } else {
-        document.getElementById('update-button').style.display = 'none';
-    }
-}
 
 // Add an event listener to the registration form to set the credentials
-document.getElementById('registration-form').addEventListener('submit', setCredentials);
-
+// document.getElementById('registration-form').addEventListener('submit');
 </script>
   
   <script>
@@ -957,7 +939,35 @@ document.getElementById('userCtmeuId').addEventListener('input', checkExistingDa
 // Initial check to hide the Update button if there is no matching user or userCtmeuId is empty
 checkExistingData();
 
+function validateUsername() {
+    var username = document.getElementById('username').value;
+    var usernameError = document.getElementById('username-error');
 
+    // Your validation logic for the username
+    if (username.length < 5) {
+      usernameError.textContent = 'Username must be at least 5 characters long.';
+    } else {
+      usernameError.textContent = '';
+    }
+  }
+
+  function validatePassword() {
+    var password = document.getElementById('password').value;
+    var passwordError = document.getElementById('password-error');
+
+    // Your validation logic for the password
+    if (password.length < 8) {
+      passwordError.textContent = 'Password must be at least 8 characters long.';
+    } else {
+      passwordError.textContent = '';
+    }
+  }
+
+  function validateForm() {
+    // Additional validation logic for the entire form if needed
+    // Return true to submit the form, or false to prevent submission
+    return true;
+  }
   </script>
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>

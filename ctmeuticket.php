@@ -208,14 +208,14 @@ $status = $user['role'];
 <div class="row">
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10" maxlength="30" placeholder="Driver's Name" name="driver_name" required>
-        <label for="floatingInputValue1">Driver's Name</label>
+        <input type="text" class="form-control" id="floatingInputValue1" required minlength="6" maxlength="6" placeholder="Traffic Citation Ticket No." name="tc_t" required>
+        <label for="floatingInputValue1">Traffic Citation Ticket No.</label>
     </div>
     </div>
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue2" minlength="10" maxlength="50" placeholder="Address" name="driver_address" required>
-        <label for="floatingInputValue2">Address</label>
+        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10" maxlength="30" placeholder="Driver's Name" name="driver_name" required>
+        <label for="floatingInputValue1">Driver's Name</label>
     </div>
     </div>
 </div>
@@ -228,8 +228,8 @@ $status = $user['role'];
     </div>
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue4" minlength="5" maxlength="30" placeholder="Address" name="issuing_district" required>
-        <label for="floatingInputValue4">Issuing Disctrict</label>
+        <input type="text" class="form-control" id="floatingInputValue11" minlength="2" maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence" required>
+        <label for="floatingInputValue10">Place of Occurrence</label>
     </div>
     </div>
 </div>
@@ -247,41 +247,12 @@ $status = $user['role'];
     </div>
     </div>
 </div>
-<div class="row">
-    <div class="col">
-    <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue7" minlength="10" maxlength="10" placeholder="Certificate of Registration No." name="cor_no" required>
-        <label for="floatingInputValue7">Certificate of Registration No.</label>
-    </div>
-    </div>
-    <div class="col">
-    <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue8" minlength="5" maxlength="30" placeholder="Place Issued" name="place_issued" required>
-        <label for="floatingInputValue7">Place Issued (COR)</label>
-    </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-    <div class="form-floating">
-        <input type="text" class="form-control" id="floatingInputValue9" minlength="10" maxlength="30" placeholder="Registered Owner" name="reg_owner" required>
-        <label for="floatingInputValue9">Registered Owner</label>
-    </div>
-    </div>
-    <div class="col">
-    <div class="form-floating">
-        <input type="text" class="form-control" id="floatingInputValue10" minlength="10" maxlength="50" placeholder="Registered Owner Address" name="reg_owner_address" required>
-        <label for="floatingInputValue10">Registered Owner Address</label>
-
-    </div>
-    </div>
-</div>
 <br>
 <div class="row">
 <div class="col">
     <div class="form-floating">
-        <input type="text" class="form-control" id="floatingInputValue11" minlength="2" maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence" required>
-        <label for="floatingInputValue10">Place of Occurrence</label>
+        <input type="text" class="form-control" id="datepicker" minlength="5" maxlength="30" placeholder="Date" name="date_time" required>
+        <label for="floatingInputValue4">Date and Time</label>
 
     </div>
     </div>
@@ -311,8 +282,27 @@ $status = $user['role'];
 
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
-<script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/timepicker.css">
 
+<script>
+// Get the current date
+const currentDate = new Date();
+
+// Format the current date as 'YYYY-MM-DD'
+const currentYear = currentDate.getFullYear();
+const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+const currentDay = String(currentDate.getDate()).padStart(2, '0');
+const formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+
+// Initialize flatpickr date and time picker
+flatpickr('#datepicker', {
+    enableTime: true, // Enable time picker
+    dateFormat: 'Y-m-d h:i K', // Set the desired date and time format
+    maxDate: '2050-12-31', // Set the maximum selectable date
+    minDate: formattedCurrentDate, // Set the minimum selectable date to today
+});
     // Apply symbol restriction to all text input fields
     const form = document.getElementById('ticketmaker');
 const inputs = form.querySelectorAll('input[type="text"]');
@@ -320,7 +310,7 @@ const inputs = form.querySelectorAll('input[type="text"]');
 inputs.forEach(input => {
     input.addEventListener('input', function (e) {
         const inputValue = e.target.value;
-        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-:]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
         e.target.value = sanitizedValue;
     });
 });

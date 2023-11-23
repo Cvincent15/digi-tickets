@@ -14,7 +14,7 @@ function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
 
   // Specify the columns you want to fetch from the violation_tickets table
-  $sql = "SELECT t.ticket_id, t.driver_name, t.driver_address, t.driver_license, t.issuing_district, t.vehicle_type, t.plate_no, t.cor_no, t.place_issued, t.reg_owner, t.reg_owner_address, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violations
+  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violations
           FROM violation_tickets AS t
           LEFT JOIN violations AS v ON t.ticket_id = v.ticket_id_violations
           GROUP BY t.ticket_id"; // Modify this query as needed
@@ -68,10 +68,6 @@ function generatePDF($data) {
   $tbl .= '<th>No.</th>';
   $tbl .= '<th>Name</th>';
   $tbl .= '<th>License No.</th>';
-  $tbl .= '<th>Address</th>';
-  $tbl .= '<th>District</th>';
-  $tbl .= '<th>Owner</th>';
-  $tbl .= '<th>Owner Address</th>';
   $tbl .= '<th>Place Occurred</th>';
   $tbl .= '<th>Plate</th>';
   $tbl .= '<th>Vehicle</th>';
@@ -88,10 +84,6 @@ function generatePDF($data) {
     $tbl .= '<td>' . $ticketNumber . '</td>'; // Use the ticket number as No.
     $tbl .= '<td>' . $row['driver_name'] . '</td>';
     $tbl .= '<td>' . $row['driver_license'] . '</td>';
-    $tbl .= '<td>' . $row['driver_address'] . '</td>';
-    $tbl .= '<td>' . $row['issuing_district'] . '</td>';
-    $tbl .= '<td>' . $row['reg_owner'] . '</td>';
-    $tbl .= '<td>' . $row['reg_owner_address'] . '</td>';
     $tbl .= '<td>' . $row['place_of_occurrence'] . '</td>';
     $tbl .= '<td>' . $row['plate_no'] . '</td>';
     $tbl .= '<td>' . $row['vehicle_type'] . '</td>';
@@ -195,6 +187,20 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+  table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:hover {
+            background-color: grey;
+        }
    /* Centered Pagination styling */
 .pagination-container {
     text-align: center; /* Center the pagination links */
@@ -357,7 +363,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </div>
 </div>
 
-<div class="container mt-1" style="display: none;">
+<div class="container mt-1" style="display:none;">
 <form method="post">
   <input type="hidden" id="filtered-data" name="filtered-data" value="">
   <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
@@ -373,10 +379,6 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             <th>No.</th>
             <th>Name</th>
             <th>License No.</th>
-            <th>Address</th>
-            <th>District</th>
-            <th>Owner</th>
-            <th>Owner Address</th>
             <th>Place Occurred</th>
             <th>Plate</th>
             <th>Vehicle</th>
@@ -415,10 +417,6 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
                 // Add the columns from the fetched data
                 echo "<td>" . $ticket['driver_name'] . "</td>";
                 echo "<td>" . $ticket['driver_license'] . "</td>";
-                echo "<td>" . $ticket['driver_address'] . "</td>";
-                echo "<td>" . $ticket['issuing_district'] . "</td>";
-                echo "<td>" . $ticket['reg_owner'] . "</td>";
-                echo "<td>" . $ticket['reg_owner_address'] . "</td>";
                 echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
                 echo "<td>" . $ticket['plate_no'] . "</td>";
                 echo "<td>" . $ticket['vehicle_type'] . "</td>";
