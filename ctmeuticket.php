@@ -258,9 +258,10 @@ $status = $user['role'];
     </div>
     <div class="col">
     <div class="input-group input-group-lg mb-3">
-        <label class="input-group-text" for="inputGroupSelect01" name="place_issued">Violation/s</label>
+        <label class="input-group-text form-control" for="inputGroupSelect01" name="place_issued" style="font-size: 1rem;">Violation/s</label>
         <div class="dropdown" id="inputGroupSelect01">
-        <button type="button" onclick="toggleDropdown()" class="dropbtn input-group-text" style="width:300px; height:50px;">Select</button>
+        <button type="button" onclick="toggleDropdown()" class="dropbtn input-group-text" style="width:300px;padding: 1rem .75rem;
+    padding-top: 1rem; padding-right: 0.75rem; padding-bottom: 1rem; padding-left: 0.75rem;">Select</button>
             <div id="optionsDropdown" class="dropdown-content">
             <label><input type="checkbox" name="violations[]" value="Driving without license">Driving without license</label>
             <label><input type="checkbox" name="violations[]" value="Driving with a delinquent, invalid, suspended ineffectual or revoked license">Driving with a delinquent, invalid, suspended ineffectual or revoked license</label>
