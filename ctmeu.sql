@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2023 at 10:51 AM
+-- Generation Time: Nov 24, 2023 at 05:18 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -155,6 +155,19 @@ CREATE TABLE `vehicletype` (
   `vehicle_name` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `vehicletype`
+--
+
+INSERT INTO `vehicletype` (`vehicle_id`, `vehicle_name`) VALUES
+(1, 'Car'),
+(2, 'Motorcycle'),
+(3, 'Truck'),
+(4, 'Bus'),
+(5, 'Van'),
+(6, 'Tricycle'),
+(7, 'E-Bike');
+
 -- --------------------------------------------------------
 
 --
@@ -176,7 +189,6 @@ CREATE TABLE `violationlist` (
 CREATE TABLE `violations` (
   `violation_id` int(11) NOT NULL,
   `violation_list_id` int(11) NOT NULL,
-  `violation_name` varchar(100) NOT NULL,
   `ticket_id_violations` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -190,7 +202,7 @@ CREATE TABLE `violation_tickets` (
   `ticket_id` int(11) NOT NULL,
   `driver_name` varchar(50) NOT NULL,
   `driver_license` varchar(50) NOT NULL,
-  `vehicle_type` varchar(20) NOT NULL,
+  `vehicle_type` int(11) NOT NULL,
   `plate_no` varchar(20) NOT NULL,
   `date_time_violation` varchar(20) NOT NULL,
   `date_time_violation_edit` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -249,7 +261,8 @@ ALTER TABLE `violations`
 ALTER TABLE `violation_tickets`
   ADD PRIMARY KEY (`ticket_id`),
   ADD KEY `user_id_motorists` (`user_id_motorists`),
-  ADD KEY `ticket sender` (`user_ctmeu_id`);
+  ADD KEY `ticket sender` (`user_ctmeu_id`),
+  ADD KEY `vehicle_type` (`vehicle_type`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -277,7 +290,7 @@ ALTER TABLE `users_motorists`
 -- AUTO_INCREMENT for table `vehicletype`
 --
 ALTER TABLE `vehicletype`
-  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `violationlist`
@@ -319,7 +332,8 @@ ALTER TABLE `violations`
 --
 ALTER TABLE `violation_tickets`
   ADD CONSTRAINT `ticket sender` FOREIGN KEY (`user_ctmeu_id`) REFERENCES `users` (`user_ctmeu_id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `violation_tickets_ibfk_1` FOREIGN KEY (`user_id_motorists`) REFERENCES `users_motorists` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `violation_tickets_ibfk_1` FOREIGN KEY (`user_id_motorists`) REFERENCES `users_motorists` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `violation_tickets_ibfk_2` FOREIGN KEY (`vehicle_type`) REFERENCES `vehicletype` (`vehicle_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
