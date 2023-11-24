@@ -38,9 +38,6 @@
     <div class="d-flex">
         <ul class="navbar-nav me-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://lto.gov.ph/">LTO Official Page</a>
-          </li>
-          <li class="nav-item">
             <!-- <a class="nav-link" href="#">Contact</a> -->
           </li>
         </ul>

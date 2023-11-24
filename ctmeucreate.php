@@ -242,6 +242,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item active" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
             
         }
     }

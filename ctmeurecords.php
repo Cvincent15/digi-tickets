@@ -14,7 +14,7 @@ function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
 
   // Specify the columns you want to fetch from the violation_tickets table
-  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violations
+  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled
           FROM violation_tickets AS t
           LEFT JOIN violations AS v ON t.ticket_id = v.ticket_id_violations
           GROUP BY t.ticket_id"; // Modify this query as needed
@@ -334,6 +334,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
             
         }
     }

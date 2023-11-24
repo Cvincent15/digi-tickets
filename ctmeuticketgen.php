@@ -109,6 +109,7 @@ $status = $user['role'];
             echo '<a href="ctmeuarchive.php" class="link" id="noEnforcers">Archive</a>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<a href="ctmeucreate.php" id="noEnforcers" class="link">Create Accounts</a>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
             echo '<a href="ctmeuusers.php" class="link"><b>User Account</b></a>';
         }
     }

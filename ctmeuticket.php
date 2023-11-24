@@ -187,6 +187,7 @@ $status = $user['role'];
             echo '<li><a class="dropdown-item active" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
             
         }
     }
@@ -234,12 +235,31 @@ $status = $user['role'];
     </div>
 </div>
 <div class="row">
-    <div class="col">
+<div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue5" minlength="3" maxlength="20" placeholder="Vehicle Type" name="vehicle_type" required>
-        <label for="floatingInputValue5">Vehicle Type</label>
+      <select class="form-control" id="vehicleType" name="vehicle_type" required>
+        <option value="" disabled selected>Select Vehicle Type</option>
+        <?php
+        // Assuming you have a database connection file
+        include 'database_connect.php';
+
+        // Retrieve vehicle types from the database
+        $sql = "SELECT * FROM vehicletype";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+          while ($row = $result->fetch_assoc()) {
+            echo "<option value='" . $row["vehicle_name"] . "'>" . $row["vehicle_name"] . "</option>";
+          }
+        }
+
+        // Close the database connection
+        $conn->close();
+        ?>
+      </select>
+      <label for="vehicleType">Vehicle Type</label>
     </div>
-    </div>
+  </div>
     <div class="col">
     <div class="form-floating mb-3">
         <input type="text" class="form-control" id="floatingInputValue6" minlength="6" maxlength="7" placeholder="Plate No." name="plate_no" required>

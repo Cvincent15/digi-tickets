@@ -175,6 +175,7 @@ if (isset($_GET['data'])) {
             echo '<li><a class="dropdown-item " href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
             
         }
     }
