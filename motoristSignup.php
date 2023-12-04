@@ -332,7 +332,7 @@ flatpickr('#datepicker2', {
 
   // Apply symbol restriction to all text input fields
 const textInputs = document.querySelectorAll('input[type="text"]');
-
+/*
 textInputs.forEach(input => {
     input.addEventListener('input', function (e) {
         const inputValue = e.target.value;
@@ -340,7 +340,7 @@ textInputs.forEach(input => {
         e.target.value = sanitizedValue;
     });
 });
-
+*/
 // Date validation function
 function validateDate(dateString) {
     const date = new Date(dateString);

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'php/database_connect.php'; // Include your database connection code here
+include 'php/database_connect.php'; 
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
@@ -8,6 +8,23 @@ if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 }
+
+// Function to fetch vehicle_name based on vehicle_id
+function fetchVehicleName($vehicleId, $conn) {
+  // Perform a database query to fetch vehicle_name based on vehicle_id
+  $query = "SELECT vehicle_name FROM vehicletype WHERE vehicle_id = $vehicleId";
+  $result = mysqli_query($conn, $query);
+
+  // Check if the query was successful and if a row was returned
+  if ($result && mysqli_num_rows($result) > 0) {
+      $row = mysqli_fetch_assoc($result);
+      return $row['vehicle_name'];
+  } else {
+      // Return a default value or handle the error as needed
+      return "Vehicle not found"; // Replace with your desired default value or error message
+  }
+}
+
 
 // Define a function to fetch data from the violation_tickets table
 function fetchViolationTickets() {
@@ -61,7 +78,7 @@ function generatePDF($data) {
   
   // Set font
   $pdf->SetFont('helvetica', '', 10);
-  
+
   // Define the table layout
   $tbl = '<table width="100%" cellspacing="0" cellpadding="4" border="1">';
   $tbl .= '<tr bgcolor="#cccccc">';
@@ -71,7 +88,6 @@ function generatePDF($data) {
   $tbl .= '<th>Place Occurred</th>';
   $tbl .= '<th>Plate</th>';
   $tbl .= '<th>Vehicle</th>';
-  $tbl .= '<th>Violation</th>';
   $tbl .= '<th>Date Occurred</th>';
   $tbl .= '<th>Account Status</th>';
   $tbl .= '</tr>';
@@ -80,19 +96,16 @@ function generatePDF($data) {
 
   // Populate the table rows with data
   foreach ($data as $row) {
+    include 'php/database_connect.php';
+    $vehicleId = $row['vehicle_type'];
+    $vehicleName = fetchVehicleName($vehicleId, $conn);
     $tbl .= '<tr>';
     $tbl .= '<td>' . $ticketNumber . '</td>'; // Use the ticket number as No.
     $tbl .= '<td>' . $row['driver_name'] . '</td>';
     $tbl .= '<td>' . $row['driver_license'] . '</td>';
     $tbl .= '<td>' . $row['place_of_occurrence'] . '</td>';
     $tbl .= '<td>' . $row['plate_no'] . '</td>';
-    $tbl .= '<td>' . $row['vehicle_type'] . '</td>';
-    // Inside the table loop
-    if (!empty($row['violations'])) {
-      $tbl .= '<td>' . $row['violations'] . '</td>';
-    } else {
-      $tbl .= '<td>Null</td>';
-    }
+    $tbl .= '<td>' . $vehicleName . '</td>';
     $tbl .= '<td>' . $row['date_time_violation'] . '</td>';
     $tbl .= '<td>' . ($row['is_settled'] == 0 ? 'Settled' : 'Unsettled') . '</td>';
     $tbl .= '</tr>';
@@ -100,26 +113,25 @@ function generatePDF($data) {
     $ticketNumber++; // Increment ticket number
   }
 
-  
-  
   $tbl .= '</table>';
 
   // Output the table to the PDF
-$pdf->writeHTML($tbl, true, false, false, false, '');
+  $pdf->writeHTML($tbl, true, false, false, false, '');
 
-// Add a row for signatures at the bottom of the table
-$tblSignatures = '<table width="100%" cellspacing="0" cellpadding="8">';
-$tblSignatures .= '<tr>';
-$tblSignatures .= '<td colspan="4">Administrator\'s Signature: ____________________________</td>';
-$tblSignatures .= '<td colspan="4">Chief\'s Signature: ____________________________</td>';
-$tblSignatures .= '</tr>';
-$tblSignatures .= '</table>';
+  // Add a row for signatures at the bottom of the table
+  $tblSignatures = '<table width="100%" cellspacing="0" cellpadding="8">';
+  $tblSignatures .= '<tr>';
+  $tblSignatures .= '<td colspan="4">Administrator\'s Signature: ____________________________</td>';
+  $tblSignatures .= '<td colspan="4">Chief\'s Signature: ____________________________</td>';
+  $tblSignatures .= '</tr>';
+  $tblSignatures .= '</table>';
 
-$pdf->writeHTML($tblSignatures, true, false, false, false, '');
+  $pdf->writeHTML($tblSignatures, true, false, false, false, '');
 
-// Output the PDF as a download
-$pdf->Output('violation_tickets.pdf', 'D');
+  // Output the PDF as a download
+  $pdf->Output('violation_tickets.pdf', 'D');
 }
+
 
 
 
@@ -198,9 +210,6 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             padding: 8px;
         }
 
-        tr:hover {
-            background-color: grey;
-        }
    /* Centered Pagination styling */
 .pagination-container {
     text-align: center; /* Center the pagination links */
@@ -334,7 +343,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             
         }
     }
@@ -371,9 +380,40 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </form>
 
 <div class="table-container mb-5" style="overflow-x: auto; max-height: 600px;">
-
-<canvas id="pieChart" width="400" height="400"></canvas>
-
+<table>
+    <tr>
+        <th>Vehicle Type</th>
+        <th>Number of Violations</th>
+    </tr>
+    <tr>
+        <td>Motorcycle</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>Car</td>
+        <td>15</td>
+    </tr>
+    <tr>
+        <td>Truck</td>
+        <td>12</td>
+    </tr>
+    <tr>
+        <td>Bus</td>
+        <td>10</td>
+    </tr>
+    <tr>
+        <td>Van</td>
+        <td>8</td>
+    </tr>
+    <tr>
+        <td>E-Bike</td>
+        <td>7</td>
+    </tr>
+    <tr>
+        <td>Tricycle</td>
+        <td>3</td>
+    </tr>
+</table>
 <table>
     <thead>
         <tr>
@@ -383,7 +423,6 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             <th>Place Occurred</th>
             <th>Plate</th>
             <th>Vehicle</th>
-            <th>Violation</th>
             <th>Date Occurred</th>
             <th>Account Status</th>
         </tr>
@@ -406,6 +445,8 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
         foreach ($violationTickets as $index => $ticket) {
             // Check if the is_settled value is 0 before making the row clickable
             $visibleTicketCount++; // Increment the visible ticket counter
+            $vehicleId = $ticket['vehicle_type'];
+            $vehicleName = fetchVehicleName($vehicleId, $conn);
 
             // Only display rows within the current page's range
             if ($visibleTicketCount > $startIndex && $visibleTicketCount <= ($startIndex + $recordsPerPage)) {
@@ -420,13 +461,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
                 echo "<td>" . $ticket['driver_license'] . "</td>";
                 echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
                 echo "<td>" . $ticket['plate_no'] . "</td>";
-                echo "<td>" . $ticket['vehicle_type'] . "</td>";
-                // Inside the table loop
-                if (!empty($ticket['violations'])) {
-                    echo "<td>" . $ticket['violations'] . "</td>";
-                } else {
-                    echo "<td>Null</td>";
-                }
+                echo "<td>" . $vehicleName . "</td>";
                 echo "<td>" . $ticket['date_time_violation'] . "</td>";
                 echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
                 echo "</tr>";
@@ -456,46 +491,12 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script>
-// Function to generate a pie chart
-function generatePieChart(data) {
-  var ctx = document.getElementById('pieChart').getContext('2d');
-
-  var chartData = {
-    labels: ['Settled', 'Unsettled'],
-    datasets: [{
-      data: data,
-      backgroundColor: ['#36A2EB', '#FFCE56'],
-    }]
-  };
-
-  var chartOptions = {
-    responsive: true,
-  };
-
-  var pieChart = new Chart(ctx, {
-    type: 'pie',
-    data: chartData,
-    options: chartOptions
-  });
-}
-
-// Call this function to generate the initial pie chart
-generatePieChart(calculateStatusCounts()); // Calculate data from the table
-
-// Function to update the pie chart with new data
-function updatePieChart(data) {
-  var pieChart = Chart.instances[0]; // Get the existing chart instance
-  pieChart.data.datasets[0].data = data; // Update the chart data
-  pieChart.update(); // Redraw the chart with updated data
-}
 
 // Add an event listener to the "Apply Filter" button
 document.getElementById('filter-button').addEventListener('click', function() {
   // Filter the table based on the selected date range (Replace with your own logic)
   var filteredData = calculateStatusCounts(); // Calculate data from the table
 
-  // Update the pie chart with the filtered data
-  updatePieChart(filteredData);
 });
 
 // Function to calculate Settled and Unsettled counts from the table
@@ -575,8 +576,6 @@ document.getElementById('filter-button').addEventListener('click', function() {
   // Filter the table based on the selected date range
   filteredData = filterTableByDate(startMonth, endMonth, year);
 
-  // Update the pie chart
-  updatePieChart(calculateStatusCounts());
 });
 
   // Function to filter the table based on the selected date range

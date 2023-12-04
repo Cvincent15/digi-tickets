@@ -20,9 +20,26 @@ function fetchIsSettled($ticketId, $conn) {
     }
 }
 
+// Function to fetch vehicle_name based on vehicle_id
+function fetchVehicleName($vehicleId, $conn) {
+    // Perform a database query to fetch vehicle_name based on vehicle_id
+    $query = "SELECT vehicle_name FROM vehicletype WHERE vehicle_id = $vehicleId";
+    $result = mysqli_query($conn, $query);
+
+    // Check if the query was successful and if a row was returned
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['vehicle_name'];
+    } else {
+        // Return a default value or handle the error as needed
+        return "Vehicle not found"; // Replace with your desired default value or error message
+    }
+}
+
+
 // Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
-    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name, GROUP_CONCAT(v.violation_name SEPARATOR ', ') AS violation_names
+    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
               LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
@@ -92,7 +109,7 @@ if (isset($_GET['data'])) {
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="ctmeupage.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
 </a>
@@ -204,8 +221,15 @@ if (isset($_GET['data'])) {
             <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" minlength="13" maxlength="13" value="<?php echo $rowData['driver_license']; ?>" readonly required></td>
         </tr>
         <tr>
+           
             <td><label for="vehicle_type">Vehicle Type:</label></td>
-            <td><input class="readonly-input" type="text" id="vehicle_type" name="vehicle_type" minlength="3" maxlength="20" value="<?php echo $rowData['vehicle_type']; ?>" readonly required></td>
+            <td> <?php 
+            $vehicleId = $rowData['vehicle_type'];
+            $vehicleName = fetchVehicleName($vehicleId, $conn);
+
+            echo "". $vehicleName;
+
+            ?></td>
             
             <td><label for="plate_no">Plate No.:</label></td>
             <td><input class="readonly-input" type="text" id="plate_no" name="plate_no" minlength="6" maxlength="7" value="<?php echo $rowData['plate_no']; ?>" readonly required></td>
@@ -214,7 +238,7 @@ if (isset($_GET['data'])) {
         <!-- Add more rows for additional fields as needed -->
         <tr>
         <td><label for="date_time_violation">Date and Time of Violation:</label></td>
-<td><input class="readonly-input" type="datetime-local" id="date_time_violation" value="<?php echo $rowData['date_time_violation']; ?>" name="date_time_violation" onclick="clearInput()" readonly required></td>
+<td><input class="readonly-input" type="text" id="date_time_violation" value="<?php echo $rowData['date_time_violation']; ?>" name="date_time_violation" onclick="clearInput()" readonly required></td>
 
 
             
@@ -235,7 +259,7 @@ if (isset($_GET['data'])) {
                 }
 
                 // Convert is_settled to "Yes" or "No"
-                $accountStatus = ($isSettled == 1) ? 'Yes' : 'No';
+                $accountStatus = ($isSettled == 1) ? 'Settled' : 'Unsettled';
 
                 // Display is_settled as text
                 echo '<span id="is_settled">' . $accountStatus . '</span>';
@@ -254,10 +278,10 @@ if (isset($_GET['data'])) {
         <td colspan="3">
         <?php
         // Encode the entire concatenated violation names string
-        $encodedViolationNames = htmlspecialchars($ticketDetails['violation_names']);
+        //$encodedViolationNames = htmlspecialchars($ticketDetails['violation_names']);
 
         // Display the encoded string as a single list item
-        echo '<p>' . $encodedViolationNames . '</p>';
+        //echo '<p>' . $encodedViolationNames . '</p>';
         ?>
 </td>
 

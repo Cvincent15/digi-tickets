@@ -16,6 +16,23 @@ if ($_SESSION['role'] === 'Enforcer') {
   exit();
 }
 
+
+// Function to fetch vehicle_name based on vehicle_id
+function fetchVehicleName($vehicleId, $conn) {
+    // Perform a database query to fetch vehicle_name based on vehicle_id
+    $query = "SELECT vehicle_name FROM vehicletype WHERE vehicle_id = $vehicleId";
+    $result = mysqli_query($conn, $query);
+  
+    // Check if the query was successful and if a row was returned
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['vehicle_name'];
+    } else {
+        // Return a default value or handle the error as needed
+        return "Vehicle not found"; // Replace with your desired default value or error message
+    }
+  }
+
 // Define a function to fetch data from the violation_tickets table
 function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
@@ -237,7 +254,7 @@ $violationTickets = fetchViolationTickets();
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
             echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Settings</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             
         }
     }
@@ -304,6 +321,8 @@ $violationTickets = fetchViolationTickets();
 
         // Loop through the fetched violation ticket data and populate the table rows
         foreach ($violationTickets as $index => $ticket) {
+            $vehicleId = $ticket['vehicle_type'];
+            $vehicleName = fetchVehicleName($vehicleId, $conn);
             // Check if the is_settled value is 0 before making the row clickable
             if ($ticket['is_settled'] == 0) {
                 $visibleTicketCount++; // Increment the visible ticket counter
@@ -328,7 +347,7 @@ $violationTickets = fetchViolationTickets();
                     // Wrap the license in a clickable <td>
                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
                     // Wrap the address in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $vehicleName . "</td>";
                     // Wrap the district in a clickable <td>
                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
                     echo "</tr>";
