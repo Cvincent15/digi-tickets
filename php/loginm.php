@@ -13,13 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 $password = trim($_POST['password']);
 
-if (empty($username) || empty($password)) {
-    // Handle empty input data
-    echo "Invalid input data.";
-    header('Refresh: 1; URL= ../index.php');
-    exit();
-}
-
 // Prepare the query using placeholders for username
 $stmt = $conn->prepare("SELECT user_ctmeu_id, username, password, first_name, last_name, role FROM users WHERE username = ?");
 $stmt->bind_param("s", $username);
@@ -45,22 +38,18 @@ if ($user) {
         $_SESSION['last_name'] = $user['last_name'];
         $_SESSION['role'] = $user['role'];
 
-        if ($_SESSION['role'] == 'Enforcer') {
-            header('Location: ../ctmeuusers.php');
-        } else {
-            header('Location: ../ctmeupage.php');
-        }
-        exit(); // Always exit after a header redirect
+        // Return a JSON response for success
+echo json_encode(array('success' => true, 'user_ctmeu_id' => $user_ctmeu_id));
+
     } else {
-        // Password is incorrect, display an error message
-        echo "Invalid username or password";
-        header('Refresh: 1; URL= ../index.php');
-        exit();
+        // Return a JSON response for incorrect password
+        echo json_encode(array('error' => true, 'message' => 'Invalid username or password'));
     }
 } else {
-    // User not found, display an error message
-    echo "User not found.";
-    header('Refresh: 1; URL= ../index.php');
-    exit();
+    // Return a JSON response for user not found
+    echo json_encode(array('error' => true, 'message' => 'User not found'));
 }
+
+// Always exit after producing the response
+exit();
 ?>

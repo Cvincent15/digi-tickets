@@ -209,7 +209,7 @@ $status = $user['role'];
 <div class="row">
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue1" required minlength="6" maxlength="6" placeholder="Traffic Citation Ticket No." name="tc_t" required>
+        <input type="text" class="form-control" id="floatingInputValue1" minlength="6" maxlength="6" placeholder="Traffic Citation Ticket No." name="tc_t" >
         <label for="floatingInputValue1">Traffic Citation Ticket No.</label>
     </div>
     </div>
@@ -249,7 +249,7 @@ $status = $user['role'];
 
         if ($result->num_rows > 0) {
           while ($row = $result->fetch_assoc()) {
-            echo "<option value='" . $row["vehicle_name"] . "'>" . $row["vehicle_name"] . "</option>";
+            echo "<option value='" . $row["vehicle_id"] . "'>" . $row["vehicle_name"] . "</option>";
           }
         }
 
@@ -271,7 +271,7 @@ $status = $user['role'];
 <div class="row">
 <div class="col">
     <div class="form-floating">
-        <input type="text" class="form-control" id="datepicker" minlength="5" maxlength="30" placeholder="Date" name="date_time" required>
+        <input type="text" class="form-control" id="datepicker" minlength="5" maxlength="30" placeholder="Date" name="date_time">
         <label for="floatingInputValue4">Date and Time</label>
 
     </div>
