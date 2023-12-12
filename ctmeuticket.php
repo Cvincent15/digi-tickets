@@ -209,8 +209,8 @@ $status = $user['role'];
 <div class="row">
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue1" minlength="6" maxlength="6" placeholder="Traffic Citation Ticket No." name="tc_t" >
-        <label for="floatingInputValue1">Traffic Citation Ticket No.</label>
+        <input type="text" class="form-control" id="floatingInputValue1" minlength="6" maxlength="6" placeholder="E-Mail" name="email" >
+        <label for="floatingInputValue1">E-Mail</label>
     </div>
     </div>
     <div class="col">

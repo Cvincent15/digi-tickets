@@ -9,7 +9,7 @@ if (isset($data['vehicleName'])) {
     $vehicleName = mysqli_real_escape_string($conn, $data['vehicleName']);
 
     // Assuming you have a 'vehicles' table with a 'name' column
-    $query = "DELETE FROM vehicles WHERE name = '$vehicleName'";
+    $query = "DELETE FROM vehicletype WHERE vehicle_name = '$vehicleName'";
 
     if (mysqli_query($conn, $query)) {
         echo json_encode(['success' => true]);
