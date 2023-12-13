@@ -181,7 +181,11 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
         } else {
             // For other roles, show the other links
             if ($_SESSION['role'] === 'IT Administrator') {
-                // Do not display the "Create Accounts" link
+                echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+          //Reports page temporary but only super admin has permission
+                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
             } else {
                 // Display the "Create Accounts" link
             //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
@@ -234,15 +238,14 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
             if ($_SESSION['role'] === 'IT Administrator') {
                 // Do not display the "Create Accounts" link
             } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+                echo '<li><a class="dropdown-item active" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
-            echo '<li><a class="dropdown-item active" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
+            
             
         }
     }
@@ -274,7 +277,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <label for="firstName">First Name:</label>
 </div>
 <div class="form-floating mx-5 mb-3">
-  <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name" minlength="5" maxlength="25" required>
+  <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name" minlength="5" maxlength="25">
   <label for="lastName">Middle Name:</label>
 </div>
 <div class="form-floating mx-5 mb-3">

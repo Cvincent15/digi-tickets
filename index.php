@@ -43,7 +43,7 @@ if (isset($_SESSION['username'])) {
                             <div class="card-body">
             <form class="form-floating mb-3" method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
               <div class="form-floating mb-3">
-                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 ]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required type="text" id="username" name="username" required>
+                <input type="text" name="username" value="" id="username" pattern="[a-zA-Z0-9 -]+" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required type="text" id="username" name="username" required>
                 <label for="username" class="form-label">Username</label>
               </div>
               <div class="form-floating mb-3">
