@@ -2,12 +2,8 @@
 session_start();
 include 'database_connect.php';
 
-// Check if the user is already logged in
-if (!isset($_SESSION['username'])) {
-    // Redirect the user to the greeting page if they are not logged in
-    header("Location: index.php");
-    exit();
-}
+ini_set('log_errors', '1');
+ini_set('error_log', './error.log');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and validate user inputs
@@ -57,8 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
 
-                // Redirect to a success page or perform any other actions as needed
-                header("Location: ../ctmeupage.php");
+                
                 exit();
             } else {
                 // No rows were affected, indicating a failed insertion
@@ -77,6 +72,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// If the script reaches this point, it means there was no POST request or an error occurred.
-// You can display the form again or perform other actions.
 ?>

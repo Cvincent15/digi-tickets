@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 04, 2023 at 11:57 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1:3306
+-- Generation Time: Dec 11, 2023 at 11:42 PM
+-- Server version: 10.6.14-MariaDB-cll-lve
+-- PHP Version: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ctmeu`
+-- Database: `u919418953_ctmeu`
 --
 
 -- --------------------------------------------------------
@@ -92,24 +92,25 @@ CREATE TABLE `users` (
   `startTicket` int(6) DEFAULT NULL,
   `endTicket` int(6) DEFAULT NULL,
   `email` varchar(30) NOT NULL,
-  `is_activated` tinyint(1) NOT NULL
+  `is_activated` tinyint(1) NOT NULL,
+  `apiKey` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `email`, `is_activated`) VALUES
-(56, 'Vincent Andrei', '', 'Cosio', '', 'suaVCosio', '$2y$10$TgYe54Uo23DFVoQbwIBVhuFu44Pygiku/B.b3mUm9IoEtV9kc/N8i', 'Super Administrator', NULL, NULL, 'vincent.andrei15@gmail.com', 0),
-(57, 'Kristine Emerald', '', 'Casindac', '', 'itsKCasindac', '$2y$10$7a79hmUn26xiO6Yduf0V5ugajSJ7V.jr28vzibUmT7jyDdTGc./KK', 'IT Administrator', NULL, NULL, '', 0),
-(58, 'Zsyra Beatrise', '', 'Almendral', '', 'itsZAlmendral', '$2y$10$FoLrzPZL4WUKp7x7f7YQMuRCIKiVI1OkZqNQrm.XZ30QUQhumFrBC', 'IT Administrator', NULL, NULL, '', 0),
-(59, 'Jazzlyn Kate', '', 'Aquino', '', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL, '', 0),
-(70, 'Kyle Dennis', '', 'Dalida', '', 'enfKDalida', '$2y$10$TKURg8EEGf32mdRWwlKbm.YMOtXsa2zrK4OkwNtcIByM9kyKV1ifu', 'Enforcer', NULL, NULL, '', 0),
-(73, 'Jhimwell', '', 'Robles', '', 'enfJRobles', '$2y$10$bB5v0ePlisqJ5EdJtFDmaeXF.BwuQiKV8ze3uY1hf9u7640akKn.K', 'Enforcer', NULL, NULL, '', 0),
-(74, 'Dan Carlo', '', 'Ramirez', '', 'enfDRamirez', '$2y$10$TN/0F4PsSP6IHez/1djKXOLmDCMrk/rWl4ZBCKep9pTAXh1gmPKZO', 'Enforcer', NULL, NULL, '', 0),
-(76, 'Carl', '', 'Bantatua', '', 'enfCBantatua', '$2y$10$8NcAU3XI/00E7VxDfqESfe3T3SdpN7aK/ukXY9zptVaJ3mcwHaKnW', 'Enforcer', NULL, NULL, '', 0),
-(90, 'Lorenz Adrian', 'Nofuente', 'Artillagas', '', 'Zephyr', '$2y$10$osueKM4rArR5IpQHKq/rUuQEfb.WdPcXYaQzNS4mVcz26XtlPyf3i', 'Super Administrator', NULL, NULL, '', 0),
-(94, 'Vince Ands', 'MMM', 'Cushion', '', 'CVanilla', '$2y$10$1B4FiM7Lu7S3Zi9dybT7PeXunqeT78YYq6gtpnNXVicOuBB0cw/je', 'Enforcer', NULL, NULL, '', 0);
+INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `email`, `is_activated`, `apiKey`) VALUES
+(56, 'Vincent Andrei', '', 'Cosio', '', 'suaVCosio', '$2y$10$TgYe54Uo23DFVoQbwIBVhuFu44Pygiku/B.b3mUm9IoEtV9kc/N8i', 'Super Administrator', NULL, NULL, 'vincent.andrei15@gmail.com', 0, ''),
+(57, 'Kristine Emerald', '', 'Casindac', '', 'itsKCasindac', '$2y$10$7a79hmUn26xiO6Yduf0V5ugajSJ7V.jr28vzibUmT7jyDdTGc./KK', 'IT Administrator', NULL, NULL, '', 0, ''),
+(58, 'Zsyra Beatrise', '', 'Almendral', '', 'itsZAlmendral', '$2y$10$FoLrzPZL4WUKp7x7f7YQMuRCIKiVI1OkZqNQrm.XZ30QUQhumFrBC', 'IT Administrator', NULL, NULL, '', 0, ''),
+(59, 'Jazzlyn Kate', '', 'Aquino', '', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL, '', 0, ''),
+(70, 'Kyle Dennis', '', 'Dalida', '', 'enfKDalida', '$2y$10$TKURg8EEGf32mdRWwlKbm.YMOtXsa2zrK4OkwNtcIByM9kyKV1ifu', 'Enforcer', NULL, NULL, '', 0, ''),
+(73, 'Jhimwell', '', 'Robles', '', 'enfJRobles', '$2y$10$bB5v0ePlisqJ5EdJtFDmaeXF.BwuQiKV8ze3uY1hf9u7640akKn.K', 'Enforcer', NULL, NULL, '', 0, ''),
+(74, 'Dan Carlo', '', 'Ramirez', '', 'enfDRamirez', '$2y$10$TN/0F4PsSP6IHez/1djKXOLmDCMrk/rWl4ZBCKep9pTAXh1gmPKZO', 'Enforcer', NULL, NULL, '', 0, ''),
+(76, 'Carl', '', 'Bantatua', '', 'enfCBantatua', '$2y$10$8NcAU3XI/00E7VxDfqESfe3T3SdpN7aK/ukXY9zptVaJ3mcwHaKnW', 'Enforcer', NULL, NULL, '', 0, ''),
+(90, 'Lorenz Adrian', 'Nofuente', 'Artillagas', '', 'Zephyr', '$2y$10$osueKM4rArR5IpQHKq/rUuQEfb.WdPcXYaQzNS4mVcz26XtlPyf3i', 'Super Administrator', NULL, NULL, '', 0, ''),
+(94, 'Vince Ands', 'MMM', 'Cushion', '', 'CVanilla', '$2y$10$1B4FiM7Lu7S3Zi9dybT7PeXunqeT78YYq6gtpnNXVicOuBB0cw/je', 'Enforcer', NULL, NULL, '', 0, '');
 
 -- --------------------------------------------------------
 
@@ -372,9 +373,10 @@ CREATE TABLE `violation_tickets` (
   `driver_license` varchar(50) NOT NULL,
   `vehicle_type` int(11) NOT NULL,
   `plate_no` varchar(20) NOT NULL,
-  `date_time_violation` varchar(20) NOT NULL,
-  `date_time_violation_edit` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `date_time_violation` datetime DEFAULT NULL,
+  `date_time_violation_edit` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `place_of_occurrence` varchar(50) NOT NULL,
+  `email` varchar(20) NOT NULL,
   `user_ctmeu_id` int(11) DEFAULT NULL,
   `user_id_motorists` int(11) DEFAULT NULL,
   `is_settled` tinyint(1) NOT NULL
@@ -384,23 +386,29 @@ CREATE TABLE `violation_tickets` (
 -- Dumping data for table `violation_tickets`
 --
 
-INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `vehicle_type`, `plate_no`, `date_time_violation`, `date_time_violation_edit`, `place_of_occurrence`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
-(2, 'CJ Denton', 'TL111111', 1, 'RST111', '2023-10-27 1:00 PM', '2023-11-27 06:21:05', 'SM', 70, NULL, 0),
-(6, 'Alex Mercer', 'TL222222', 3, 'XYZ222', '2023-10-27 2:30 PM', '2023-11-30 01:01:54', 'Downtown', 70, NULL, 0),
-(7, 'Elena Fisher', 'TL333333', 2, 'ABC333', '2023-10-27 3:45 PM', '2023-11-30 01:02:00', 'Main Street', 70, NULL, 0),
-(8, 'Nathan Drake', 'TL444444', 4, 'JKL444', '2023-10-27 5:15 PM', '2023-11-30 01:02:06', 'Market Square', 73, NULL, 0),
-(9, 'Aloy Horizon', 'TL555555', 5, 'MNO555', '2023-10-27 6:30 PM', '2023-11-30 01:02:11', 'Park Avenue', 76, NULL, 0),
-(10, 'Geralt of Rivia', 'TL666666', 6, 'PQR666', '2023-09-27 7:45 PM', '2023-11-30 01:02:16', 'Crossroads', 74, NULL, 0),
-(12, 'Ezio Auditore', 'TL888888', 2, 'VWX888', '2023-09-27 10:15 PM', '2023-11-27 06:21:58', 'Waterfront Drive', 70, NULL, 0),
-(13, 'Aloy Horizon', 'TL999999', 1, 'YZA999', '2023-09-27 11:30 PM', '2023-11-27 06:21:58', 'Oak Street', 70, NULL, 0),
-(14, 'John Wick', 'TL777777', 1, 'JKL777', '2023-08-27 4:00 PM', '2023-11-27 06:21:58', 'Alley Street', 70, NULL, 0),
-(15, 'Ellie Williams', 'TL888888', 2, 'XYZ888', '2023-08-27 5:30 PM', '2023-11-30 02:25:32', 'Broadway Avenue', 74, NULL, 1),
-(16, 'Joel Miller', 'TL999999', 1, 'ABC999', '2023-08-27 6:45 PM', '2023-11-27 06:21:58', 'City Park', 74, NULL, 0),
-(17, 'Ezio Auditore', 'TL123456', 2, 'DEF123', '2023-09-27 8:15 PM', '2023-11-27 06:21:58', 'Sunset Boulevard', 74, NULL, 0),
-(18, 'Chloe Frazer', 'TL654321', 1, 'GHI654', '2023-09-27 9:30 PM', '2023-11-27 06:21:58', 'Maple Lane', 74, NULL, 0),
-(19, 'Nathan Drake', 'TL987654', 2, 'JKL987', '2023-09-27 10:45 PM', '2023-11-27 06:21:58', 'Highland Road', 74, NULL, 0),
-(20, 'Aloy Horizon', 'TL321654', 1, 'MNO321', '2023-09-27 11:59 PM', '2023-11-27 06:21:58', 'Hillside Drive', 70, NULL, 0),
-(23, 'sarah johnson', 'B45-67-890123', 1, 'ABC123', '2023-11-27 1:00 PM', '2023-11-30 03:35:31', 'SM', 74, 6, 0);
+INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `vehicle_type`, `plate_no`, `date_time_violation`, `date_time_violation_edit`, `place_of_occurrence`, `email`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
+(2, 'CJ Denton', 'TL111111', 1, 'RST111', '2023-10-27 01:00:00', '2023-11-27 06:21:05', 'SM', '', 70, NULL, 0),
+(6, 'Alex Mercer', 'TL222222', 3, 'XYZ222', '2023-10-27 02:30:00', '2023-11-30 01:01:54', 'Downtown', '', 70, NULL, 0),
+(7, 'Elena Fisher', 'TL333333', 2, 'ABC333', '2023-10-27 03:45:00', '2023-11-30 01:02:00', 'Main Street', '', 70, NULL, 0),
+(8, 'Nathan Drake', 'TL444444', 4, 'JKL444', '2023-10-27 05:15:00', '2023-11-30 01:02:06', 'Market Square', '', 73, NULL, 0),
+(9, 'Aloy Horizon', 'TL555555', 5, 'MNO555', '2023-10-27 06:30:00', '2023-11-30 01:02:11', 'Park Avenue', '', 76, NULL, 0),
+(10, 'Geralt of Rivia', 'TL666666', 6, 'PQR666', '2023-09-27 07:45:00', '2023-11-30 01:02:16', 'Crossroads', '', 74, NULL, 0),
+(12, 'Ezio Auditore', 'TL888888', 2, 'VWX888', '2023-09-27 10:15:00', '2023-11-27 06:21:58', 'Waterfront Drive', '', 70, NULL, 0),
+(13, 'Aloy Horizon', 'TL999999', 1, 'YZA999', '2023-09-27 11:30:00', '2023-11-27 06:21:58', 'Oak Street', '', 70, NULL, 0),
+(14, 'John Wick', 'TL777777', 1, 'JKL777', '2023-08-27 04:00:00', '2023-11-27 06:21:58', 'Alley Street', '', 70, NULL, 0),
+(15, 'Ellie Williams', 'TL888888', 2, 'XYZ888', '2023-08-27 05:30:00', '2023-11-30 02:25:32', 'Broadway Avenue', '', 74, NULL, 1),
+(16, 'Joel Miller', 'TL999999', 1, 'ABC999', '2023-08-27 06:45:00', '2023-11-27 06:21:58', 'City Park', '', 74, NULL, 0),
+(17, 'Ezio Auditore', 'TL123456', 2, 'DEF123', '2023-09-27 20:15:00', '2023-12-10 08:22:42', 'Sunset Boulevard', '', 74, NULL, 0),
+(18, 'Chloe Frazer', 'TL654321', 1, 'GHI654', '2023-09-27 09:30:00', '2023-11-27 06:21:58', 'Maple Lane', '', 74, NULL, 0),
+(19, 'Nathan Drake', 'TL987654', 2, 'JKL987', '2023-09-27 10:45:00', '2023-11-27 06:21:58', 'Highland Road', '', 74, NULL, 0),
+(20, 'Aloy Horizon', 'TL321654', 1, 'MNO321', '2023-09-27 11:59:00', '2023-11-27 06:21:58', 'Hillside Drive', '', 70, NULL, 0),
+(23, 'sarah johnson', 'B45-67-890123', 1, 'ABC123', '2023-11-27 01:00:00', '2023-11-30 03:35:31', 'SM', '', 74, 6, 0),
+(33, 'ABC 123', 'ABC123', 3, 'XYZ789', '2023-12-10 05:00:00', '2023-12-10 09:17:45', 'Tagapo', '', 70, NULL, 0),
+(36, 'Sarah Connor', 'DL56789CA', 2, 'Oakwood', '2023-12-10 22:00:00', '2023-12-10 14:01:52', 'FGH456', '', 70, NULL, 0),
+(38, 'Driver1', 'License2', 3, 'Plate3', '2023-12-10 22:07:00', '2023-12-10 14:07:57', 'Place4', '', 70, NULL, 0),
+(39, 'Beyonce', 'NoCar12', 6, 'XYZ542', '2023-12-10 22:34:00', '2023-12-10 14:34:55', 'Empire State Building', '', 70, NULL, 0),
+(40, 'Robbie', 'jkl432', 2, 'tyufg3', '2023-12-10 22:35:00', '2023-12-10 14:35:55', 'PUP', '', 76, NULL, 0),
+(41, 'Ed Sheeran', 'LegoHouse', 1, 'Photograph', '2023-12-10 22:38:00', '2023-12-10 14:39:30', 'Happier', '', 76, NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -498,7 +506,7 @@ ALTER TABLE `violations`
 -- AUTO_INCREMENT for table `violation_tickets`
 --
 ALTER TABLE `violation_tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- Constraints for dumped tables

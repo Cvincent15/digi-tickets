@@ -94,7 +94,8 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: rgb(209, 209, 209);
+  background-color: #F5F5F5;
+  border-color: #F5F5F5;
 }
 
 tr:nth-child(odd) {
@@ -104,7 +105,6 @@ tr:nth-child(odd) {
 th, td {
   padding: 8px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
 
 .pagination {
