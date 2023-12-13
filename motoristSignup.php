@@ -114,8 +114,28 @@ if (isset($_SESSION['email'])) {
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="License No." name="licenseNo" minlength="8" maxlength="8"  >
+              <input type="text" class="form-control"  oninput="this.className = ''; formatLicenseNo(this);" placeholder="License No." name="licenseNo" minlength="13" maxlength="13"  >
             </div>
+            <script>
+                  function formatLicenseNo(input) {
+                          // Remove any non-alphanumeric characters
+                          const inputValue = input.value.replace(/[^A-Za-z0-9]/g, '');
+
+                          // Capitalize the input value
+                          const capitalizedValue = inputValue.toUpperCase();
+
+                          // Add dashes at the 4th and 7th positions
+                          const formattedValue = capitalizedValue.replace(/(.{3})(.{2})?(.{1,6})?/, function(match, p1, p2, p3) {
+                              let result = p1;
+                              if (p2) result += '-' + p2;
+                              if (p3) result += '-' + p3;
+                              return result;
+                          });
+
+                          // Update the input value
+                          input.value = formattedValue;
+                      }
+            </script>
             <div class="col-md-6 mb-3">
               <div class="date-input-overlay"></div>
               <input type="date" class="form-control" id="datepicker" readonly placeholder="Expiry Date" name="expiry" pattern="\d{4}-\d{2}-\d{2}" title="Enter a date in the format YYYY-MM-DD" required>
@@ -123,8 +143,17 @@ if (isset($_SESSION['email'])) {
           </div>
           <div class="row">
             <div class="col-md-6 mb-5">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Serial No. (back of your card)" name="serialNo" minlength="12" maxlength="12"  >
+              <input type="text" class="form-control"  oninput="this.className = ''; formatSerialNo(this);" placeholder="Serial No. (back of your card)" name="serialNo" minlength="9" maxlength="9"  >
             </div>
+            <script>
+                function formatSerialNo(input) {
+                  // Allow only numeric characters
+                  const numericValue = input.value.replace(/\D/g, '');
+
+                  // Update the input value
+                  input.value = numericValue;
+              }
+            </script>
         </div>
       </div>
         </div>
@@ -207,17 +236,36 @@ if (isset($_SESSION['email'])) {
         <div class="container">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Email Address" name="email" minlength="10" maxlength="50" >
+              <input type="text" class="form-control"  oninput="this.className = ''; validateEmails(this);" placeholder="Email Address" name="email" minlength="10" maxlength="50" >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="text" class="form-control"  oninput="this.className = ''" placeholder="Confirm Email Address" name="email2" minlength="10" maxlength="50"  >
+              <input type="text" class="form-control"  oninput="this.className = ''; validateEmails(this);" placeholder="Confirm Email Address" name="email2" minlength="10" maxlength="50"  >
+              
             </div>
+            <div id="emailError" style="color: red; font-size: 12px; display: none;">Email addresses do not match</div>
+            <script>
+                function validateEmails(input) {
+                  const emailInput = document.querySelector('input[name="email"]');
+                  const confirmEmailInput = document.querySelector('input[name="email2"]');
+                  const errorDiv = document.getElementById('emailError');
+
+                  // Check if the email format is valid
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  const isValidFormat = emailRegex.test(emailInput.value) && emailRegex.test(confirmEmailInput.value);
+
+                  if (emailInput.value !== confirmEmailInput.value || !isValidFormat) {
+                      errorDiv.style.display = 'block';
+                  } else {
+                      errorDiv.style.display = 'none';
+                  }
+              }
+            </script>
           </div>
           <div class="row">
     <div class="col-md-6 mb-5">
         <div class="input-group">
-            <span class="input-group-text">+639</span>
-            <input type="text" class="form-control" id="phoneInput" placeholder="Mobile Phone" minlength="9" maxlength="9" name="phone">
+            <span class="input-group-text">+63</span>
+            <input type="text" class="form-control" id="phoneInput" placeholder="Mobile Phone" minlength="10" maxlength="10" name="phone" style="width: 30px;">
 
 
         </div>
@@ -225,11 +273,26 @@ if (isset($_SESSION['email'])) {
 </div>
         <div class="row">
             <div class="col-md-6">
-              <input type="password" class="form-control"  oninput="this.className = ''" placeholder="Password" name="password" minlength="8" maxlength="25"  >
+              <input type="password" class="form-control"  oninput="this.className = '';validatePasswords(this);" placeholder="Password" name="password" minlength="8" maxlength="25"  >
             </div>
             <div class="col-md-6 mb-3">
-              <input type="password" class="form-control"  oninput="this.className = ''" placeholder="Confirm Password" name="password2" minlength="8" maxlength="25"  >
+              <input type="password" class="form-control"  oninput="this.className = '';validatePasswords(this);" placeholder="Confirm Password" name="password2" minlength="8" maxlength="25"  >
             </div>
+            <div id="passwordError" style="color: red; font-size: 12px; display: none;">Passwords do not match</div>
+
+            <script>
+                function validatePasswords(input) {
+                    const passwordInput = document.querySelector('input[name="password"]');
+                    const confirmPasswordInput = document.querySelector('input[name="password2"]');
+                    const errorDiv = document.getElementById('passwordError');
+
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        errorDiv.style.display = 'block';
+                    } else {
+                        errorDiv.style.display = 'none';
+                    }
+                }
+            </script>
           </div>
       </div>
         </div>
@@ -239,6 +302,7 @@ if (isset($_SESSION['email'])) {
             <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
             <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
         </div>
+        
         <!-- end previous / next buttons -->
     </form>
    </section>
@@ -272,35 +336,6 @@ phoneInput.addEventListener('input', function (e) {
     e.target.value = sanitizedValue;
 });
 
-
-
-  // Get all text input fields
-  var textInputs2 = document.querySelectorAll('input[type="text"]');
-
-  // Get the "Next" button element
-  var nextButton = document.getElementById('nextBtn');
-
-  // Function to check input fields and enable/disable the "Next" button
-  function checkInputFields() {
-    var isAnyInputWithOneChar = false;
-
-    textInputs2.forEach(function (input) {
-      if (input.value.length === 1) {
-        isAnyInputWithOneChar = true;
-      }
-    });
-
-    // Disable the "Next" button if any input field has one character, otherwise enable it
-    nextButton.disabled = isAnyInputWithOneChar;
-  }
-
-  // Attach an input event listener to all text input fields
-  textInputs2.forEach(function (input) {
-    input.addEventListener('input', checkInputFields);
-  });
-
-  // Initially check the input fields when the page loads
-  checkInputFields();
 
 // Get the current date
 const currentDate = new Date();
