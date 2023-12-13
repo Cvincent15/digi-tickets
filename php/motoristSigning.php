@@ -4,6 +4,8 @@ session_start();
 include 'database_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+        
 // Retrieve form data (replace these field names with your actual form field names)
 $licenseNo = $_POST["licenseNo"];
 $expiry = $_POST["expiry"];
@@ -19,13 +21,20 @@ $motherFname = $_POST["motherFname"];
 $motherMname = $_POST["motherMname"];
 $email = $_POST["email"];
 $phone = $_POST["phone"];
+$password = $_POST["password"];
+$password2 = $_POST["password2"];
 
-    // Add the "+639" prefix to the phone number
-    $phoneWithPrefix = "+639" . $phone;
+    // Add the "+63" prefix to the phone number
+    $phoneWithPrefix = "+63" . $phone;
 
     // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
+    if ($password !== $password2) {
+        // Passwords do not match
+        echo "Error: Passwords do not match.";
+        header("Refresh: 5; URL= ../motoristSignup.php"); 
+        exit();  // Add this to stop further processing
+        } else {
     // Create an SQL statement to insert the data into the database
     $sql = "INSERT INTO users_motorists (driver_license, driver_license_expiry, driver_license_serial, is_filipino, driver_last_name, driver_first_name, driver_middle_name, driver_birthday, driver_gender, mother_last_name, mother_first_name, mother_middle_name, driver_email, driver_phone, driver_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -37,8 +46,9 @@ $phone = $_POST["phone"];
         $stmt->bind_param("sssssssssssssss", $licenseNo, $expiry, $serialNo, $citizenship, $driverLname, $driverFname, $driverMname, $birthday, $gender, $motherLname, $motherFname, $motherMname, $email, $phoneWithPrefix, $hashedPassword);
     if ($stmt->execute()) {
         // Data insertion was successful
-        echo "<p>" . htmlspecialchars("Data inserted successfully.", ENT_QUOTES, 'UTF-8') . "</p>";
         header("Location: ../MotoristMain.php"); 
+        echo "<p>" . htmlspecialchars("Data inserted successfully.", ENT_QUOTES, 'UTF-8') . "</p>";
+        
     } else {
         // Data insertion failed
         echo "Error: " . $stmt->error;
@@ -46,10 +56,14 @@ $phone = $_POST["phone"];
 
     // Close the statement
     $stmt->close();
-}
+    }
+    }
 
 // Close the database connection
 $conn->close();
+ 
+
+
 } else {
 // Handle cases where the request method is not POST (optional)
 echo "Invalid request method.";
