@@ -26,6 +26,23 @@ if (isset($_SESSION['email'])) {
 </head>
 
 <body>
+<div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
@@ -78,6 +95,8 @@ if (isset($_SESSION['email'])) {
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script>
       // Apply symbol restriction to all text input fields
 const form = document.getElementById('loginM');
@@ -112,6 +131,23 @@ inputs.forEach(input => {
         }
     });
 
+    // Function to show the Bootstrap modal
+    function showAlert(message) {
+        const modal = new bootstrap.Modal(document.getElementById('customModal'));
+        document.getElementById('modalMessage').innerText = message;
+        modal.show();
+    }
+
   </script>
+  <?php
+// Check if there is a login error message
+if (isset($_SESSION['login_errorM'])) {
+  $loginErrorM = $_SESSION['login_errorM'];
+  // Clear the login error session variable
+  unset($_SESSION['login_errorM']);
+  // You can use $loginError to display the error message in your popup
+  echo "<script>showAlert('$loginErrorM');</script>";
+} 
+  ?>
 </body>
 </html>
