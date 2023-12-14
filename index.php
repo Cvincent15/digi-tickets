@@ -8,6 +8,15 @@ if (isset($_SESSION['username'])) {
     header("Location: ctmeupage.php");
     exit();
 }
+
+// Check if there is a login error message
+if (isset($_SESSION['login_error'])) {
+    $loginError = $_SESSION['login_error'];
+    // Clear the login error session variable
+    unset($_SESSION['login_error']);
+    // You can use $loginError to display the error message in your popup
+    echo "<script>alert('$loginError');</script>";
+}
 ?>
 
 <!DOCTYPE html>
