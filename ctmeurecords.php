@@ -87,14 +87,14 @@ $pdf->SetLineStyle(array('width' => 0)); // Set line width to 0
 // Define the table layout
 $tbl = '<table width="100%" cellspacing="0" cellpadding="4" border="1">';
 $tbl .= '<tr bgcolor="#cccccc">';
-$tbl .= '<th style="width:30px; height:10px;">No.</th>';
-$tbl .= '<th>Name</th>';
-$tbl .= '<th>License No.</th>';
-$tbl .= '<th>Place Occurred</th>';
-$tbl .= '<th>Plate</th>';
-$tbl .= '<th>Vehicle</th>';
-$tbl .= '<th>Date Occurred</th>';
-$tbl .= '<th>Account Status</th>';
+$tbl .= '<th style="width:5%;">No.</th>'; // Adjust the width as needed
+$tbl .= '<th width="15%">Name</th>';
+$tbl .= '<th width="15%">License No.</th>';
+$tbl .= '<th width="15%">Place Occurred</th>';
+$tbl .= '<th width="10%">Plate</th>';
+$tbl .= '<th width="10%">Vehicle</th>';
+$tbl .= '<th width="15%">Date Occurred</th>';
+$tbl .= '<th width="15%">Account Status</th>';
 $tbl .= '</tr>';
 
 $ticketNumber = 1; // Initialize ticket number
@@ -105,14 +105,14 @@ foreach ($data as $row) {
   $vehicleId = $row['vehicle_type'];
   $vehicleName = fetchVehicleName($vehicleId, $conn);
   $tbl .= '<tr>';
-  $tbl .= '<td style="width:30px; height:10px;">' . $ticketNumber . '</td>'; // Use the ticket number as No.
-  $tbl .= '<td>' . $row['driver_name'] . '</td>';
-  $tbl .= '<td>' . $row['driver_license'] . '</td>';
-  $tbl .= '<td>' . $row['place_of_occurrence'] . '</td>';
-  $tbl .= '<td>' . $row['plate_no'] . '</td>';
-  $tbl .= '<td>' . $vehicleName . '</td>';
-  $tbl .= '<td>' . $row['date_time_violation'] . '</td>';
-  $tbl .= '<td>' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
+  $tbl .= '<td style="width:5%;">' . $ticketNumber . '</td>'; // Use the ticket number as No.
+  $tbl .= '<td width="15%">' . $row['driver_name'] . '</td>';
+  $tbl .= '<td width="15%">' . $row['driver_license'] . '</td>';
+  $tbl .= '<td width="15%">' . $row['place_of_occurrence'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['plate_no'] . '</td>';
+  $tbl .= '<td width="10%">' . $vehicleName . '</td>';
+  $tbl .= '<td width="15%">' . $row['date_time_violation'] . '</td>';
+  $tbl .= '<td width="15%">' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
   $tbl .= '</tr>';
 
   $ticketNumber++; // Increment ticket number

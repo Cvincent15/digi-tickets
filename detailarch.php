@@ -2,47 +2,40 @@
 session_start();
 include 'php/database_connect.php'; // Include your database connection code here
 
-
 // Function to fetch is_settled based on ticket_id
 function fetchIsSettled($ticketId, $conn) {
     // Perform a database query to fetch is_settled based on ticket_id
-    // Replace 'your_query_here' with the actual query to retrieve is_settled
     $query = "SELECT is_settled FROM violation_tickets WHERE ticket_id = $ticketId";
     $result = mysqli_query($conn, $query);
 
-    // Check if the query was successful and if a row was returned
     if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         return $row['is_settled'];
     } else {
-        // Return a default value or handle the error as needed
-        return 0; // Default to 'No' if not found
+        return 0;
     }
 }
 
 // Function to fetch vehicle_name based on vehicle_id
 function fetchVehicleName($vehicleId, $conn) {
-    // Perform a database query to fetch vehicle_name based on vehicle_id
     $query = "SELECT vehicle_name FROM vehicletype WHERE vehicle_id = $vehicleId";
     $result = mysqli_query($conn, $query);
 
-    // Check if the query was successful and if a row was returned
     if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         return $row['vehicle_name'];
     } else {
-        // Return a default value or handle the error as needed
-        return "Vehicle not found"; // Replace with your desired default value or error message
+        return "Vehicle not found";
     }
 }
 
-
 // Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
-    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name
+    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name, GROUP_CONCAT(vl.violation_name SEPARATOR ', ') AS violation_names
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
               LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
+              LEFT JOIN violationlists vl ON v.violationlist_id = vl.violation_list_ids
               WHERE vt.ticket_id = $ticketId
               GROUP BY vt.ticket_id";
     $result = mysqli_query($conn, $query);
@@ -57,26 +50,20 @@ function fetchTicketDetails($ticketId, $conn) {
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-    // Redirect the user to the login page if they are not logged in
     header("Location: index.php");
     exit();
 }
 
 // Check if the data parameter is set in the URL
 if (isset($_GET['data'])) {
-    // Decode the JSON data passed in the URL
     $rowData = json_decode(urldecode($_GET['data']), true);
-
-    // Fetch ticket details including is_settled, first_name, and last_name
     $ticketDetails = fetchTicketDetails($rowData['ticket_id'], $conn);
 
     if (!$ticketDetails) {
-        // Handle the case where ticket details are not found
         echo "Error: Ticket details not found.";
         exit();
     }
 } else {
-    // If no data parameter is set, handle it accordingly (e.g., show an error message)
     echo "Error: Row data not found.";
     exit();
 }
@@ -220,7 +207,7 @@ if (isset($_GET['data'])) {
             <td><label for="driver_name">Driver Name:</label></td>
             <td><input class="readonly-input" type="text" id="driver_name" name="driver_name" minlength="10" maxlength="30" value="<?php echo $rowData['driver_name']; ?>" readonly required></td>
             
-            <td><label for="driver_license">Driver License No.:</label></td>
+            <td><label for="driver_license">Driver's License No.:</label></td>
             <td><input class="readonly-input" type="text" id="driver_license" name="driver_license" minlength="13" maxlength="13" value="<?php echo $rowData['driver_license']; ?>" readonly required></td>
         </tr>
         <tr>
@@ -241,10 +228,8 @@ if (isset($_GET['data'])) {
         <!-- Add more rows for additional fields as needed -->
         <tr>
         <td><label for="date_time_violation">Date and Time of Violation:</label></td>
-<td><input class="readonly-input" type="text" id="date_time_violation" value="<?php echo $rowData['date_time_violation']; ?>" name="date_time_violation" onclick="clearInput()" readonly required></td>
+<td><input class="readonly-input" type="text" id="datepicker" value="<?php echo $rowData['date_time_violation']; ?>" name="date_time_violation" onclick="clearInput()" readonly required></td>
 
-
-            
             <td><label for="place_of_occurrence">Place of Occurrence:</label></td>
             <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" minlength="10" maxlength="50" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly required></td>
         </tr>
@@ -280,12 +265,21 @@ if (isset($_GET['data'])) {
         <td><label for="violation_names">Violations:</label></td>
         <td colspan="3">
         <?php
-        // Encode the entire concatenated violation names string
-        //$encodedViolationNames = htmlspecialchars($ticketDetails['violation_names']);
+    // Check if violation_names key exists in $ticketDetails
+    if (isset($ticketDetails['violation_names'])) {
+        // Split the violations string using both commas and pipes as separators
+        $violationsArray = preg_split('/[,|]/', $ticketDetails['violation_names'], -1, PREG_SPLIT_NO_EMPTY);
 
-        // Display the encoded string as a single list item
-        //echo '<p>' . $encodedViolationNames . '</p>';
-        ?>
+        // Trim each violation to remove leading/trailing whitespaces
+        $violationsArray = array_map('trim', $violationsArray);
+
+        // Join the violations using a comma as a separator
+        $formattedViolations = implode(', ', $violationsArray);
+
+        // Display the formatted violations
+        echo '<p>' . $formattedViolations . '</p>';
+    }
+?>
 </td>
 
     </tr>
@@ -306,6 +300,30 @@ if (isset($_GET['data'])) {
 </div>
 
 <script src="js/jquery-3.6.4.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // Get the current date
+    const currentDate = new Date();
+
+    // Format the current date as 'YYYY-MM-DD'
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const currentDay = String(currentDate.getDate()).padStart(2, '0');
+    const formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+
+    // Initialize flatpickr date and time picker
+    flatpickr('#datepicker', {
+        enableTime: true, // Enable time picker
+        dateFormat: 'Y-m-d H:i', // Set the desired date and time format
+        maxDate: '2050-12-31', // Set the maximum selectable date
+        minDate: formattedCurrentDate, // Set the minimum selectable date to today
+        altInput: true, // Use an alternate input field for better accessibility
+        altFormat: 'F j, Y H:i', // Set the format for the alternate input field
+        time_24hr: true, // Use 24-hour time format
+    });
+</script>
 
 <script>
      function clearInput() {

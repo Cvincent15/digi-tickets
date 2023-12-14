@@ -47,13 +47,24 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
         }
 
         .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            min-width: 160px;
-            border: 1px solid #ddd;
-            z-index: 1;
-        }
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
 
         .dropdown-content label {
             display: block;
@@ -212,7 +223,7 @@ $status = $user['role'];
 <div class="row">
     <div class="col">
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="floatingInputValue1" minlength="6" maxlength="6" placeholder="E-Mail" name="email" >
+        <input type="text" class="form-control" id="floatingInputValue1" minlength="10" maxlength="30" placeholder="E-Mail" name="email" >
         <label for="floatingInputValue1">E-Mail</label>
     </div>
     </div>
@@ -278,23 +289,135 @@ $status = $user['role'];
         <label for="floatingInputValue4">Date and Time</label>
 
     </div>
+    <button type="button" onclick="removeSelected()" style="margin-top:20px;">Remove Selected</button>
+    <table id="selectedOptionsTable" style="margin-top:20px; margin-bottom:20px;">
+    <thead>
+        <tr>
+            <th>Violation Name</th>
+            <th>Action</th>
+            <!-- Hidden column for violations[] -->
+            <th style="display: none;">Violations</th>
+        </tr>
+    </thead>
+    <tbody id="selectedOptions">
+        <!-- Selected options will be displayed here -->
+    </tbody>
+</table>
+        <script>
+// Function to populate the dropdown with data from the server
+function populateDropdownFromServer() {
+    $.ajax({
+        url: 'php/getViolations.php', // Change this to your server-side script
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            const dropdownContent = $('.dropdown-content');
+            dropdownContent.empty();
+
+            data.forEach((violation) => {
+                dropdownContent.append(`<a href="#" data-id="${violation.violation_list_ids}" onclick="selectOption(${violation.violation_list_ids}, '${violation.violation_name}')">${violation.violation_name}</a>`);
+            });
+        },
+        error: function (error) {
+            console.error('Error fetching data from the server:', error);
+        }
+    });
+}
+
+function selectOption(violationListId, violationName) {
+    const selectedOptionsTable = $('#selectedOptionsTable');
+    const selectedOptionsBody = $('#selectedOptions');
+    const selectedViolationsInput = $('#selectedViolationsInput');
+
+    // Check if the option is already selected
+    const isOptionSelected = $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
+
+    if (!isOptionSelected) {
+        // Add a new row to the table
+        selectedOptionsBody.append(`<tr data-id="${violationListId}">
+                                        <td>${violationName}</td>
+                                        <td><button onclick="removeOption(${violationListId})">Remove</button></td>
+                                        <!-- Hidden input field for violations[] -->
+                                        <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
+                                    </tr>`);
+
+        // Show the table row
+        $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
+
+        // Update the selectedViolationsInput with the selected violations
+        let selectedViolations = selectedViolationsInput.val() || ''; // Initialize as string
+        selectedViolations = selectedViolations.split(',').filter(Boolean); // Convert to array
+
+        // Convert all elements in the array to integers
+        selectedViolations = selectedViolations.map(id => parseInt(id, 10));
+
+        selectedViolations.push(violationListId);
+        selectedViolationsInput.val(selectedViolations.join(',')); // Convert to comma-separated string
+
+        // Log the selected violations to the console
+        console.log('Selected Violations:', selectedViolations);
+    } else {
+        // Provide a visual indication or alert that the option is already selected
+        alert(`Violation "${violationName}" is already selected.`);
+    }
+}
+
+
+
+
+// Function to remove a selected option
+function removeOption(violationListId) {
+    $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).remove();
+}
+
+// Function to remove all selected options
+function removeSelected() {
+    $('#selectedOptions').empty();
+}
+
+// Document ready function
+$(document).ready(function () {
+    populateDropdownFromServer();
+
+    // Event listener for the search input
+    $('#searchInput').on('input', function () {
+        const searchTerm = $(this).val().toLowerCase();
+        const dropdownItems = $('.dropdown-content a');
+
+        dropdownItems.each(function () {
+            const itemText = $(this).text().toLowerCase();
+            $(this).toggle(itemText.includes(searchTerm));
+        });
+    });
+
+    // Toggle the dropdown visibility on click
+    $('.dropdown').on('click', function (e) {
+        e.stopPropagation(); // Prevent the document click event from closing the dropdown
+        $('.dropdown-content').show();
+    });
+
+    // Close the dropdown when clicking outside of it
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown').length) {
+            $('.dropdown-content').hide();
+        }
+    });
+});
+	</script>
     </div>
     <div class="col">
     <div class="input-group input-group-lg mb-3">
-        <label class="input-group-text form-control" for="inputGroupSelect01" name="place_issued" style="font-size: 1rem;">Violation/s</label>
+        <label class="input-group-text form-control" for="inputGroupSelect01" name="violationlabel" style="font-size: 1rem; width: 30px;">Violation/s</label>
         <div class="dropdown" id="inputGroupSelect01">
-        <button type="button" onclick="toggleDropdown()" class="dropbtn input-group-text" style="width:300px;padding: 1rem .75rem;
-    padding-top: 1rem; padding-right: 0.75rem; padding-bottom: 1rem; padding-left: 0.75rem;">Select</button>
-            <div id="optionsDropdown" class="dropdown-content">
-            <label><input type="checkbox" name="violations[]" value="Driving without license">Driving without license</label>
-            <label><input type="checkbox" name="violations[]" value="Driving with a delinquent, invalid, suspended ineffectual or revoked license">Driving with a delinquent, invalid, suspended ineffectual or revoked license</label>
-            <label><input type="checkbox" name="violations[]" value="Fake or Counterfeit License">Fake or Counterfeit License</label>
-            <label><input type="checkbox" name="violations[]" value="Defective horn or signaling device">Defective horn or signaling device</label>
-            <label><input type="checkbox" name="violations[]" value="Defective brakes">Defective brakes</label>
-            <label><input type="checkbox" name="violations[]" value="Tampered/marked plate or stickers">Tampered/marked plate or stickers</label>
+        <input type="hidden" id="selectedViolationsInput" name="violations[]" />
+        <input type="text" id="searchInput" onclick="toggleDropdown()" class="dropbtn input-group-text" style="width:300px;padding: 1rem .75rem;
+    padding-top: 1rem; padding-right: 0.75rem; padding-bottom: 1rem; padding-left: 0.75rem;" placeholder="Search violations...">
+            <div class="dropdown-content">
+                <!-- Options will be dynamically loaded here -->
             </div>
         </div>
     </div>
+    
 </div>
 
 </div>
@@ -308,7 +431,6 @@ $status = $user['role'];
 <script src="js/jquery-3.6.4.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/timepicker.css">
 
 <script>
 // Get the current date
@@ -334,20 +456,30 @@ const inputs = form.querySelectorAll('input[type="text"]');
 inputs.forEach(input => {
     input.addEventListener('input', function (e) {
         const inputValue = e.target.value;
-        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 \-:]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
+        const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 .\-:]/g, ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
         e.target.value = sanitizedValue;
     });
 });
 
     // Custom JavaScript to show/hide the dropdown
-    function toggleDropdown() {
-            var dropdown = document.getElementById("optionsDropdown");
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
-        }
+function toggleDropdown() {
+    var dropdown = $('#inputGroupSelect01');
+
+    if (dropdown.hasClass('show')) {
+        dropdown.removeClass('show');
+    } else {
+        dropdown.addClass('show');
+    }
+}
+
+// Close the dropdown when clicking outside of it
+$(document).on('click', function (e) {
+    var dropdown = $('#inputGroupSelect01');
+
+    if (!dropdown.is(e.target) && dropdown.has(e.target).length === 0) {
+        dropdown.removeClass('show');
+    }
+});
 
 $(document).ready(function () {
     // Add a click event listener to the Change Password button
