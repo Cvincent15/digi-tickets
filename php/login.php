@@ -14,9 +14,9 @@ $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 $password = trim($_POST['password']);
 
 if (empty($username) || empty($password)) {
-    // Handle empty input data
-    echo "Invalid input data.";
-    header('Refresh: 1; URL= ../index.php');
+    // Password is incorrect, display an error message
+    $_SESSION['login_error'] = "Invalid Input Data.";
+    header('Location: ../index.php');
     exit();
 }
 
@@ -53,14 +53,14 @@ if ($user) {
         exit(); // Always exit after a header redirect
     } else {
         // Password is incorrect, display an error message
-        echo "Invalid username or password";
-        header('Refresh: 1; URL= ../index.php');
+        $_SESSION['login_error'] = "Invalid username or password";
+        header('Location: ../index.php');
         exit();
     }
 } else {
-    // User not found, display an error message
-    echo "User not found.";
-    header('Refresh: 1; URL= ../index.php');
+    // Password is incorrect, display an error message
+    $_SESSION['login_error'] = "User not found.";
+    header('Location: ../index.php');
     exit();
 }
 ?>
