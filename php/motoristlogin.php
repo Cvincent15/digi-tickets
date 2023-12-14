@@ -31,14 +31,14 @@ if ($user) {
         exit(); // Always exit after a header redirect
     } else {
         // Password is incorrect, display an error message
-        echo "Invalid username or password";
-        header('Refresh: 5; URL= ../motorist_login.php');
+        $_SESSION['login_errorM'] = "Invalid username or password";
+        header('Location: ../motorist_login.php');
         exit();
     }
 } else {
-    // User not found, display an error message
-    echo "User not found.";
-    header('Refresh: 5; URL= ../motorist_login.php');
+    // Password is incorrect, display an error message
+    $_SESSION['login_errorM'] = "User not found";
+    header('Location: ../motorist_login.php');
     exit();
 }
 ?>
