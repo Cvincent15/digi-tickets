@@ -151,7 +151,7 @@ foreach ($violationTickets as $ticket) {
 }
 
 </style>
-<body style="height: auto;">
+<body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
   <a class="navbar-brand" href="ctmeupage.php">
