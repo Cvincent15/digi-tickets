@@ -79,6 +79,9 @@ $violationTickets = fetchViolationTickets();
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
     <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>CTMEU Data Hub</title>
 </head>
 <style>
@@ -193,11 +196,7 @@ $violationTickets = fetchViolationTickets();
         } else {
             // For other roles, show the other links
             if ($_SESSION['role'] === 'IT Administrator') {
-                echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                // Do not display the "Create Accounts" link
             } else {
                 // Display the "Create Accounts" link
             //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
@@ -250,14 +249,15 @@ $violationTickets = fetchViolationTickets();
             if ($_SESSION['role'] === 'IT Administrator') {
                 // Do not display the "Create Accounts" link
             } else {
-                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
-            
+            echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             
         }
     }
@@ -279,7 +279,45 @@ $violationTickets = fetchViolationTickets();
   </select>
   
 </div>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<i class="bx bx-archive-in"></i>
+</button>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Archive</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      Are you sure you want to archive the selected tickets?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="archiveButton" data-bs-dismiss="modal">
+  Yes
+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="successModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex align-items-center justify-content-center">
+                <div class="text-center">
+                    <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
+                    <h5 class="modal-title mb-3" style="font-weight: 800;">Archived!</h5>
+                    <p class="mb-3" style="font-weight: 500;">Selected tickets have been archived succesfully</p>
+                    <button type="button" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal" onclick="refreshPage()" style="background-color: #0A157A;">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="table-container">
     <form id="archive-form" action="php/archiverow.php" method="POST">
     <?php
@@ -631,6 +669,35 @@ $(document).ready(function () {
   // Call the function initially to set the count to the initial state
   updateCheckboxCount();
 });
+
+const myModal = document.getElementById('myModal')
+const myInput = document.getElementById('myInput')
+
+myModal.addEventListener('shown.bs.modal', () => {
+  myInput.focus()
+})
+
 </script>
+
+<script>
+  document.getElementById('archiveButton').addEventListener('click', function () {
+    // Hide the first modal
+    $('#exampleModal').modal('hide');
+    
+    // Show the second modal after the first modal is hidden
+    $('#exampleModal').on('hidden.bs.modal', function () {
+      $('#successModal').modal('show');
+      // Remove the event listener to prevent showing the second modal multiple times
+      $('#exampleModal').off('hidden.bs.modal');
+    });
+  });
+
+  // Function to refresh the page
+  function refreshPage() {
+    location.reload(true);
+  }
+</script>
+<script src="js/script.js"></script>
+<script src="js/jquery-3.6.4.js"></script>
 </body>
 </html>
