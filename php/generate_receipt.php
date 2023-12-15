@@ -76,21 +76,21 @@ function generateReceipt($ticketDetails, $vehicleName) {
     $receipt .= '<div class="summer-sale-up-to-wrapper"><p class="summer-sale-up-to">Traffic Citation Ticket</p></div>';
     $receipt .= '<div class="paragraph-text"><p class="date-and-time">' . date('Y-m-d H:i:s') . '</p></div>';
 
-    /*
+    
     // Table section
     $receipt .= '<div class="table">';
     foreach ($ticketDetails['violations'] as $violation) {
         $receipt .= '<div class="table-row">';
         $receipt .= '<div class="something-that-is">' . $violation['violation_name'] . '</div>';
-        $receipt .= '<div class="element">' . $violation['fine_amount'] . ' PHP</div>';
+        $receipt .= '<div class="element">' . $violation['violation_fine'] . ' PHP</div>';
         $receipt .= '</div>';
     }
     $receipt .= '<div class="div">';
     $receipt .= '<div class="text-wrapper">Total</div>';
-    $receipt .= '<div class="element-2">' . $ticketDetails['total_fine'] . ' PHP</div>';
+    $receipt .= '<div class="element-2">PHP</div>'; //' . $ticketDetails['total_fine'] . ' 
     $receipt .= '</div>';
     $receipt .= '</div>';
-*/
+
     // Other sections
     $receipt .= '<div class="ticket-details">';
     $receipt .= '<div class="hi-george-we-ve-det-wrapper"><p class="hi-george-we-ve-det">The details of the traffic citation are:</p></div>';
