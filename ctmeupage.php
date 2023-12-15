@@ -196,7 +196,7 @@ $violationTickets = fetchViolationTickets();
         } else {
             // For other roles, show the other links
             if ($_SESSION['role'] === 'IT Administrator') {
-                  echo '<li class="nav-item">
+                echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
           //Reports page temporary but only super admin has permission
@@ -220,7 +220,7 @@ $violationTickets = fetchViolationTickets();
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<li class="nav-item">
-            <a class="nav-link active" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
           </li>';
 
 
@@ -253,15 +253,14 @@ $violationTickets = fetchViolationTickets();
             if ($_SESSION['role'] === 'IT Administrator') {
                 // Do not display the "Create Accounts" link
             } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
+                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
-            echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
+            
             
         }
     }
@@ -297,7 +296,7 @@ $violationTickets = fetchViolationTickets();
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+        <button type="button" id="archive-confirmation-button" class="btn btn-primary" data-bs-dismiss="modal">
   Yes
 </button>
       </div>
@@ -666,18 +665,41 @@ document.getElementById('archiveButton').addEventListener('click', function () {
         $('#exampleModal').modal('show');
     }
 });
+// Add an event listener to the "Yes" button in the "Archive" modal
+document.getElementById('archiveButton').addEventListener('click', function () {
+    // Check if at least one checkbox is selected
+    const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length === 0) {
+        // Show the "No Selection" modal if no checkboxes are selected
+        $('#noSelectionModal').modal('show');
+    } else {
+        // Hide the "No Selection" modal if it was shown previously
+        $('#noSelectionModal').modal('hide');
+
+        // Show the "Archive" modal
+        $('#exampleModal').modal('show');
+    }
+});
 
 // Add an event listener to the "Yes" button in the "Archive" modal
-document.getElementById('exampleModal').addEventListener('click', function () {
+document.getElementById('archive-confirmation-button').addEventListener('click', function () {
     // Perform the necessary actions when the user clicks "Yes" in the "Archive" modal
     // For example, you can submit the form or perform an AJAX request here
 
     // After the action is completed, hide the "Archive" modal
     $('#exampleModal').modal('hide');
 
-    // Show the "Success" modal
+    // Show the "Success" modal only if the user clicked "Yes" in the "Archive" modal
     $('#successModal').modal('show');
 });
+
+// Add an event listener to the "No" button in the "Archive" modal
+document.getElementById('archive-cancel-button').addEventListener('click', function () {
+    // If the user clicks "No" in the "Archive" modal, do not proceed to the "Success" modal
+    $('#exampleModal').modal('hide');
+});
+
 // Function to refresh the page
 function refreshPage() {
     location.reload(true);

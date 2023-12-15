@@ -1,44 +1,94 @@
 <?php
 session_start();
-include 'database_connect.php';
+include 'php/database_connect.php';
 
-// Retrieve the login form data and trim it
-$email = trim($_POST['email']);
-$password = trim($_POST['password']);
-
-// Use htmlspecialchars to sanitize user input to prevent XSS
-$email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-
-// Prepare the query using placeholders for username
-$stmt = $conn->prepare("SELECT driver_email, driver_password FROM users_motorists WHERE driver_email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-
-// Get the result
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-// Close the statement and connection
-$stmt->close();
-$conn->close();
-
-if ($user) {
-    // Verify the hashed password
-    if (password_verify($password, $user['driver_password'])) {
-        // Password is correct, set the session variables
-        $_SESSION['email'] = $email;
-        header("Location: ../MotoristMain.php"); 
-        exit(); // Always exit after a header redirect
-    } else {
-        // Password is incorrect, display an error message
-        $_SESSION['login_errorM'] = "Invalid username or password";
-        header('Location: ../motorist_login.php');
-        exit();
-    }
-} else {
-    // Password is incorrect, display an error message
-    $_SESSION['login_errorM'] = "User not found";
-    header('Location: ../motorist_login.php');
+// Check if the user is already logged in
+if (isset($_SESSION['email'])) {
+    // Redirect the user to the greeting page if they are already logged in
+    header("Location: MotoristMain.php");
     exit();
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CTMEU</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/motorist.css"/>
+  <link rel="stylesheet" href="css/bootstrap.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
+  <div class="container-fluid">
+  <a class="navbar-brand" href="motoristlogin.php">
+  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
+  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="d-flex">
+        <ul class="navbar-nav me-2">
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </li>
+        </ul>
+        <button type="button" class="btn transparent-btn btn-outline-primary" style="margin-right: 20px;" onclick="redirectToRegister()">Register</button>
+        <button type="button" class="btn transparent-btn btn-outline-primary" onclick="redirectToLogin()">Log In</button>
+    </div>
+    </div>
+  </div>
+</nav>
+
+<div class="masthead" style="background-image: url('./images/mainbg.png');">
+<div class="container min-vh-100 text-center justify-content-center align-items-center">
+  <div class="row">
+    <div class="col">
+      <h4>City Traffic Management and Enforcement Unit</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h1>Motorist Portal</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <img src="./images/ctmeu.png">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h3>A front line government agency showcasing fast and efficient public service for a progressive land transport sector</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+    <button type="button" class="btn btn-success btn-lg" style="background-color: #5CBA13;" onclick="redirectToRegister()">Register</button>
+        <button type="button" class="btn btn-outline-light btn-lg" onclick="redirectToLogin()">Log In</button>
+    </div>
+  </div>
+</div>
+</div>
+    </div>
+
+    <script>
+    function redirectToRegister() {
+      window.location.href = 'motoristSignup.php';
+    }
+
+    function redirectToLogin() {
+      window.location.href = 'motorist_login.php';
+    }
+  </script>
+</body>
+</html>
