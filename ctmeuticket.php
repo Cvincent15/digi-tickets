@@ -85,7 +85,7 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
         padding: 12px 30px; /* Adjust the padding as needed */
     }
 </style>
-<body style="height: auto;">
+<body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <?php
 
 // Check if the user is already logged in
