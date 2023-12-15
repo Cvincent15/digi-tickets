@@ -1,0 +1,25 @@
+:root {
+    --body-text-font-family: "Inter-Regular", Helvetica;
+    --body-text-font-weight: 400;
+    --body-text-font-size: 16px;
+    --body-text-letter-spacing: 0px;
+    --body-text-line-height: 20px;
+    --body-text-font-style: normal;
+    --heading-4-font-family: "Inter-Bold", Helvetica;
+    --heading-4-font-weight: 700;
+    --heading-4-font-size: 16px;
+    --heading-4-letter-spacing: 0px;
+    --heading-4-line-height: 20px;
+    --heading-4-font-style: normal;
+    --spacing-l: 24px;
+    --spacing-main-border-radius: 16px;
+    --spacing-XS: 4px;
+    --spacing-m: 16px;
+    --spacing-alert-border-radius: 8px;
+    --colors-white: rgba(255, 255, 255, 1);
+    --colors-grey: rgba(234, 235, 237, 1);
+    --colors-black: rgba(22, 31, 51, 1);
+    --colors-dark-blue: rgba(7, 92, 212, 1);
+    --colors-dark-grey: rgba(154, 158, 166, 1);
+  }
+  
