@@ -1,4 +1,5 @@
 <?php
+//MotoristTransaction.php
 session_start();
 include 'php/database_connect.php';
 
@@ -52,7 +53,33 @@ if (isset($_SESSION['email'])) {
     // Redirect the user to the login page if not logged in
     header("Location: ../motoristlogin.php");
     exit();
+
+    
 }
+
+// Function to fetch vehicle_name based on vehicle_type
+function fetchVehicleName($vehicleType, $conn) {
+  // Perform a database query to fetch vehicle_name based on vehicle_type
+  $query = "SELECT vehicle_name FROM vehicletype WHERE vehicle_id = ?";
+  $stmt = $conn->prepare($query);
+  $stmt->bind_param("s", $vehicleType);
+  $stmt->execute();
+  $stmt->bind_result($vehicleName);
+  
+  // Check if the query was successful and if a row was returned
+  if ($stmt->fetch()) {
+      return $vehicleName;
+  } else {
+      // Return a default value or handle the error as needed
+      return "Vehicle not found"; // Replace with your desired default value or error message
+  }
+}
+
+// Fetch violation ticket data for the logged-in user
+$stmt = $conn->prepare("SELECT * FROM violation_tickets WHERE driver_license = ?");
+$stmt->bind_param("s", $driverLicense);
+$stmt->execute();
+$violationTickets = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -67,8 +94,25 @@ if (isset($_SESSION['email'])) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="css/styleguide.css" />
+    <link rel="stylesheet" href="css/styleticket.css" />
+
 
 <style>
+.fine-steps {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  .fine-steps > li {
+    margin-bottom: 10px; /* Adjust this value to control the spacing between list items */
+  }
+
+  .fine-steps > li > ul > li {
+    margin-bottom: 5px; /* Adjust this value to control the spacing between sub-list items */
+  }
   /* table */
 .table-container {
   margin: 0 auto;
@@ -192,28 +236,25 @@ if ($unsettledTicketCount > 0) {
     echo '<tbody id="ticket-table-body">';
 
     // Loop through the fetched violation ticket data and populate the table rows for unsettled tickets
-    foreach ($violationTickets as $index => $ticket) {
-        if ($ticket['is_settled'] == 0) {
-            // Convert the row data to a JSON string
-            $rowData = json_encode($ticket);
-            $visibleTicketCount++; // Increment the visible ticket counter
+foreach ($violationTickets as $index => $ticket) {
+  if ($ticket['is_settled'] == 0) {
+      $rowData = json_encode($ticket);
+      $visibleTicketCount++;
 
-            echo '<tr>';
-            // Display the visible ticket count in the "No." column
-            echo '<td>' . $visibleTicketCount . '</td>';
-            // Wrap the name in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_name'] . '</td>';
-            // Wrap the license in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_license'] . '</td>';
-            // Wrap the address in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['vehicle_type'] . '</td>';
-            // Wrap the district in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['place_of_occurrence'] . '</td>';
-            // Add a button to mark the ticket as settled
-            echo '<td><button class="settle-button" data-ticket-index="' . $index . '" style="background-color:green; color:white; border-radius:10px;">Settle</button></td>';
-            echo '</tr>';
-        }
-    }
+      echo '<tr>';
+      echo '<td>' . $visibleTicketCount . '</td>';
+      echo '<td class="clickable-cell" data-ticket-details=\'' . htmlspecialchars($rowData, ENT_QUOTES, 'UTF-8') . '\'>' . $ticket['driver_name'] . '</td>';
+      echo '<td class="clickable-cell" data-ticket-details=\'' . htmlspecialchars($rowData, ENT_QUOTES, 'UTF-8') . '\'>' . $ticket['driver_license'] . '</td>';
+      
+      // Call the fetchVehicleName function to get the vehicle name
+      $vehicleName = fetchVehicleName($ticket['vehicle_type'], $conn);
+      
+      echo '<td class="clickable-cell" data-ticket-details=\'' . htmlspecialchars($rowData, ENT_QUOTES, 'UTF-8') . '\'>' . $vehicleName . '</td>';
+      echo '<td class="clickable-cell" data-ticket-details=\'' . htmlspecialchars($rowData, ENT_QUOTES, 'UTF-8') . '\'>' . $ticket['place_of_occurrence'] . '</td>';
+      echo '<td><button class="settle-button" data-ticket-index="' . $index . '" style="background-color:green; color:white; border-radius:10px;">Settle</button></td>';
+      echo '</tr>';
+  }
+}
 
     echo '</tbody>';
     echo '</table>';
@@ -299,7 +340,22 @@ if ($unsettledTicketCount > 0) {
 
     </div>
 </div>
-
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img class="modal-title mx-auto" id="exampleModalLabel" src="images/ctmeu.jpg" style="width: 60px; height: 60px;">
+      </div>
+      <div class="modal-body" id="ticket-receipt">
+        <!-- Receipt content goes here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="downloadReceiptBtn">Download Receipt</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="row">
     <div class="col">
     <button type="button" class="btn btn-lg btn-danger ms-4 mt-5" onclick="redirectToMain()">Close</button>
@@ -309,6 +365,89 @@ if ($unsettledTicketCount > 0) {
    </section>
 </div>
     <script>
+      const receiptSection = document.getElementById('ticket-receipt');
+console.log(receiptSection);
+document.addEventListener('DOMContentLoaded', function () {
+    const clickableCells = document.querySelectorAll('.clickable-cell');
+    const receiptSection = document.getElementById('ticket-receipt');
+
+    clickableCells.forEach(function (cell) {
+        cell.addEventListener('click', function () {
+            const ticketDetails = JSON.parse(this.getAttribute('data-ticket-details'));
+            // You can use this data to display the receipt or perform other actions
+            receiptSection.innerHTML = generateReceiptHtml(ticketDetails);
+        });
+    });
+
+    const settleButtons = document.querySelectorAll('.settle-button');
+  settleButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      const ticketIndex = this.getAttribute('data-ticket-index');
+      const ticketDetails = JSON.parse(clickableCells[ticketIndex].getAttribute('data-ticket-details'));
+
+      // Fetch the receipt content and update the 'ticket-receipt' div
+      fetch('php/generate_receipt.php', {
+        method: 'POST',
+        body: JSON.stringify({ ticketDetails: ticketDetails }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const receiptSection = document.getElementById('ticket-receipt');
+          receiptSection.innerHTML = data.receipt;
+
+          // Open the Bootstrap modal
+          const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+          receiptModal.show();
+
+          // Event listener for the Download Receipt button
+          const downloadReceiptBtn = document.getElementById('downloadReceiptBtn');
+          downloadReceiptBtn.addEventListener('click', function () {
+            downloadReceipt();
+            receiptModal.hide(); // Hide the modal after download
+          });
+        } else {
+          console.error('Receipt generation failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    });
+  });
+
+    function generateReceiptHtml(ticketDetails) {
+        // Customize this function based on your receipt format
+        return `
+            <h2>Ticket Details</h2>
+            <p><strong>Name:</strong> ${ticketDetails.driver_name}</p>
+            <p><strong>License No.:</strong> ${ticketDetails.driver_license}</p>
+            <p><strong>Vehicle:</strong> ${ticketDetails.vehicle_name}</p>
+            <p><strong>Place of Occurrence:</strong> ${ticketDetails.place_of_occurrence}</p>
+            <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+        `;
+    }
+
+    function downloadReceipt() {
+    // Use html2canvas to capture the 'ticket-receipt' div as an image
+    html2canvas(receiptSection).then(function (canvas) {
+      // Convert the canvas to a data URL
+      const imageDataUrl = canvas.toDataURL('image/png');
+
+      // Create a link element and trigger a download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = imageDataUrl;
+      downloadLink.download = 'receipt.png';
+      downloadLink.click();
+    });
+  }
+});
+
+
+
       /*
 // Add event listeners to the Settle buttons
 const settleButtons = document.querySelectorAll('.settle-button');

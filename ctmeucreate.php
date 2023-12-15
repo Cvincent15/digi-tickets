@@ -272,7 +272,6 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <div class="error" id="username-error"></div>
 </div>
         <div class="form-floating mx-5 mb-3">
-        <input type="hidden" id="userCtmeuId" name="userCtmeuId">
   <input type="text" class="form-control" id="firstName" placeholder="First Name" name="firstName" minlength="10" maxlength="25" required>
   <label for="firstName">First Name:</label>
 </div>
@@ -288,6 +287,7 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <input type="text" class="form-control" id="affixes" name="affixes" placeholder="Affixes" minlength="2" maxlength="5">
   <label for="lastName">Affixes (Optional):</label>
 </div>
+<input type="hidden" id="userCtmeuId" name="userCtmeuId">
 <div class="form-floating mx-5 mb-3">
   <input type="password" class="form-control" id="password" name="password" placeholder="Last Name" minlength="5" maxlength="25" oninput="validatePassword()" required>
   <label for="Password">Password:</label>
@@ -482,9 +482,11 @@ function generatePassword() {
 <table id="user-table">
     <thead>
         <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
             <th>Username</th>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Last Name</th>
+            <th>Affixes</th>
             <th>Role</th>
         </tr>
     </thead>
@@ -493,16 +495,19 @@ function generatePassword() {
         // Loop through the $userData array and populate the table rows
         foreach ($userData as $user) {
             echo "<tr>";
-            echo "<td class='clickable-cell'>" . $user['first_name'] . "</td>";
-            echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
             echo "<td class='clickable-cell'>" . $user['username'] . "</td>";
+            echo "<td class='clickable-cell'>" . $user['first_name'] . "</td>";
+            echo "<td class='clickable-cell'>" . ($user['middle_name'] ?? '') . "</td>"; // Display middle name or an empty string
+            echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
+            echo "<td class='clickable-cell'>" . ($user['affixes'] ?? '') . "</td>"; // Display affixes or an empty string
             echo "<td class='clickable-cell'>" . $user['role'] . "</td>";
             echo "<td class='user-ctmeu-id' style='display:none;'>" . $user['user_ctmeu_id'] . "</td>";
             echo "</tr>";
         }
-        ?>
+    ?>
     </tbody>
 </table>
+
   </div>
   </div>
 
@@ -531,15 +536,19 @@ document.getElementById('reset-button').addEventListener('click', function() {
   // Function to handle row selection and populate form fields with data
 function handleRowSelection(row) {
     // Get the data associated with the clicked row
-    const firstName = row.cells[0].textContent;
-    const lastName = row.cells[1].textContent;
-    const username = row.cells[2].textContent;
-    const role = row.cells[3].textContent;
-    const userCtmeuId = row.cells[4].textContent; // Get the user_ctmeu_id
+    const username = row.cells[0].textContent;
+    const firstName = row.cells[1].textContent;
+    const middleName = row.cells[2].textContent;
+    const lastName = row.cells[3].textContent;
+    const affixes = row.cells[4].textContent;
+    const role = row.cells[5].textContent;
+    const userCtmeuId = row.cells[6].textContent; // Get the user_ctmeu_id
 
     // Populate form fields with the data
     document.getElementById('firstName').value = firstName;
+    document.getElementById('middleName').value = middleName;
     document.getElementById('lastName').value = lastName;
+    document.getElementById('affixes').value = affixes;
     document.getElementById('username').value = username;
     document.getElementById('role').value = role;
     document.getElementById('userCtmeuId').value = userCtmeuId; // Set the user_ctmeu_id in a hidden input field
@@ -608,18 +617,25 @@ function resetPassword(username) {
     // Add a new JavaScript function to disable the role dropdown
   function disableRoleDropdown() {
     document.getElementById('role').disabled = true;
+    document.getElementById('password').disabled = true;
   }
 
     // Function to populate form fields with the selected row data
   function populateFormFields(row) {
-    const firstName = row.cells[0].textContent;
-      const lastName = row.cells[1].textContent;
-      const role = row.cells[3].textContent; // Status is in the 5th cell (index 4)
+    const username = row.cells[0].textContent;
+    const firstName = row.cells[1].textContent;
+    const middleName = row.cells[2].textContent;
+      const lastName = row.cells[3].textContent;
+      const affixes = row.cells[4].textContent;
+      const role = row.cells[6].textContent; // Status is in the 5th cell (index 4)
       /*const startTicket = row.cells[5].textContent; // Start Ticket is in the 6th cell (index 5)
       const endTicket = row.cells[6].textContent; */
 
-    document.getElementById('firstName').value = firstName;
-    document.getElementById('lastName').value = lastName;
+      document.getElementById('firstName').value = firstName;
+      document.getElementById('middleName').value = middleName;
+      document.getElementById('lastName').value = lastName;
+      document.getElementById('affixes').value = affixes;
+      document.getElementById('username').value = username;
 
     // Disable the role dropdown when an existing user is selected
     disableRoleDropdown();
@@ -684,6 +700,7 @@ document.getElementById('logout-button').addEventListener('click', function() {
 
     // Enable the role dropdown when the form is cleared
     document.getElementById('role').disabled = false;
+    document.getElementById('password').disabled = false;
 
   }
 
@@ -838,13 +855,18 @@ if ($_SESSION['role'] === 'Super Administrator') {
 document.getElementById('update-button').addEventListener('click', function() {
     // Get the user information from the form fields
     const firstNameToUpdate = document.getElementById('firstName').value;
+    const middleNameToUpdate = document.getElementById('middleName').value;
     const lastNameToUpdate = document.getElementById('lastName').value;
-    const roleToUpdate = document.getElementById('role').value;
+    const affixesToUpdate = document.getElementById('affixes').value;
+    const usernameToUpdate = document.getElementById('username').value;
 
     // Check if the user is trying to update themselves
-    if (firstNameToUpdate === '<?php echo $_SESSION['first_name']; ?>' &&
+    if (
+        firstNameToUpdate === '<?php echo $_SESSION['first_name']; ?>' &&
         lastNameToUpdate === '<?php echo $_SESSION['last_name']; ?>' &&
-        roleToUpdate === '<?php echo $_SESSION['role']; ?>') {
+        roleToUpdate === '<?php echo $_SESSION['role']; ?>' &&
+        usernameToUpdate === '<?php echo $_SESSION['username']; ?>'
+    ) {
         alert("You cannot update your own account.");
         return;
     }
@@ -855,9 +877,11 @@ document.getElementById('update-button').addEventListener('click', function() {
     // Create an object with the data to be updated
     const userDataToUpdate = {
         firstName: firstNameToUpdate,
+        middleName: middleNameToUpdate,
         lastName: lastNameToUpdate,
-        role: roleToUpdate,
-        userCtmeuId: userCtmeuIdToUpdate
+        affixes: affixesToUpdate,
+        username: usernameToUpdate,
+        userCtmeuId: userCtmeuIdToUpdate,
     };
 
     // Ask for confirmation before updating
@@ -893,8 +917,11 @@ document.getElementById('update-button').addEventListener('click', function() {
 
 // JavaScript code: Check if there is an existing user with the same data
 function checkExistingData() {
+    const username = document.getElementById('username').value.trim();
     const firstName = document.getElementById('firstName').value.trim();
+    const middleName = document.getElementById('middleName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
+    const affixes = document.getElementById('affixes').value.trim();
     const role = document.getElementById('role').value.trim();
     const userCtmeuId = document.getElementById('userCtmeuId').value.trim(); // Get userCtmeuId
 
@@ -906,13 +933,24 @@ function checkExistingData() {
 
     // Loop through the table rows and compare data
     for (const row of tableRows) {
-        const rowFirstName = row.cells[0].textContent.trim();
-        const rowLastName = row.cells[1].textContent.trim();
-        const rowRole = row.cells[3].textContent.trim();
+        const rowFirstName = row.cells[1].textContent.trim();
+        const rowMiddleName = row.cells[2].textContent.trim();
+        const rowLastName = row.cells[3].textContent.trim();
+        const rowAffixes = row.cells[4].textContent.trim();
+        const rowUsername = row.cells[0].textContent.trim();
+        const rowRole = row.cells[5].textContent.trim();
         const rowUserCtmeuId = row.querySelector('.user-ctmeu-id').textContent.trim(); // Get user_ctmeu_id
 
         // Check if there is a match based on firstName, lastName, role, and userCtmeuId
-        if (rowFirstName === firstName && rowLastName === lastName && rowRole === role && rowUserCtmeuId === userCtmeuId) {
+        if (
+            rowFirstName === firstName &&
+            rowMiddleName === middleName &&
+            rowLastName === lastName &&
+            rowAffixes === affixes &&
+            rowUsername === username &&
+            rowRole === role &&
+            rowUserCtmeuId === userCtmeuId
+        ) {
             // Match found, set the matchFound flag to true
             matchFound = true;
             break; // No need to continue checking
@@ -936,7 +974,10 @@ function checkExistingData() {
 
 // Add an input event listener to each input field and userCtmeuId field
 document.getElementById('firstName').addEventListener('input', checkExistingData);
+document.getElementById('middleName').addEventListener('input', checkExistingData);
 document.getElementById('lastName').addEventListener('input', checkExistingData);
+document.getElementById('affixes').addEventListener('input', checkExistingData);
+document.getElementById('username').addEventListener('input', checkExistingData);
 document.getElementById('role').addEventListener('input', checkExistingData);
 document.getElementById('userCtmeuId').addEventListener('input', checkExistingData);
 

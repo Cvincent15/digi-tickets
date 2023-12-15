@@ -79,6 +79,9 @@ $violationTickets = fetchViolationTickets();
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
     <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>CTMEU Data Hub</title>
 </head>
 <style>
@@ -193,11 +196,7 @@ $violationTickets = fetchViolationTickets();
         } else {
             // For other roles, show the other links
             if ($_SESSION['role'] === 'IT Administrator') {
-                echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                // Do not display the "Create Accounts" link
             } else {
                 // Display the "Create Accounts" link
             //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
@@ -250,14 +249,15 @@ $violationTickets = fetchViolationTickets();
             if ($_SESSION['role'] === 'IT Administrator') {
                 // Do not display the "Create Accounts" link
             } else {
-                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="link">Reports</a>';
             }
             // Uncomment this line to show "Activity Logs" to other roles
             // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
             echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
             // Uncomment this line to show "Create Accounts" to other roles
-            
+            echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
             
         }
     }
@@ -280,6 +280,54 @@ $violationTickets = fetchViolationTickets();
   
 </div>
 
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Archive</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      Are you sure you want to archive the selected tickets?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+  Yes
+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="successModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex align-items-center justify-content-center">
+                <div class="text-center">
+                    <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
+                    <h5 class="modal-title mb-3" style="font-weight: 800;">Archived!</h5>
+                    <p class="mb-3" style="font-weight: 500;">Selected tickets have been archived successfully</p>
+                    <button type="submit" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal" onclick="submitForm()" style="background-color: #0A157A;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="noSelectionModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex align-items-center justify-content-center">
+                <div class="text-center">
+                    <h5 class="modal-title mb-3" style="font-weight: 800;">No Selection</h5>
+                    <p class="mb-3" style="font-weight: 500;">Please select at least one ticket to archive.</p>
+                    <button type="button" class="btn btn-primary mb-3" data-bs-dismiss="modal" style="background-color: #0A157A;">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="table-container">
     <form id="archive-form" action="php/archiverow.php" method="POST">
     <?php
@@ -287,7 +335,8 @@ $violationTickets = fetchViolationTickets();
     if ($_SESSION['role'] === 'Super Administrator') {
       // Show the archive button, count, and "records are selected"
       echo '<div style="display: inline-block; background-color: white; padding: 2px 6px; border-radius: 4px;"><span id="checkbox-count">0</span> records are selected</div>';
-      echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+      //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+      echo '<button type="button" id="archiveButton" class="btn btn-primary mb-3 float-end" data-bs-target="#exampleModal"><i class="bx bx-archive-in"></i></button>';
   }
 
     ?>
@@ -360,6 +409,8 @@ $violationTickets = fetchViolationTickets();
         ?>
     </tbody>
 </table>
+      </form>
+      </div>
 
 <!-- Pagination -->
 <div class="pagination-container">
@@ -469,50 +520,10 @@ function updateArrowIcons() {
 </script>
 
 <script>
-  /* // JavaScript code
-document.addEventListener("DOMContentLoaded", function () {
-    const rowsPerPage = 10; // Number of rows to show per page
-    const tableBody = document.getElementById("ticket-table-body");
-    const rows = tableBody.querySelectorAll("tr");
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    let currentPage = 1;
-
-    // Function to show the rows for the current page
-    function showPage(page) {
-        const startIdx = (page - 1) * rowsPerPage;
-        const endIdx = startIdx + rowsPerPage;
-        
-        rows.forEach((row, index) => {
-            if (index >= startIdx && index < endIdx) {
-                row.style.display = "table-row";
-            } else {
-                row.style.display = "none";
-            }
-        });
-        
-        document.getElementById("page-info").textContent = `Page ${currentPage} of ${totalPages}`;
-    }
-
-    // Show the first page initially
-    showPage(currentPage);
-
-    // Event listener for the "Next" button
-    document.getElementById("next-page").addEventListener("click", function () {
-        if (currentPage < totalPages) {
-            currentPage++;
-            showPage(currentPage);
-        }
-    });
-
-    // Event listener for the "Previous" button
-    document.getElementById("prev-page").addEventListener("click", function () {
-        if (currentPage > 1) {
-            currentPage--;
-            showPage(currentPage);
-        }
-    });
-}); */
-
+ function submitForm() {
+  // Trigger form submission
+  document.getElementById('archive-form').submit();
+}
   
   <?php
             // Check if the user is a Super Administrator
@@ -631,6 +642,44 @@ $(document).ready(function () {
   // Call the function initially to set the count to the initial state
   updateCheckboxCount();
 });
+
 </script>
+
+<script>
+ // Add an event listener to the "Yes" button in the "Archive" modal
+document.getElementById('archiveButton').addEventListener('click', function () {
+    // Check if at least one checkbox is selected
+    const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length === 0) {
+        // Show the "No Selection" modal if no checkboxes are selected
+        $('#noSelectionModal').modal('show');
+    } else {
+        // Hide the "No Selection" modal if it was shown previously
+        $('#noSelectionModal').modal('hide');
+
+        // Show the "Archive" modal
+        $('#exampleModal').modal('show');
+    }
+});
+
+// Add an event listener to the "Yes" button in the "Archive" modal
+document.getElementById('exampleModal').addEventListener('click', function () {
+    // Perform the necessary actions when the user clicks "Yes" in the "Archive" modal
+    // For example, you can submit the form or perform an AJAX request here
+
+    // After the action is completed, hide the "Archive" modal
+    $('#exampleModal').modal('hide');
+
+    // Show the "Success" modal
+    $('#successModal').modal('show');
+});
+// Function to refresh the page
+function refreshPage() {
+    location.reload(true);
+}
+</script>
+<script src="js/script.js"></script>
+<script src="js/jquery-3.6.4.js"></script>
 </body>
 </html>
