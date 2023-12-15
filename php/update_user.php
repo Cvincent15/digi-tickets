@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_data = json_decode($json_data, true);
 
     // Check if user data is valid
-    if ($user_data && isset($user_data['firstName'], $user_data['middleName'], $user_data['lastName'], $user_data['affixes'], $user_data['username'], $user_data['role'], $user_data['userCtmeuId'])) {
+    if ($user_data && isset($user_data['firstName'], $user_data['middleName'], $user_data['lastName'], $user_data['affixes'], $user_data['username'], $user_data['userCtmeuId'])) {
         // Prepare and execute the SQL update statement using prepared statements
-        $stmt = $conn->prepare("UPDATE users SET first_name=?, middle_name=?, last_name=?, affixes=?, username=?, role=? WHERE user_ctmeu_id=?");
-        $stmt->bind_param("ssssssi", $user_data['firstName'], $user_data['middleName'], $user_data['lastName'], $user_data['affixes'], $user_data['username'], $user_data['role'], $user_data['userCtmeuId']);
+        $stmt = $conn->prepare("UPDATE users SET first_name=?, middle_name=?, last_name=?, affixes=?, username=? WHERE user_ctmeu_id=?");
+        $stmt->bind_param("sssssi", $user_data['firstName'], $user_data['middleName'], $user_data['lastName'], $user_data['affixes'], $user_data['username'], $user_data['userCtmeuId']);
 
         if ($stmt->execute()) {
             // Update successful
