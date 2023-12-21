@@ -13,73 +13,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and validate user inputs
     $selectedViolations = isset($_POST['violations']) ? $_POST['violations'] : [];
     $driverName = filter_var($_POST['driver_name'], FILTER_SANITIZE_STRING);
+    $driverAddress = filter_var($_POST['driver_address'], FILTER_SANITIZE_STRING);
     $licenseNo = filter_var($_POST['driver_license'], FILTER_SANITIZE_STRING);
+    $issuingDistrict = filter_var($_POST['issuing_district'], FILTER_SANITIZE_STRING);
     $vehicleType = filter_var($_POST['vehicle_type'], FILTER_SANITIZE_STRING);
     $plateNo = filter_var($_POST['plate_no'], FILTER_SANITIZE_STRING);
+    $regOwner = filter_var($_POST['reg_owner'], FILTER_SANITIZE_STRING);
+    $regOwnerAddress = filter_var($_POST['reg_owner_address'], FILTER_SANITIZE_STRING);
     $placeOfOccurrence = filter_var($_POST['place_of_occurrence'], FILTER_SANITIZE_STRING);
     $date_time = filter_var($_POST['date_time'], FILTER_SANITIZE_STRING);
     $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
     $user_ctmeu_id = $_POST['user_ctmeu_id']; // Assuming this is an integer
 
     // Insert the form data into the violation_tickets table using prepared statements
-    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_license, vehicle_type, plate_no, date_time_violation, place_of_occurrence, email)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_time_violation, place_of_occurrence, email)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $insertTicketQuery);
 
     if ($stmt) {
         // Bind parameters and execute the statement
-        mysqli_stmt_bind_param($stmt, "isssssss", $user_ctmeu_id, $driverName, $licenseNo, $vehicleType, $plateNo, $date_time, $placeOfOccurrence, $email);
+        mysqli_stmt_bind_param($stmt, "isssssssssss", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date_time, $placeOfOccurrence, $email);
 
         if (mysqli_stmt_execute($stmt)) {
             // Check if any rows were affected by the insertion
             if (mysqli_affected_rows($conn) > 0) {
                 // Get the ID of the newly inserted ticket
-$ticketID = mysqli_insert_id($conn);
+                $ticketID = mysqli_insert_id($conn);
 
-// Insert each selected violation into the violations table with the ticket_id_violations foreign key using prepared statements
-$insertViolationQuery = "INSERT INTO violations (violationlist_id, ticket_id_violations) VALUES (?, ?)";
-$stmtViolation = mysqli_prepare($conn, $insertViolationQuery);
+                // Insert each selected violation into the violations table with the ticket_id_violations foreign key using prepared statements
+                $insertViolationQuery = "INSERT INTO violations (violationlist_id, ticket_id_violations) VALUES (?, ?)";
+                $stmtViolation = mysqli_prepare($conn, $insertViolationQuery);
 
-if ($stmtViolation) {
-    mysqli_stmt_bind_param($stmtViolation, "ii", $violationId, $ticketID);
+                if ($stmtViolation) {
+                    mysqli_stmt_bind_param($stmtViolation, "ii", $violationId, $ticketID);
 
-    // Use array_unique to remove duplicate violations
-    $selectedViolations = array_unique($selectedViolations);
+                    // Use array_unique to remove duplicate violations
+                    $selectedViolations = array_unique($selectedViolations);
 
-    foreach ($selectedViolations as $violationId) {
-        // Check if the violation already exists for the ticket
-        $checkViolationQuery = "SELECT COUNT(*) FROM violations WHERE violationlist_id = ? AND ticket_id_violations = ?";
-        $stmtCheckViolation = mysqli_prepare($conn, $checkViolationQuery);
-        mysqli_stmt_bind_param($stmtCheckViolation, "ii", $violationId, $ticketID);
-        mysqli_stmt_execute($stmtCheckViolation);
-        mysqli_stmt_bind_result($stmtCheckViolation, $violationCount);
-        mysqli_stmt_fetch($stmtCheckViolation);
-        mysqli_stmt_close($stmtCheckViolation);
+                    foreach ($selectedViolations as $violationId) {
+                        // Check if the violation already exists for the ticket
+                        $checkViolationQuery = "SELECT COUNT(*) FROM violations WHERE violationlist_id = ? AND ticket_id_violations = ?";
+                        $stmtCheckViolation = mysqli_prepare($conn, $checkViolationQuery);
+                        mysqli_stmt_bind_param($stmtCheckViolation, "ii", $violationId, $ticketID);
+                        mysqli_stmt_execute($stmtCheckViolation);
+                        mysqli_stmt_bind_result($stmtCheckViolation, $violationCount);
+                        mysqli_stmt_fetch($stmtCheckViolation);
+                        mysqli_stmt_close($stmtCheckViolation);
 
-        if ($violationCount == 0) {
-            // Execute the prepared statement for each violation only if it doesn't exist for the ticket
-            mysqli_stmt_execute($stmtViolation);
+                        if ($violationCount == 0) {
+                            // Execute the prepared statement for each violation only if it doesn't exist for the ticket
+                            mysqli_stmt_execute($stmtViolation);
 
-            // Check for errors in execution
-            if (mysqli_stmt_errno($stmtViolation) != 0) {
-                // Handle the error (you can log it or echo for debugging)
-                echo "Error inserting violation: " . mysqli_stmt_error($stmtViolation);
-                break;  // Exit the loop on error
-            }
-        }
-    }
+                            // Check for errors in execution
+                            if (mysqli_stmt_errno($stmtViolation) != 0) {
+                                // Handle the error (you can log it or echo for debugging)
+                                echo "Error inserting violation: " . mysqli_stmt_error($stmtViolation);
+                                break;  // Exit the loop on error
+                            }
+                        }
+                    }
 
-    // Close the statement after the loop
-    mysqli_stmt_close($stmtViolation);
+                    // Close the statement after the loop
+                    mysqli_stmt_close($stmtViolation);
 
-    // Redirect to a success page or perform any other actions as needed
-    header("Location: ../ctmeuticket.php");
-    exit();
-} else {
-    // Handle the prepared statement error for violation insertion
-    echo "Error preparing violations statement: " . mysqli_error($conn);
-}
+                    // Redirect to a success page or perform any other actions as needed
+                    header("Location: ../ctmeuticket.php");
+                    exit();
+                } else {
+                    // Handle the prepared statement error for violation insertion
+                    echo "Error preparing violations statement: " . mysqli_error($conn);
+                }
             } else {
                 // No rows were affected, indicating a failed insertion
                 echo "Error inserting ticket: Ticket insertion failed.";
