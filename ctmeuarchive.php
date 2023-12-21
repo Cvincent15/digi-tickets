@@ -10,34 +10,48 @@ if (!isset($_SESSION['username'])) {
 }
 
 // Define a function to fetch data from the violation_tickets table
-function fetchViolationTickets() {
-  global $conn; // Assuming you have a database connection established
+function fetchViolationTickets()
+{
+    global $conn; // Assuming you have a database connection established
 
-  // Write a SQL query to fetch data from the violation_tickets table
-  $sql = "SELECT * FROM violation_tickets"; // Modify this query as needed
+    // Write a SQL query to fetch data from the violation_tickets table
+    $sql = "SELECT 
+                violation_tickets.*,
+                users.first_name,users.middle_name,users.last_name,
+                vehicletype.vehicle_name as vehicle_name,
+                GROUP_CONCAT(violationlists.violation_name SEPARATOR '|||') AS concatenated_violations
+            FROM violation_tickets
+                JOIN vehicletype ON violation_tickets.vehicle_type = vehicletype.vehicle_id
+                LEFT JOIN violations ON violation_tickets.ticket_id = violations.ticket_id_violations
+                LEFT JOIN violationlists ON violations.violationlist_id = violationlists.violation_list_ids
+                LEFT JOIN users ON users.user_ctmeu_id = violation_tickets.user_ctmeu_id
+            WHERE violation_tickets.user_ctmeu_id IS NOT NULL
+            GROUP BY violation_tickets.ticket_id;
+    "; // Modify this query as needed
 
-  // Execute the query
-  $result = mysqli_query($conn, $sql);
+    // Execute the query
+    $result = mysqli_query($conn, $sql);
 
-  // Check if the query was successful
-  if ($result) {
-    // Initialize an empty array to store the fetched data
-    $data = array();
 
-    // Fetch data and store it in the array
-    while ($row = mysqli_fetch_assoc($result)) {
-      $data[] = $row;
+    // Check if the query was successful
+    if ($result) {
+        // Initialize an empty array to store the fetched data
+        $data = array();
+
+        // Fetch data and store it in the array
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+
+        // Return the fetched data
+
+        return $data;
+    } else {
+        // Handle the error, e.g., display an error message
+        echo "Error: " . mysqli_error($conn);
+        return array(); // Return an empty array if there was an error
     }
-
-    // Return the fetched data
-    return $data;
-  } else {
-    // Handle the error, e.g., display an error message
-    echo "Error: " . mysqli_error($conn);
-    return array(); // Return an empty array if there was an error
-  }
 }
-
 
 // Fetch the violation ticket data
 $violationTickets = fetchViolationTickets();
@@ -151,7 +165,7 @@ foreach ($violationTickets as $ticket) {
 }
 
 </style>
-<body style="height: auto;">
+<body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
   <a class="navbar-brand" href="ctmeupage.php">
@@ -314,7 +328,7 @@ if ($hasArchivedData) {
                 // Wrap the license in a clickable <td>
                 echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
                 // Wrap the address in a clickable <td>
-                echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_type'] . "</td>";
+                echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_name'] . "</td>";
                 // Wrap the district in a clickable <td>
                 echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
                 echo "</tr>";

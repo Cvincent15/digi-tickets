@@ -251,10 +251,20 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
         max-width: 100%;
         overflow-x: hidden;
     }
+    .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 10vh;
+        }
+
+        form {
+            text-align: center;
+        }
 
   
 </style>
-<body style="height: auto;">
+<body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
@@ -358,27 +368,30 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </nav>
 
 
-<div class="card align-items-center">
-    <div class="date-filter-container">
-  <label for="start-month">Start Month:</label>
-  <select id="start-month">
-  </select>
-
-  <label for="end-month">End Month:</label>
-  <select id="end-month"> 
-  </select>
-
-  <label for="year">Year:</label>
-  <select id="year"></select>
-  <button class="btn btn-primary" id="filter-button">Apply Filter</button>
+<div class="card">
+<div class="date-filter-container mx-auto">
+  <div class="row">
+    <div class="col-sm-4 mt-3 mb-3 ms-3" style="font-weight: 700;">Start Date</div>
+    <div class="col-sm-7 mt-3 mb-3" style="font-weight: 700;">End Date</div>
+  </div>
+  <div class="row">
+    <div class="col-sm mb-3 ms-3"><select id="start-month" class="form-select form-select-lg mb-3"></select></div>
+    <div class="col-sm"><select id="end-month" class="form-select form-select-lg mb-3"></select></div>
+    <div class="col-sm"><select id="year" class="form-select form-select-lg"></select></select></div>
+    <div class="col-sm"><button class="btn btn-primary" id="filter-button">Apply Filter</button></div>
+  </div>
 </div>
 </div>
 
 <div class="container mt-1" style="display:none;">
-<form method="post" target="_blank">
-  <input type="hidden" id="filtered-data" name="filtered-data" value="">
-  <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
-</form>
+<div class="container">
+    <form method="post" target="_blank">
+        <input type="hidden" id="filtered-data" name="filtered-data" value="">
+        <button class="btn btn-light" style="--bs-btn-padding-y: 1.5rem; --bs-btn-padding-x: 8rem; --bs-btn-font-size: 1rem; font-weight: 800; color: #0A157A;" type="submit" name="generate_pdf">
+            <img src="./images/icon file.png">Generate PDF
+        </button>
+    </form>
+</div>
 
 <div class="table-container mb-5">
 <table id="vehicle-violations-table">
