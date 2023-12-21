@@ -130,7 +130,7 @@ function countSuperAdmins($conn) {
             background-color: grey;
         }
   </style>
-<body style="height: auto;">
+<body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <?php
 // Check if the limit_reached session variable is set
 if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
@@ -266,35 +266,35 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
       <div class="card mx-auto rounded-4" style="max-width: 80%;">
         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an account</h1>
-        <div class="form-floating mx-5 mb-3">
+        <div class="form-floating mx-5">
   <input type="text" class="form-control" id="username" name="username" placeholder="Username" minlength="5" maxlength="25" oninput="validateUsername()" required>
   <label for="Username">Username:</label>
   <div class="error" id="username-error"></div>
 </div>
-        <div class="form-floating mx-5 mb-3">
+        <div class="form-floating mx-5">
   <input type="text" class="form-control" id="firstName" placeholder="First Name" name="firstName" minlength="10" maxlength="25" required>
   <label for="firstName">First Name:</label>
 </div>
-<div class="form-floating mx-5 mb-3">
+<div class="form-floating mx-5">
   <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name" minlength="5" maxlength="25">
   <label for="lastName">Middle Name:</label>
 </div>
-<div class="form-floating mx-5 mb-3">
+<div class="form-floating mx-5">
   <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" minlength="5" maxlength="25" required>
   <label for="lastName">Last Name:</label>
 </div>
-<div class="form-floating mx-5 mb-3">
+<div class="form-floating mx-5">
   <input type="text" class="form-control" id="affixes" name="affixes" placeholder="Affixes" minlength="2" maxlength="5">
   <label for="lastName">Affixes (Optional):</label>
 </div>
 <input type="hidden" id="userCtmeuId" name="userCtmeuId">
-<div class="form-floating mx-5 mb-3">
+<div class="form-floating mx-5">
   <input type="password" class="form-control" id="password" name="password" placeholder="Last Name" minlength="5" maxlength="25" oninput="validatePassword()" required>
   <label for="Password">Password:</label>
   <div class="error" id="password-error"></div>
 </div>
 
-<div class="form-floating mx-5 mb-3">
+<div class="form-floating mx-5">
   <select class="form-select" id="role" name="role" aria-label="Floating label select example" required>
   <option value="Enforcer">Enforcer</option>
     <?php
