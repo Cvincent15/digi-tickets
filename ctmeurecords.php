@@ -471,20 +471,19 @@ function mapVehicleType(vehicleType) {
       return 'Motorcycle';
     case '3':
       return 'Truck';
-    case '2':
-      return 'Bus';
     case '4':
-      return 'Van';
+      return 'Bus'; // Corrected case for '4' (Bus)
     case '5':
-      return 'Tricycle';
+      return 'Van';
     case '6':
-      return 'E-Bike';
+      return 'Tricycle'; // Corrected case for '6' (Tricycle)
+    case '7':
+      return 'E-Bike'; // Added case for '7' (E-Bike)
     // Add more cases for other vehicle types if needed
     default:
       return 'Unknown Vehicle Type';
   }
 }
-
 // Function to update the vehicle violations table
 function updateVehicleViolationsTable(data) {
   var vehicleViolationsTable = document.getElementById('vehicle-violations-table');
@@ -493,24 +492,27 @@ function updateVehicleViolationsTable(data) {
   // Clear existing rows
   tbody.innerHTML = '';
 
-  // Count violations for each vehicle type
+  // Aggregate counts for each unique vehicle type
   var vehicleCounts = {};
   data.forEach(function (row) {
     var vehicleType = row['vehicle_type']; // Use the vehicle_type directly
     var vehicleName = mapVehicleType(vehicleType); // Map numeric type to name
 
     if (vehicleType in vehicleCounts) {
-      vehicleCounts[vehicleType]++;
+      vehicleCounts[vehicleType].count++;
     } else {
-      vehicleCounts[vehicleType] = 1;
+      vehicleCounts[vehicleType] = { name: vehicleName, count: 1 };
     }
-
-    // Populate the new table
-    var rowElement = document.createElement('tr');
-    rowElement.innerHTML = `<td>${vehicleName}</td><td>${vehicleCounts[vehicleType]}</td>`;
-    tbody.appendChild(rowElement);
   });
+
+  // Populate the new table
+  for (var vehicleType in vehicleCounts) {
+    var rowElement = document.createElement('tr');
+    rowElement.innerHTML = `<td>${vehicleCounts[vehicleType].name}</td><td>${vehicleCounts[vehicleType].count}</td>`;
+    tbody.appendChild(rowElement);
+  }
 }
+
 
 
 
@@ -605,7 +607,7 @@ document.getElementById('filter-button').addEventListener('click', function() {
   data: { filteredData: JSON.stringify(filteredData) },
   dataType: 'json',  // Specify the expected data type
   success: function(response) {
-    console.log(response);
+
     // Handle the server response if needed
   },
   error: function(xhr, status, error) {
