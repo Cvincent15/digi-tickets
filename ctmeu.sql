@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2023 at 04:16 PM
+-- Generation Time: Dec 26, 2023 at 07:18 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -112,7 +112,6 @@ INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, 
 (74, 'Dan Carlo', '', 'Ramirez', '', 'enfDRamirez', '$2y$10$TN/0F4PsSP6IHez/1djKXOLmDCMrk/rWl4ZBCKep9pTAXh1gmPKZO', 'Enforcer', NULL, NULL, '', 0, ''),
 (76, 'Carl', '', 'Bantatua', '', 'enfCBantatua', '$2y$10$8NcAU3XI/00E7VxDfqESfe3T3SdpN7aK/ukXY9zptVaJ3mcwHaKnW', 'Enforcer', NULL, NULL, '', 0, ''),
 (90, 'Lorenz Adrian', 'Nofuente', 'Artillagas', '', 'Zephyr', '$2y$10$MwCDJbFLL52gISaXsHf2O.8WrVxDVckPprCvbS6/E/IAimNqxloxG', 'Super Administrator', NULL, NULL, '', 0, ''),
-(94, 'Vince Ands', 'MMM', 'Cushion', '', 'CVanilla', '$2y$10$1B4FiM7Lu7S3Zi9dybT7PeXunqeT78YYq6gtpnNXVicOuBB0cw/je', 'Enforcer', NULL, NULL, '', 0, ''),
 (95, 'Bon Jovi', '', 'Villarama', '', 'BonJovi-IT', '$2y$10$WW5BROc7oWIiqP5HWHYG0uqh8l3TVJRSpVaoCK0U5VcDn6z/OuMmG', 'IT Administrator', NULL, NULL, '', 0, NULL),
 (97, 'jj', '', 'calma', '', 'enfJcalma', '$2y$10$qZnxaEZXz/VUWxC8/9IgCepnXcdimo8H2XQVaAE5M94.wlq6Yw8ty', 'Enforcer', NULL, NULL, '', 0, NULL),
 (98, 'Ash', 'K', 'Etchum', '', 'AshKetchum', '$2y$10$ytui9LIqYcENlD0W2NaFfOAL922m1K8IcAtkYQ3XmabPA9.8pgW2q', 'Enforcer', NULL, NULL, '', 0, NULL);
@@ -553,7 +552,7 @@ ALTER TABLE `motorist_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
