@@ -1,0 +1,86 @@
+[27-Dec-2023 14:53:51 UTC] PHP Warning:  Undefined array key "driver_address" in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 12
+[27-Dec-2023 14:53:51 UTC] PHP Warning:  Undefined array key "issuing_district" in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 14
+[27-Dec-2023 14:53:51 UTC] PHP Warning:  Undefined array key "reg_owner" in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 17
+[27-Dec-2023 14:53:51 UTC] PHP Warning:  Undefined array key "reg_owner_address" in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 18
+[28-Dec-2023 10:36:08 UTC] PHP Warning:  Undefined array key "driver_address" in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 12
+[29-Dec-2023 15:11:21 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:11:40 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:19:15 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:19:15 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:19:35 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:38:29 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:39:22 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:41:08 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 15:41:23 UTC] PHP Fatal error:  Uncaught TypeError: array_unique(): Argument #1 ($array) must be of type array, string given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:48
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(48): array_unique()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 48
+[29-Dec-2023 16:04:07 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 45
+[29-Dec-2023 16:05:28 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 45
+[29-Dec-2023 16:06:58 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 45
+[29-Dec-2023 16:11:20 UTC] Invalid format for violations data.
+[29-Dec-2023 16:12:20 UTC] Invalid format for violations data.
+[29-Dec-2023 16:12:32 UTC] Invalid format for violations data.
+[29-Dec-2023 16:14:12 UTC] Invalid format for violations data. Data: , SHUTTLE POINT TO POINT
+[29-Dec-2023 16:14:12 UTC] Invalid format for violations data.
+[29-Dec-2023 16:15:05 UTC] Invalid format for violations data. Data: , SHUTTLE POINT TO POINT, ILLEGAL TERMINAL, SHUTTLE POINT TO POINT, Coding
+[29-Dec-2023 16:15:05 UTC] Invalid format for violations data.
+[29-Dec-2023 16:19:37 UTC] Invalid format for violations data. Data: , SHUTTLE POINT TO POINT, ILLEGAL TERMINAL, SHUTTLE POINT TO POINT, Coding
+[29-Dec-2023 16:19:37 UTC] Invalid format for violations data.
+[29-Dec-2023 16:21:03 UTC] Invalid format for violations data. Data: , SHUTTLE POINT TO POINT, Coding
+[29-Dec-2023 16:21:03 UTC] Invalid format for violations data.
+[29-Dec-2023 16:22:54 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`u919418953_ctmeu`.`violations`, CONSTRAINT `violations_ibfk_1` FOREIGN KEY (`violationlist_id`) REFERENCES `violationlists` (`violation_list_ids`) ON DELETE CASCADE ON UPDATE CASCADE) in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:67
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(67): mysqli_stmt_execute()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 67
+[29-Dec-2023 16:27:13 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'violation_description' in 'where clause' in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php:59
+Stack trace:
+#0 /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php(59): mysqli_prepare()
+#1 {main}
+  thrown in /home/u919418953/domains/ctmeu-hub.net/public_html/php/submit_ticketm.php on line 59
+[29-Dec-2023 16:27:52 UTC] Violation ID not found for: 
+[29-Dec-2023 16:29:22 UTC] Violation ID not found for: 
+[29-Dec-2023 17:10:49 UTC] Violation ID not found for: 
+[29-Dec-2023 18:10:48 UTC] Violation ID not found for: Driving without license,Driving with a delinquent
+[29-Dec-2023 18:10:48 UTC] Violation ID not found for: invalid
+[29-Dec-2023 18:10:48 UTC] Violation ID not found for: suspended ineffectual or revoked license
+[02-Jan-2024 16:06:16 UTC] Violation ID not found for: tags or stickers
+[02-Jan-2024 16:15:47 UTC] Violation ID not found for: "Driving without license"
+[02-Jan-2024 16:15:47 UTC] Violation ID not found for: "TRUCK BAN"
+[02-Jan-2024 16:15:47 UTC] Violation ID not found for: "Illegal transfer of plates"
+[02-Jan-2024 16:15:47 UTC] Violation ID not found for: "tags or stickers"
+[02-Jan-2024 16:38:44 UTC] Violation ID not found for: Driving without license, TRUCK BAN, Illegal transfer of plates, tags or stickers
