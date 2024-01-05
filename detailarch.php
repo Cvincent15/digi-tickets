@@ -40,10 +40,12 @@ function fetchVehicleName($vehicleId, $conn) {
 
 // Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
-    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name
+    $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name,
+                     GROUP_CONCAT(vl.violation_name SEPARATOR '|||') AS concatenated_violations
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
               LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
+              LEFT JOIN violationlists vl ON v.violationlist_id = vl.violation_list_ids
               WHERE vt.ticket_id = $ticketId
               GROUP BY vt.ticket_id";
     $result = mysqli_query($conn, $query);
@@ -295,11 +297,16 @@ if (isset($_GET['data'])) {
         <td><label for="violation_names">Violations:</label></td>
         <td colspan="3">
         <?php
-        // Encode the entire concatenated violation names string
-        //$encodedViolationNames = htmlspecialchars($ticketDetails['violation_names']);
+       // Encode the entire concatenated violation names string
+$encodedViolationNames = htmlspecialchars($ticketDetails['concatenated_violations']);
 
-        // Display the encoded string as a single list item
-        //echo '<p>' . $encodedViolationNames . '</p>';
+// Display the encoded string as bullet points
+echo '<ul>';
+$violationsList = explode('|||', $encodedViolationNames);
+foreach ($violationsList as $violation) {
+    echo '<li>' . $violation . '</li>';
+}
+echo '</ul>';
         ?>
 </td>
 

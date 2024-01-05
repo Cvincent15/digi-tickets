@@ -68,18 +68,70 @@ function generatePDF($data) {
   $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 
   // Set document information
-  $pdf->SetCreator('Your Name');
-  $pdf->SetAuthor('Your Name');
   $pdf->SetTitle('CTMEU Traffic Violation Data');
   $pdf->SetSubject('Traffic Violation Data');
   $pdf->SetKeywords('CTMEU, traffic violation, PDF');
 
   // Add a page
   $pdf->AddPage();
+  
+  $pdf->Image('images/santarc.jpg', 45, 15, 25, 0, 'JPG');
+  $pdf->Image('images/ctmeu.jpg', 230, 15, 25, 0, 'JPG');
+  // Set font size and style for the first part of the header text
 
-  // Set font
-  $pdf->SetFont('helvetica', '', 10);
+// Set draw color and fill color to white
+$pdf->SetDrawColor(255, 255, 255);
+$pdf->SetFillColor(255, 255, 255);
 
+$pdf->SetFont('helvetica', '', 12);
+
+// Set position for the first part of the header text
+$pdf->SetXY(10, 10); // Adjust the X and Y coordinates as needed
+
+// Concatenate the lines into a single string
+$headerText = "
+Republika ng Pilipinas
+";
+
+// Output the header text using a single MultiCell call
+$pdf->MultiCell(0, 8, $headerText, 0, 'C');
+
+// Set font size for the second part of the header text
+$pdf->SetFont('helvetica', '', 10);
+
+// Adjust the Y-coordinate to position the next part on the same line
+$pdf->SetY($pdf->GetY() - 5); // Subtract the height of the previous MultiCell
+
+// Output the second part of the header text using MultiCell
+$pdf->MultiCell(0, 8, "
+Lungsod ng Santa Rosa\n
+", 0, 'C');
+
+// Set font size for the third part of the header text
+$pdf->SetFont('helvetica', '', 8);
+
+// Adjust the Y-coordinate to position the next part on the same line
+$pdf->SetY($pdf->GetY() - 7); // Subtract the height of the previous MultiCell
+
+// Output the third part of the header text using MultiCell
+$pdf->MultiCell(0, 8, "
+Lalawigan ng Laguna
+", 0, 'C');
+
+// Set font size and style for the second part of the header text
+$pdf->SetFont('helvetica', 'B', 14);
+
+// Output the second part of the header text using MultiCell
+$pdf->MultiCell(0, 8, "SANGAY NG PAMAMAHALA AT PAGPAPATUPAD NG TRAPIKO", 0, 'C');
+
+// Set font size for the third part of the header text
+$pdf->SetFont('helvetica', '', 8);
+
+// Output the third part of the header text using MultiCell
+$pdf->MultiCell(0, 8, "(CITY TRAFFIC MANAGEMENT AND ENFORCEMENT UNIT)", 0, 'C');
+
+// Reset font for the rest of the content
+$pdf->SetFont('helvetica', '', 10);
 
   // Remove the line above the header
 $pdf->SetLineStyle(array('width' => 0)); // Set line width to 0
@@ -120,16 +172,9 @@ foreach ($data as $row) {
 
 $tbl .= '</table>';
 
-// Output the table to the PDF with header
-$pdf->writeHTML('
-  <div style="text-align: center; margin-top: 10px;">
-      <h1 style="font-size: 14px; margin: 0;">Republika ng Pilipinas</h1>
-      <p style="font-size: 12px; margin: 0;">Lungsod ng Santa Rosa</p>
-      <p style="font-size: 10px; margin: 0;">Lalawigan ng Laguna</p>
-      <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px; margin: 0;">SANGAY NG PAMAMAHALA AT PAGPAPATUPAD NG TRAPIKO</p>
-      <p style="font-size: 10px; margin-bottom: 20px; margin: 0;">(CITY TRAFFIC MANAGEMENT AND ENFORCEMENT UNIT)</p>
-  </div>
-  ' . $tbl, true, false, false, false, '');
+// Output the table to the PDF
+$pdf->writeHTML($tbl, true, false, false, false, '');
+
 
 // Add a row for signatures at the bottom of the table
 $tblSignatures = '<table width="100%" cellspacing="0" cellpadding="8">';
@@ -471,20 +516,19 @@ function mapVehicleType(vehicleType) {
       return 'Motorcycle';
     case '3':
       return 'Truck';
-    case '2':
-      return 'Bus';
     case '4':
-      return 'Van';
+      return 'Bus'; // Corrected case for '4' (Bus)
     case '5':
-      return 'Tricycle';
+      return 'Van';
     case '6':
-      return 'E-Bike';
+      return 'Tricycle'; // Corrected case for '6' (Tricycle)
+    case '7':
+      return 'E-Bike'; // Added case for '7' (E-Bike)
     // Add more cases for other vehicle types if needed
     default:
       return 'Unknown Vehicle Type';
   }
 }
-
 // Function to update the vehicle violations table
 function updateVehicleViolationsTable(data) {
   var vehicleViolationsTable = document.getElementById('vehicle-violations-table');
@@ -493,24 +537,27 @@ function updateVehicleViolationsTable(data) {
   // Clear existing rows
   tbody.innerHTML = '';
 
-  // Count violations for each vehicle type
+  // Aggregate counts for each unique vehicle type
   var vehicleCounts = {};
   data.forEach(function (row) {
     var vehicleType = row['vehicle_type']; // Use the vehicle_type directly
     var vehicleName = mapVehicleType(vehicleType); // Map numeric type to name
 
     if (vehicleType in vehicleCounts) {
-      vehicleCounts[vehicleType]++;
+      vehicleCounts[vehicleType].count++;
     } else {
-      vehicleCounts[vehicleType] = 1;
+      vehicleCounts[vehicleType] = { name: vehicleName, count: 1 };
     }
-
-    // Populate the new table
-    var rowElement = document.createElement('tr');
-    rowElement.innerHTML = `<td>${vehicleName}</td><td>${vehicleCounts[vehicleType]}</td>`;
-    tbody.appendChild(rowElement);
   });
+
+  // Populate the new table
+  for (var vehicleType in vehicleCounts) {
+    var rowElement = document.createElement('tr');
+    rowElement.innerHTML = `<td>${vehicleCounts[vehicleType].name}</td><td>${vehicleCounts[vehicleType].count}</td>`;
+    tbody.appendChild(rowElement);
+  }
 }
+
 
 
 
@@ -605,7 +652,7 @@ document.getElementById('filter-button').addEventListener('click', function() {
   data: { filteredData: JSON.stringify(filteredData) },
   dataType: 'json',  // Specify the expected data type
   success: function(response) {
-    console.log(response);
+
     // Handle the server response if needed
   },
   error: function(xhr, status, error) {

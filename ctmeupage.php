@@ -70,7 +70,7 @@ $violationTickets = fetchViolationTickets();
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -251,7 +251,8 @@ $violationTickets = fetchViolationTickets();
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    
+                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
                                     //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
@@ -361,7 +362,7 @@ $violationTickets = fetchViolationTickets();
                             Are you sure you want to archive the selected tickets?
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="button" id="archive-cancel-button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                             <button type="button" id="archive-confirmation-button" class="btn btn-primary"
                                 data-bs-dismiss="modal">
                                 Yes
@@ -427,7 +428,6 @@ $violationTickets = fetchViolationTickets();
                             <th class="sortable" data-column="14">Registered Owner's Address<span
                                     class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="9">Violations<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="10">Place of Occurrence<span class="sort-arrow"></span>
                             </th>
                             <th class="sortable" data-column="11">Status<span class="sort-arrow"></span></th>
@@ -486,23 +486,6 @@ $violationTickets = fetchViolationTickets();
                                     // Wrap the district in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['reg_owner'] . "</td>";
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['reg_owner_address'] . "</td>";
-                                    // Wrap the district in a clickable <td>
-                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>";
-
-                                    // Start the unordered list (you can use <ol> for ordered list)
-                                    echo "<ul>";
-
-                                    // Loop through the array and generate list items
-                                    $violations = explode("|||", $ticket['concatenated_violations']);
-
-                                    foreach ($violations as $violation) {
-                                        echo "<li>$violation</li>";
-                                    }
-
-                                    // Close the unordered list
-                                    echo "</ul>";
-
-                                    echo "</td>";
                                     // Wrap the district in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
                                     // Wrap the district in a clickable <td>
@@ -756,22 +739,7 @@ $violationTickets = fetchViolationTickets();
         </script>
 
         <script>
-            // Add an event listener to the "Yes" button in the "Archive" modal
-            document.getElementById('archiveButton').addEventListener('click', function () {
-                // Check if at least one checkbox is selected
-                const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-
-                if (selectedCheckboxes.length === 0) {
-                    // Show the "No Selection" modal if no checkboxes are selected
-                    $('#noSelectionModal').modal('show');
-                } else {
-                    // Hide the "No Selection" modal if it was shown previously
-                    $('#noSelectionModal').modal('hide');
-
-                    // Show the "Archive" modal
-                    $('#exampleModal').modal('show');
-                }
-            });
+            
             // Add an event listener to the "Yes" button in the "Archive" modal
             document.getElementById('archiveButton').addEventListener('click', function () {
                 // Check if at least one checkbox is selected

@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 21, 2023 at 04:16 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1:3306
+-- Generation Time: Jan 05, 2024 at 10:29 AM
+-- Server version: 10.6.14-MariaDB-cll-lve
+-- PHP Version: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ctmeu`
+-- Database: `u919418953_ctmeu`
 --
 
 -- --------------------------------------------------------
@@ -33,13 +33,6 @@ CREATE TABLE `motorist_documents` (
   `expiry_date` date NOT NULL,
   `status` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `motorist_documents`
---
-
-INSERT INTO `motorist_documents` (`document_id`, `license_type`, `expiry_date`, `status`) VALUES
-('N02-18-018507', 'Driver\'s License', '2023-09-16', 1);
 
 -- --------------------------------------------------------
 
@@ -66,15 +59,6 @@ CREATE TABLE `motorist_info` (
   `address` varchar(50) DEFAULT NULL,
   `users_motorists_info_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `motorist_info`
---
-
-INSERT INTO `motorist_info` (`motorist_info_id`, `driver_area_code`, `civil_status`, `birthplace`, `blood_type`, `complexion`, `eye_color`, `hair_color`, `weight`, `height`, `organ_donor`, `em_name`, `em_area_code`, `em_mobile`, `em_address`, `address`, `users_motorists_info_id`) VALUES
-(5, '4020', 'Single', 'Santa Rosa', 'O+', 'White', 'Blue', 'Yellow', 60, 168, 'Lungs', 'Nigel Malapitan', '4020', '+6394521312', 'Dyan lang malapits', 'dun lang sa tagapo', 6),
-(7, '4652', 'single', 'dun lang', 'a+', 'macho', 'GREEN', 'blue', 65, 173, 'no i will not donate', 'baby ko ', 'si k', '09222222222', 'don sa kanto', 'brgy batumbakal si idol ko ', 13),
-(8, '5465', 'widow', 'market place', 'a-', 'macho', 'green', 'blue', 60, 179, 'kjkjkbhb', 'Lorenz Artillagas', '977', '8465830', 'B4 L7 P2 Celina home', 'B4 L7 P2 Celina homes 5 Tagapo', 16);
 
 -- --------------------------------------------------------
 
@@ -103,19 +87,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `email`, `is_activated`, `apiKey`) VALUES
-(56, 'Vincent Andrei', '', 'Cosio', '', 'suaVCosio', '$2y$10$QBn.JZrKySQ/WX7LJkjVEedOIjJ3xchcW960phCULhl88ucNw6w/C', 'Super Administrator', NULL, NULL, 'vincent.andrei15@gmail.com', 0, ''),
-(57, 'Kristine Emerald', '', 'Casindac', '', 'itsKCasindac', '$2y$10$7a79hmUn26xiO6Yduf0V5ugajSJ7V.jr28vzibUmT7jyDdTGc./KK', 'IT Administrator', NULL, NULL, '', 0, ''),
-(58, 'Zsyra Beatrise', '', 'Almendral', '', 'itsZAlmendral', '$2y$10$FoLrzPZL4WUKp7x7f7YQMuRCIKiVI1OkZqNQrm.XZ30QUQhumFrBC', 'IT Administrator', NULL, NULL, '', 0, ''),
-(59, 'Jazzlyn Kate', '', 'Aquino', '', 'itsJAquino', '$2y$10$fODyHUzw731MZGbkkOYPFeBxJewacAucw/YGqCDciqh3zbn7NPAUW', 'IT Administrator', NULL, NULL, '', 0, ''),
-(70, 'Kyle Dennis', '', 'Dalida', '', 'enfKDalida', '$2y$10$TKURg8EEGf32mdRWwlKbm.YMOtXsa2zrK4OkwNtcIByM9kyKV1ifu', 'Enforcer', NULL, NULL, '', 0, ''),
-(73, 'Jhimwell', '', 'Robles', '', 'enfJRobles', '$2y$10$bB5v0ePlisqJ5EdJtFDmaeXF.BwuQiKV8ze3uY1hf9u7640akKn.K', 'Enforcer', NULL, NULL, '', 0, ''),
-(74, 'Dan Carlo', '', 'Ramirez', '', 'enfDRamirez', '$2y$10$TN/0F4PsSP6IHez/1djKXOLmDCMrk/rWl4ZBCKep9pTAXh1gmPKZO', 'Enforcer', NULL, NULL, '', 0, ''),
-(76, 'Carl', '', 'Bantatua', '', 'enfCBantatua', '$2y$10$8NcAU3XI/00E7VxDfqESfe3T3SdpN7aK/ukXY9zptVaJ3mcwHaKnW', 'Enforcer', NULL, NULL, '', 0, ''),
-(90, 'Lorenz Adrian', 'Nofuente', 'Artillagas', '', 'Zephyr', '$2y$10$MwCDJbFLL52gISaXsHf2O.8WrVxDVckPprCvbS6/E/IAimNqxloxG', 'Super Administrator', NULL, NULL, '', 0, ''),
-(94, 'Vince Ands', 'MMM', 'Cushion', '', 'CVanilla', '$2y$10$1B4FiM7Lu7S3Zi9dybT7PeXunqeT78YYq6gtpnNXVicOuBB0cw/je', 'Enforcer', NULL, NULL, '', 0, ''),
-(95, 'Bon Jovi', '', 'Villarama', '', 'BonJovi-IT', '$2y$10$WW5BROc7oWIiqP5HWHYG0uqh8l3TVJRSpVaoCK0U5VcDn6z/OuMmG', 'IT Administrator', NULL, NULL, '', 0, NULL),
-(97, 'jj', '', 'calma', '', 'enfJcalma', '$2y$10$qZnxaEZXz/VUWxC8/9IgCepnXcdimo8H2XQVaAE5M94.wlq6Yw8ty', 'Enforcer', NULL, NULL, '', 0, NULL),
-(98, 'Ash', 'K', 'Etchum', '', 'AshKetchum', '$2y$10$ytui9LIqYcENlD0W2NaFfOAL922m1K8IcAtkYQ3XmabPA9.8pgW2q', 'Enforcer', NULL, NULL, '', 0, NULL);
+(1, 'Vincent Andrei', '', 'Cosio', '', 'suaVCosio', '$2y$10$wr.wTumAsDICvNPpWek8IeRYiG8ldm/qwBUdsTLzE7h1ANmozXG1q', 'Super Administrator', NULL, NULL, 'vincent.andrei15@gmail.com', 0, ''),
+(101, 'eddie', 'alibusan', 'colarina', '', 'edscolarina', '$2y$10$b/G/TZG1b0aZAY0d1CAbeehcamsohCpmRbSZpr8nP53W9Sc4b61YK', 'Enforcer', NULL, NULL, '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -142,23 +115,6 @@ CREATE TABLE `users_motorists` (
   `is_filipino` tinyint(1) NOT NULL,
   `is_activated` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users_motorists`
---
-
-INSERT INTO `users_motorists` (`user_id`, `driver_last_name`, `driver_first_name`, `driver_middle_name`, `driver_birthday`, `driver_gender`, `mother_last_name`, `mother_first_name`, `mother_middle_name`, `driver_email`, `driver_phone`, `driver_password`, `driver_license`, `driver_license_expiry`, `driver_license_serial`, `is_filipino`, `is_activated`) VALUES
-(6, 'Johnson', 'Sarah', 'Black-Briar', '2003-06-11', 'Male', 'Black-Briar', 'Maven', 'Riften', 'sarahjohnson@gmail.com', '+639956372834', '$2y$10$1x2NpUncR9ZFrM8muJkZXe94Vqm6ezJc1oam8tilWeJuZrQpZ.sOW', 'B45-67-890123', '2026-08-19', '111111111111', 1, 0),
-(9, 'Smith', 'Alice', 'Masda', '2001-08-06', 'Female', 'Masda', 'Melissa', 'Tasda', 'alicesmith@gmail.com', '+639123456789', '$2y$10$t6ramdBpiu5d0JWakQH2aOLUaadVvt1/9ZSWvKcHHILNelxM/xigG', 'A12-34-567890', '2024-05-15', '222222222222', 1, 0),
-(11, 'Denton', 'CJ', 'Top G', '2005-12-25', 'Male', 'Aquino', 'Jazzlyn Kate', 'Manalo', 'cjdenton@gmail.com', '+639987654321', '$2y$10$FKo2l2qA0zDzrAJL..kiW.OFHHG.gb0HYiLYvPjJS2Sz6g4IPSXN6', 'TL111111', '2024-02-29', '1111111111-1', 1, 0),
-(12, 'Mercer', 'Alex', 'GG', '2005-12-04', 'Male', 'Aquino', 'Jazzlyn Kate', 'Manalo', 'amercer@gmail.com', '+639954556789', '$2y$10$JD/vprKwlxojm.p.sxxF9O74LkDRL2jI6JpaC154XJXMLaM8vt/Gy', 'TL222222', '2023-12-02', '1111111111-3', 1, 0),
-(13, 'ching', 'chong', 'wang', '2005-12-19', 'Male', 'chang', 'chung', 'wong', 'dancarlo342@gmail.com', '+639562541265', '$2y$10$V7iStCfsO6A11L.ijAdJ/OgXF7Pdtd/f/7E9L6Q2KyiBBeoQnqgp6', 'D04-22-305969', '2024-12-11', '31495260', 0, 0),
-(14, 'robles', 'jhim', 'dasd', '2005-12-07', 'Male', 'calma ', 'jj', 'reaf', 'artillagaslorenz4@gmail.com', '+639778465830', '$2y$10$saY7tXa46rSSVNd83uIx6O8Az7Q7UbHfn21IENykJGUEBqp/iaYLW', 'N50-97-654345', '2023-12-15', '966663434', 1, 0),
-(15, 'may kagat ', 'apple', 'asd', '2005-12-28', 'Male', 'mansanas', 'hilaw', 'hinog', 'carloramirez@gmail.com', '+630983258723', '$2y$10$RHg7kGc/ePNUJSKulIUz6OznbY/hOONqmcZr3hCk2wzXLPeuOVcLy', 'DS0-98-098908', '2023-12-20', '099890890', 1, 0),
-(16, 'almendral', 'jazz', 'dalida', '1999-12-03', 'Female', 'dasdasd', 'asodja', 'aposjd', 'dalidakyle@gmail.com', '+630982342342', '$2y$10$7puMPM2BFykplhnKPJRTM.3C.NJ0nXthYU.6VZoPO5OPDiCtZRqPi', 'NCQ-O3-423524', '2023-12-18', '523525235', 1, 0),
-(17, 'calma', 'jayjay', 'jhim', '2005-12-02', 'Male', 'drex', 'eph', 'tin', 'calmajj@gmail.com', '+639876543211', '$2y$10$.GOPFwAnih9eYRj8vSPFxef2xTmLyhFiHPO6tXmkSMJ23J7pcYFc6', 'N09-12-345678', '2023-12-15', '123456789', 1, 0),
-(18, 'almendral', 'jazz', 'dalida', '2005-12-06', 'Male', 'sa school', 'cassie', 'di ka muna papasok ', 'dalidakyle2@gmail.com', '+639876543567', '$2y$10$qwTJSXu5YEITFYLApmuF/.XxhYODfX3xONv5JNjprgHNumFdqK9yi', 'N05-34-123456', '2023-12-22', '123456789', 1, 0),
-(19, 'Oak', 'Gary', 'Blue', '2005-12-15', 'Male', 'Professor', 'Oak', 'Pokemon', 'gary@gmail.com', '+639914877549', '$2y$10$/F7rPhoX9rhja41di4.oj.0NnOdcNSB03Mo0HhPn/jBFQBbbgrrwO', 'NB0-86-12334', '2028-12-28', '123123123', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -377,26 +333,9 @@ CREATE TABLE `violations` (
 --
 
 INSERT INTO `violations` (`violation_id`, `violationlist_id`, `ticket_id_violations`) VALUES
-(1, 1, 47),
-(2, 2, 47),
-(3, 3, 47),
-(4, 5, 47),
-(5, 4, 47),
-(6, 1, 53),
-(7, 2, 53),
-(8, 2, 54),
-(9, 4, 54),
-(10, 5, 54),
-(11, 1, 57),
-(12, 2, 57),
-(13, 6, 57),
-(14, 5, 57),
-(15, 8, 57),
-(16, 9, 57),
-(17, 11, 57),
-(18, 3, 79),
-(19, 1, 81),
-(20, 2, 81);
+(3, 99, 2),
+(4, 1, 2),
+(5, 1, 3);
 
 -- --------------------------------------------------------
 
@@ -428,64 +367,8 @@ CREATE TABLE `violation_tickets` (
 --
 
 INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `issuing_district`, `driver_address`, `vehicle_type`, `plate_no`, `reg_owner`, `reg_owner_address`, `date_time_violation`, `date_time_violation_edit`, `place_of_occurrence`, `email`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
-(2, 'CJ Denta', 'TL111111', '', '', 1, 'RST111', '', '', '2023-10-01 09:00:00', '2023-12-16 04:40:53', 'SM', '', 70, NULL, 1),
-(6, 'Alex Mercer', 'TL222222', '', '', 3, 'XYZ222', '', '', '2023-10-27 02:30:00', '2023-12-15 07:26:25', 'Downtown', '', 70, NULL, 1),
-(7, 'Elena Fisher', 'TL333333', '', '', 2, 'ABC333', '', '', '2023-10-27 03:45:00', '2023-12-15 07:27:32', 'Main Street', '', 70, NULL, 1),
-(8, 'Nathan Drake', 'TL444444', '', '', 4, 'JKL444', '', '', '2023-10-27 05:15:00', '2023-12-15 07:22:10', 'Market Square', '', 73, NULL, 1),
-(9, 'Aloy Horizon', 'TL555555', '', '', 5, 'MNO555', '', '', '2023-10-27 06:30:00', '2023-12-15 07:27:32', 'Park Avenue', '', 76, NULL, 1),
-(10, 'Geralt of Rivia', 'TL6666668', '', '', 6, 'PQR6668', '', '', '2023-10-18 10:00:00', '2023-12-16 04:41:08', 'Crossroads', '', 74, NULL, 1),
-(12, 'Ezio Auditore', 'TL888888', '', '', 2, 'VWX888', '', '', '2023-10-19 10:15:00', '2023-12-16 04:42:14', 'Waterfront Drive', '', 70, NULL, 0),
-(13, 'Aloy Horizon', 'TL999999', '', '', 1, 'YZA999', '', '', '2023-10-27 11:30:00', '2023-12-16 04:42:24', 'Oak Street', '', 70, NULL, 0),
-(14, 'John Wick', 'TL777777', '', '', 1, 'JKL777', '', '', '2023-10-23 04:00:00', '2023-12-16 04:42:41', 'Alley Street', '', 70, NULL, 0),
-(15, 'Ellie Williams', 'TL888888', '', '', 2, 'XYZ888', '', '', '2023-10-20 05:30:00', '2023-12-16 04:43:24', 'Broadway Avenue', '', 74, NULL, 0),
-(16, 'Joel Miller', 'TL999999', '', '', 1, 'ABC999', '', '', '2023-10-13 06:45:00', '2023-12-16 04:43:31', 'City Park', '', 74, NULL, 0),
-(17, 'Ezio Auditore', 'TL123456', '', '', 2, 'DEF123', '', '', '2023-09-27 20:15:00', '2023-12-15 07:14:47', 'Sunset Boulevard', '', 74, NULL, 0),
-(18, 'Chloe Frazer', 'TL654321', '', '', 1, 'GHI654', '', '', '2023-09-27 09:30:00', '2023-12-15 07:14:49', 'Maple Lane', '', 74, NULL, 0),
-(19, 'Nathan Drake', 'TL987654', '', '', 2, 'JKL987', '', '', '2023-09-27 10:45:00', '2023-12-15 07:14:50', 'Highland Road', '', 74, NULL, 0),
-(20, 'Aloy Horizon', 'TL321654', '', '', 1, 'MNO321', '', '', '2023-09-27 11:59:00', '2023-12-16 00:18:30', 'Hillside Drive', '', 70, NULL, 1),
-(23, 'sarah johnson', 'B45-67-890123', '', '', 1, 'ABC123', '', '', '2023-10-06 01:00:00', '2023-12-16 04:45:46', 'SM', '', 74, 6, 0),
-(33, 'ABC 123', 'ABC123', '', '', 3, 'XYZ789', '', '', '2023-12-10 05:00:00', '2023-12-15 07:14:57', 'Tagapo', '', 70, NULL, 0),
-(36, 'Sarah Connor', 'DL56789CA', '', '', 2, 'Oakwood', '', '', '2023-12-10 22:00:00', '2023-12-15 07:14:59', 'FGH456', '', 70, NULL, 0),
-(38, 'Driver1', 'License2', '', '', 3, 'Plate3', '', '', '2023-12-10 22:07:00', '2023-12-15 07:15:01', 'Place4', '', 70, NULL, 0),
-(39, 'Beyonce', 'NoCar12', '', '', 6, 'XYZ542', '', '', '2023-12-10 22:34:00', '2023-12-15 07:15:03', 'Empire State Building', '', 70, NULL, 0),
-(40, 'Robbie', 'jkl432', '', '', 2, 'tyufg3', '', '', '2023-12-10 22:35:00', '2023-12-15 07:15:07', 'PUP', '', 76, NULL, 0),
-(41, 'Ed Sheeran', 'LegoHouse', '', '', 1, 'Photograph', '', '', '2023-12-10 22:38:00', '2023-12-10 14:39:30', 'Happier', '', 76, NULL, 0),
-(46, 'Drive', 'Lice', '', '', 1, 'Plate', '', '', '2023-12-12 20:04:00', '2023-12-15 07:15:09', 'Place', 'Email', 70, NULL, 0),
-(47, 'done charlo ', 'n50-231234134-12412414 124', '', '', 2, 'mc 123v', '', '', '2023-12-15 12:00:00', '2023-12-15 07:14:24', 'dun sa kanto', 'dandandan.com', 70, NULL, 0),
-(48, '', '', '', '', 1, '', '', '', '2023-12-15 16:14:00', '2023-12-15 08:14:18', '', '', 90, NULL, 0),
-(49, '', '', '', '', 1, '', '', '', '2023-12-15 16:15:00', '2023-12-15 08:15:22', '', '', 90, NULL, 0),
-(50, '', '', '', '', 1, '', '', '', '2023-12-15 17:29:00', '2023-12-15 09:29:35', '', '', 90, NULL, 0),
-(51, 'Dan', '123456', '', '', 6, '123456778', '', '', '2023-12-15 17:29:00', '2023-12-15 09:31:01', 'santa rosa', 'test@gmail.com', 90, NULL, 0),
-(52, 'Yowyow revillame', 'no50-9284uhjuyyy', '', '', 3, 'tr 183837', '', '', '2023-12-15 18:21:00', '2023-12-15 10:26:36', 'sa padis', 'artillagaslorenz7@gm', 70, NULL, 0),
-(53, 'Jazz dalida almendral', 'N05-34-123456', '', '', 1, 'CHAR234', '', '', '2023-12-15 12:00:00', '2023-12-15 12:27:36', 'KANTO', 'dalidakylegmail.com', 70, 18, 0),
-(54, 'qweqwe', 'weqwe', '', '', 3, 'asdad', '', '', '2023-12-15 02:00:00', '2023-12-15 12:07:30', 'asdadq', 'asdadsadasdsad', 76, NULL, 0),
-(55, 'asdasdasda', 'qweqweqweqwe', '', '', 1, 'asdasdqwe', '', '', '2023-12-15 20:09:00', '2023-12-15 12:10:35', 'eqweqsa', 'zxcsdqweqwe', 76, NULL, 0),
-(56, 'CP ni cosio', 'lhcoyxo', '', '', 1, 'khcoyxoyd', '', '', '2023-12-15 20:13:00', '2023-12-15 12:13:32', 'ljljv', 'igxkhcoh', 76, NULL, 0),
-(57, 'jhimwill dela cruz ', 'N05-34-123456', '', '', 5, 'nvaoinr', '', '', '2023-12-15 12:00:00', '2023-12-15 12:30:22', 'arko', 'dalidatickitgmail.co', 70, 18, 0),
-(58, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:08', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(59, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:09', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(60, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:10', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(61, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:11', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(62, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:12', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(63, 'Jaslin Aquino', '', '', '', 4, '', '', '', '2023-12-15 20:37:00', '2023-12-15 12:39:13', 'ZSP127', 'jasscheesecurls@gmai', 70, NULL, 0),
-(64, 'Jaslin Aquino', 'ayoko', '', '', 4, 'ayoko nga', '', '', '2023-12-15 20:37:00', '2023-12-15 12:40:09', 'Enchanted Kingdom', 'jasscheesecurls@gmai', 70, NULL, 0),
-(65, 'Jaslin Aquino', 'ayoko', '', '', 4, 'ayoko nga', '', '', '2023-12-15 20:37:00', '2023-12-15 12:40:10', 'Enchanted Kingdom', 'jasscheesecurls@gmai', 70, NULL, 0),
-(66, 'Jaslin Aquino', 'ayoko', '', '', 4, 'ayoko nga', '', '', '2023-12-15 20:37:00', '2023-12-15 12:40:11', 'Enchanted Kingdom', 'jasscheesecurls@gmai', 70, NULL, 0),
-(67, 'Jaslin Aquino', 'ayoko', '', '', 4, 'ayoko nga', '', '', '2023-12-15 20:37:00', '2023-12-15 12:40:12', 'Enchanted Kingdom', 'jasscheesecurls@gmai', 70, NULL, 0),
-(68, 'Jaslin Aquino', 'ayoko', '', '', 4, 'ayoko nga', '', '', '2023-12-15 20:37:00', '2023-12-15 12:40:13', 'Enchanted Kingdom', 'jasscheesecurls@gmai', 70, NULL, 0),
-(69, 'Apo Whang Od', 'N03-12-123457', '', '', 5, 'ZSP127', '', '', '2023-12-15 20:45:00', '2023-12-15 12:47:47', 'Barangay Malitlit', 'enfkdaliduh1234@gmai', 70, NULL, 0),
-(70, 'Apo Whang Od', 'N03-12-123457', '', '', 5, 'ZSP127', '', '', '2023-12-15 20:45:00', '2023-12-15 12:47:48', 'Barangay Malitlit', 'enfkdaliduh1234@gmai', 70, NULL, 0),
-(71, 'asdqwe', 'qwe123', '', '', 1, 'qwe123', '', '', '2023-12-15 22:59:00', '2023-12-15 15:00:21', 'asda', '123sad', 76, NULL, 0),
-(72, 'Driver80', '12354567', '', '', 5, 'hcrexed', '', '', '2023-12-15 23:43:00', '2023-12-15 15:44:08', 'njio564', '2154jhv', 76, NULL, 0),
-(73, 'Olaf Frozen', 'N04-12-789091', '', '', 2, 'NCT127', '', '', '2023-12-16 01:54:00', '2023-12-15 17:56:17', 'Barangay Malusak', 'elsaandanna@gmail.co', 70, NULL, 0),
-(74, 'Olaf Frozen', 'N04-12-789091', '', '', 2, 'NCT127', '', '', '2023-12-16 01:54:00', '2023-12-15 17:56:23', 'Barangay Malusak', 'elsaandanna@gmail.co', 70, NULL, 0),
-(75, 'Driver', '123', '', '', 3, '123abc', '', '', '2023-12-16 07:21:00', '2023-12-15 23:23:21', 'sm', 'test@testing.com', 90, NULL, 1),
-(76, 'Gary Oak', 'NB-086-12334', '', '', 3, 'ABC123', '', '', '2023-12-16 08:11:00', '2023-12-16 00:13:04', 'PUP', 'gary@gmail.com', 98, NULL, 0),
-(77, '', '', '', '', 1, '', '', '', '2023-12-16 18:03:00', '2023-12-16 10:03:37', '', '', 70, NULL, 0),
-(78, '123', 'i2', '', '', 1, 'q1230', '', '', '2023-12-16 18:03:00', '2023-12-16 10:04:06', '2krbwnw', 'jwhr.c', 70, NULL, 0),
-(79, 'Mark Lee', 'L123453', '', '', 3, 'ZSP122', '', '', '2023-12-20 12:00:00', '2023-12-18 18:32:37', 'Malusak', 'lingmaildotcom', 70, NULL, 0),
-(80, 'Mark Lee', 'L123NCT127', '', '', 3, 'EXO143', '', '', '2023-12-19 02:33:00', '2023-12-18 18:34:19', 'Kanluran', 'marklee@gmail.com', 70, NULL, 0),
-(81, 'Eme Mikasa', 'DL321785', 'Canlalay', '21 Jump Street', 3, 'RST679', 'Charlutte Ann', '21 Jump Street', '2023-12-22 04:00:00', '2023-12-21 15:01:42', 'Budget lane', 'asdgmail.com', 57, NULL, 0);
+(2, 'Juan Dela Cruz', 'DO4-45-709665', 'Cabuyao', 'Market Area lakeville', 2, 'ABC1234', 'Dela Cruz Juan', 'Market Area lakeville', '2024-12-27 12:00:00', '2024-01-05 09:11:40', 'SM', 'motorist1@gmail.com', 101, NULL, 1),
+(3, 'tom', 'do412345', 'cabuyao', 'aplaya', 1, 'dxn1244', 'ddosjs', 'wiehgei', '2024-01-03 13:17:00', '2024-01-05 09:17:34', 'simbahan', 'edscolarina@gmail.co', 101, NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -547,25 +430,25 @@ ALTER TABLE `violation_tickets`
 -- AUTO_INCREMENT for table `motorist_info`
 --
 ALTER TABLE `motorist_info`
-  MODIFY `motorist_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `motorist_info_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
 --
 ALTER TABLE `users_motorists`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `vehicletype`
 --
 ALTER TABLE `vehicletype`
-  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `violationlists`
@@ -577,13 +460,13 @@ ALTER TABLE `violationlists`
 -- AUTO_INCREMENT for table `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `violation_tickets`
 --
 ALTER TABLE `violation_tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

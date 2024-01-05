@@ -270,16 +270,36 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
             <div class="row">
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue3" minlength="10" maxlength="30"
+                        <input type="text" class="form-control" id="floatingInputValue3" oninput="formatLicenseNo(this)" minlength="13" maxlength="13"
                             placeholder="License Number" name="driver_license" required>
                         <label for="floatingInputValue3">License Number</label>
+                        <script>
+                  function formatLicenseNo(input) {
+                          // Remove any non-alphanumeric characters
+                          const inputValue = input.value.replace(/[^A-Za-z0-9]/g, '');
+
+                          // Capitalize the input value
+                          const capitalizedValue = inputValue.toUpperCase();
+
+                          // Add dashes at the 4th and 7th positions
+                          const formattedValue = capitalizedValue.replace(/(.{3})(.{2})?(.{1,6})?/, function(match, p1, p2, p3) {
+                              let result = p1;
+                              if (p2) result += '-' + p2;
+                              if (p3) result += '-' + p3;
+                              return result;
+                          });
+
+                          // Update the input value
+                          input.value = formattedValue;
+                      }
+            </script>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
                             maxlength="30" placeholder="Issuing District" name="issuing_district" reg_owner>
-                        <label for="floatingInputValue1">Issuing Disctrict</label>
+                        <label for="floatingInputValue1">Issuing District</label>
                     </div>
                 </div>
             </div>
@@ -527,7 +547,7 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
         inputs.forEach(input => {
             input.addEventListener('input', function (e) {
                 const inputValue = e.target.value;
-                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 .\-:]/g,
+                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9@.\-: ]/g,
                     ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
                 e.target.value = sanitizedValue;
             });

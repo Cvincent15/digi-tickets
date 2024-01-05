@@ -285,6 +285,7 @@ if ($hasArchivedData) {
 <table>
     <thead>
         <tr>
+            <th><input type="checkbox" id="select-all-checkbox"></th>
             <th class="sortable" data-column="0">No.</th>
             <th class="sortable" data-column="1">Name <span class="sort-arrow"></span></th>
             <th class="sortable" data-column="2">License No. <span class="sort-arrow"></span></th>
@@ -321,6 +322,7 @@ if ($hasArchivedData) {
                 $rowData = json_encode($ticket);
 
                 echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
+                echo "<td><input type='checkbox' class='row-checkbox' data-rowdata='$rowData'></td>";
                 // Display the visible ticket count in the "No." column
                 echo "<td>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
                 // Wrap the name in a clickable <td>
@@ -336,6 +338,7 @@ if ($hasArchivedData) {
         }
         ?>
     </tbody>
+    <button id="delete-selected-btn" class="btn btn-danger" style="margin-top: 10px;">Delete Selected</button>
 </table>
 
 <!-- Pagination -->
@@ -409,6 +412,54 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // Event listener for header checkbox (select/deselect all)
+    document.getElementById('select-all-checkbox').addEventListener('change', function() {
+        var checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = this.checked;
+        }, this);
+    });
+
+    // Event listener for delete button
+    document.getElementById('delete-selected-btn').addEventListener('click', function() {
+        var selectedRows = document.querySelectorAll('.row-checkbox:checked');
+        if (selectedRows.length > 0) {
+            if (confirm('Are you sure you want to delete the selected rows?')) {
+                // Prepare an array to store the selected row data
+                var selectedData = [];
+                selectedRows.forEach(function(rowCheckbox) {
+                    var rowData = JSON.parse(rowCheckbox.getAttribute('data-rowdata'));
+                    selectedData.push(rowData);
+                });
+
+                // Send an AJAX request to deleteticket.php
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'php/deleteticket.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var response = JSON.parse(xhr.responseText);
+
+                        // Handle the response (you can show a success message or handle errors)
+                        if (response.success) {
+                            alert(response.message);
+                            // You may want to refresh the page or update the table after successful deletion
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    }
+                };
+                
+                // Convert the selectedData array to a JSON string and send it in the request
+                var formData = 'selectedRows=' + encodeURIComponent(JSON.stringify(selectedData));
+                xhr.send(formData);
+            }
+        } else {
+            alert('Please select rows to delete.');
+        }
+    });
 
     // Event listener for header clicks
     headers.forEach((header, index) => {
