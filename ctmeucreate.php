@@ -5,7 +5,7 @@ include 'php/database_connect.php';
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
   // Redirect the user to the greeting page if they are already logged in
-  header("Location: index.php");
+  header("Location: login");
   exit();
 }
 
@@ -15,6 +15,13 @@ function countSuperAdmins($conn) {
   $result = $conn->query($sql);
   $row = $result->fetch_assoc();
   return $row['count'];
+}
+
+function fetchEmployeeMasterlist($conn) {
+  $sql = "SELECT * FROM employee_masterlist";
+  $result = mysqli_query($conn, $sql);
+  $employees = mysqli_fetch_all($result, MYSQLI_ASSOC);
+  return $employees;
 }
 
 ?>
@@ -98,6 +105,13 @@ function countSuperAdmins($conn) {
       background-color: #f44336;
     }
 
+    div[style*="overflow-x:auto; overflow-y:auto;"] {
+        overflow-x: auto;
+        overflow-y: auto;
+        height: 400px; /* Adjust the height as needed */
+        width: 650px; /* Adjust the width as needed */
+    }
+
 .search-container {
   text-align: center;
 }
@@ -158,109 +172,146 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
 }
 ?>
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
-  <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
-  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
-  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
-</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="d-flex">
-        <ul class="navbar-nav me-2">
-          <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li class="nav-item">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="records">
+                    <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+                    <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data
+                        Hub
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="d-flex">
+                    <ul class="navbar-nav me-2">
+                        <?php
+                        // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                        if (isset($_SESSION['role'])) {
+                            $userRole = $_SESSION['role'];
+
+                            // Show the "User Account" link only for Enforcer users
+                            if ($userRole === 'Enforcer') {
+                                echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                echo '<li class="nav-item">
+                            } else {
+                                // For other roles, show the other links
+                                if ($_SESSION['role'] === 'IT Administrator') {
+                                    echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-            } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //Reports page temporary but only super admin has permission
+                                    
+                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                } else {
+                                    // Display the "Create Accounts" link
+                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                        
+                                    echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
-
-            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-
-            echo '<li class="nav-item">
-          <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+                                    echo '<li class="nav-item">
+          <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
         </li>';
 
-       /* echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>'; */
+                                    /* echo '<li class="nav-item">
+                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                       </li>'; */
 
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+                                }
+                                // Uncomment this line to show "Activity Logs" to other roles
+                                // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                echo '<li class="nav-item">
+            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
           </li>';
 
+                            }
+                        }
+                        ?>
+                        <li class="nav-item">
+                            <!-- <a class="nav-link" href="#">Contact</a> -->
+                        </li>
+                    </ul>
+                    <div class="dropdown-center">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <?php
+                            // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                            if (isset($_SESSION['role'])) {
+                                $userRole = $_SESSION['role'];
 
+                                // Show the "User Account" link only for Enforcer users
+                                if ($userRole === 'Enforcer') {
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                } else {
+                                    // For other roles, show the other links
+                                    if ($_SESSION['role'] === 'IT Administrator') {
+                                        // Do not display the "Create Accounts" link
+                                    } else {
+                                        echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
+                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
+                                    }
+                                    // Uncomment this line to show "Activity Logs" to other roles
+                                    // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                    // Uncomment this line to show "Create Accounts" to other roles
+                            
 
-        
-            
-            
-        }
-    }
-    ?>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href="#">Contact</a> -->
-          </li>
-        </ul>
-        <div class="dropdown-center">
-  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
-  </button>
-  <ul class="dropdown-menu">
-  <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                // Do not display the "Create Accounts" link
-            } else {
-                echo '<li><a class="dropdown-item active" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-            // Uncomment this line to show "Create Accounts" to other roles
-            
-            
-        }
-    }
-    ?>
-    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
-  </ul>
-</div>
-    </div>
-    </div>
-  </div>
-</nav>
+                                }
+                            }
+                            ?>
+                            <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
 <div class="container bg-transparent mt-5" style="max-width: 90%;">
   <div class="row">
     <div class="col">
       <img src="./images/password illustration.png" class="img-fluid">
+      <?php
+// Call the function to fetch data
+$employeeData = fetchEmployeeMasterlist($conn);
+?>
+
+<!-- Container to make the table scrollable horizontally and vertically -->
+<div style="overflow-x:auto; overflow-y:auto; height:400px; width:650px;">
+    <table id="Masterlist">
+        <thead>
+            <tr>
+                <th>Masterlist ID</th>
+                <th>Employee ID</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Last Name</th>
+                <th>Employee Position</th>
+                <th>Employee Status</th>
+                <th>Date Hired</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($employeeData as $employee): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($employee['masterlist_id']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Employee_ID']); ?></td>
+                <td><?php echo htmlspecialchars($employee['First_name']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Middle_name']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Last_name']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Employee_Position']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Employee_Status']); ?></td>
+                <td><?php echo htmlspecialchars($employee['Date_hired']); ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
     </div>
     <div class="col">
     <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
@@ -293,6 +344,9 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
   <label for="Password">Password:</label>
   <div class="error" id="password-error"></div>
 </div>
+<div class="form-floating mx-5">
+  <input type="hidden" class="form-control" id="masterlistId" name="employeeid" placeholder="Masterlist ID" readonly>
+</div>
 
 <div class="form-floating mx-5">
   <select class="form-select" id="role" name="role" aria-label="Floating label select example" required>
@@ -304,19 +358,19 @@ if (isset($_SESSION["limit_reached"]) && $_SESSION["limit_reached"] === true) {
     $itAdminCount = countUsersByRole($conn, 'IT Administrator');
 
     // Check if the IT admin limit has been reached (e.g., limit is 4)
-    if ($itAdminCount < 4) {
-        echo '<option value="IT Administrator">IT Admin</option>';
+    if ($itAdminCount < 8) {
+        echo '<option value="IT Administrator">Encoder</option>';
     } else {
-        echo '<option value="IT Administrator" disabled>IT Admin (Limit Reached)</option>';
+        echo '<option value="IT Administrator" disabled>Encoder (Limit Reached)</option>';
     }
 
     // Check if the selected role is "IT Administrator" and disable "Super Administrator" if true
     if ($_POST['role'] === 'IT Administrator') {
-        echo '<option value="Super Administrator" disabled>Super Admin (Disabled for IT Admin)</option>';
-    } elseif ($superAdminCount < 2) {
-        echo '<option value="Super Administrator">Super Admin</option>';
+        echo '<option value="Super Administrator" disabled>IT Admin/Super Admin (Disabled for IT Admin)</option>';
+    } elseif ($superAdminCount < 4) {
+        echo '<option value="Super Administrator">IT Admin/Super Admin</option>';
     } else {
-        echo '<option value="Super Administrator" disabled>Super Admin (Limit Reached)</option>';
+        echo '<option value="Super Administrator" disabled>IT Admin/Super Admin (Limit Reached)</option>';
     }
     ?>
   </select><br>
@@ -439,8 +493,8 @@ if (userExists($conn, $firstName, $lastName, $role)) {
   }
 } else {
   // Check the role limits
-  $superAdminLimit = 2;
-  $itAdminLimit = 4;
+  $superAdminLimit = 4;
+  $itAdminLimit = 8;
 
   // Count the number of existing Super Administrators and IT Administrators
   $superAdminCount = countUsersByRole($conn, 'Super Administrator');
@@ -494,15 +548,27 @@ function generatePassword() {
     <?php
         // Loop through the $userData array and populate the table rows
         foreach ($userData as $user) {
-            echo "<tr>";
-            echo "<td class='clickable-cell'>" . $user['username'] . "</td>";
-            echo "<td class='clickable-cell'>" . $user['first_name'] . "</td>";
-            echo "<td class='clickable-cell'>" . ($user['middle_name'] ?? '') . "</td>"; // Display middle name or an empty string
-            echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
-            echo "<td class='clickable-cell'>" . ($user['affixes'] ?? '') . "</td>"; // Display affixes or an empty string
-            echo "<td class='clickable-cell'>" . $user['role'] . "</td>";
-            echo "<td class='user-ctmeu-id' style='display:none;'>" . $user['user_ctmeu_id'] . "</td>";
-            echo "</tr>";
+          echo "<tr>";
+          echo "<td class='clickable-cell'>" . $user['username'] . "</td>";
+          echo "<td class='clickable-cell'>" . $user['first_name'] . "</td>";
+          echo "<td class='clickable-cell'>" . ($user['middle_name'] ?? '') . "</td>";
+          echo "<td class='clickable-cell'>" . $user['last_name'] . "</td>";
+          echo "<td class='clickable-cell'>" . ($user['affixes'] ?? '') . "</td>";
+          
+          // Check the role and display accordingly
+          echo "<td class='clickable-cell'>";
+          if ($user['role'] == 'IT Administrator') {
+              echo "Encoder";
+          } elseif ($user['role'] == 'Super Administrator') {
+              echo "IT Admin/Super Admin";
+          } else {
+              echo $user['role'];
+          }
+          echo "</td>";
+          
+          echo "<td class='user-ctmeu-id' style='display:none;'>" . $user['user_ctmeu_id'] . "</td>";
+          echo "</tr>";
+          
         }
     ?>
     </tbody>
@@ -797,6 +863,30 @@ document.getElementById('user-table').addEventListener('click', function (event)
         document.getElementById('update-button').style.display = 'none';
         document.getElementById('delete-button').style.display = 'none';
     }
+});
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+document.getElementById('Masterlist').addEventListener('click', function(event) {
+  // Get the clicked row
+  var row = event.target.parentNode;
+  
+  // Check if the clicked element is within a table row but not the header row
+  if (row.nodeName === 'TR' && row.parentNode.nodeName === 'TBODY') {
+    // Extract data from the clicked row
+    var masterlistId = row.cells[0].textContent;
+    var firstName = capitalizeFirstLetter(row.cells[2].textContent);
+    var middleName = capitalizeFirstLetter(row.cells[3].textContent);
+    var lastName = capitalizeFirstLetter(row.cells[4].textContent);
+    
+    // Populate the registration form fields
+    document.getElementById('firstName').value = firstName;
+    document.getElementById('middleName').value = middleName;
+    document.getElementById('lastName').value = lastName;
+    document.getElementById('masterlistId').value = masterlistId;
+  }
 });
 
 <?php

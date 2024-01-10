@@ -5,7 +5,7 @@ include 'php/database_connect.php'; // Include your database connection code her
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
   // Redirect the user to the greeting page if they are not logged in
-  header("Location: index.php");
+  header("Location: login");
   exit();
 }
 
@@ -167,105 +167,106 @@ foreach ($violationTickets as $ticket) {
 </style>
 <body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
-  <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
-  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
-  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
-</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="d-flex">
-        <ul class="navbar-nav me-2">
-          <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li class="nav-item">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="records">
+                    <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+                    <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data
+                        Hub
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="d-flex">
+                    <ul class="navbar-nav me-2">
+                        <?php
+                        // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                        if (isset($_SESSION['role'])) {
+                            $userRole = $_SESSION['role'];
+
+                            // Show the "User Account" link only for Enforcer users
+                            if ($userRole === 'Enforcer') {
+                                echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                echo '<li class="nav-item">
+                            } else {
+                                // For other roles, show the other links
+                                if ($_SESSION['role'] === 'IT Administrator') {
+                                    echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-            } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //Reports page temporary but only super admin has permission
+                                    
+                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                } else {
+                                    // Display the "Create Accounts" link
+                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                        
+                                    echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
-
-            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-
-            echo '<li class="nav-item">
-          <a class="nav-link active" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+                                    echo '<li class="nav-item">
+          <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
         </li>';
 
-       /* echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>'; */
+                                    /* echo '<li class="nav-item">
+                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                       </li>'; */
 
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+                                }
+                                // Uncomment this line to show "Activity Logs" to other roles
+                                // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                echo '<li class="nav-item">
+            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
           </li>';
 
+                            }
+                        }
+                        ?>
+                        <li class="nav-item">
+                            <!-- <a class="nav-link" href="#">Contact</a> -->
+                        </li>
+                    </ul>
+                    <div class="dropdown-center">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <?php
+                            // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                            if (isset($_SESSION['role'])) {
+                                $userRole = $_SESSION['role'];
 
+                                // Show the "User Account" link only for Enforcer users
+                                if ($userRole === 'Enforcer') {
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                } else {
+                                    // For other roles, show the other links
+                                    if ($_SESSION['role'] === 'IT Administrator') {
+                                        // Do not display the "Create Accounts" link
+                                    } else {
+                                        echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
+                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
+                                    }
+                                    // Uncomment this line to show "Activity Logs" to other roles
+                                    // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                    // Uncomment this line to show "Create Accounts" to other roles
+                            
 
-        
-            
-            
-        }
-    }
-    ?>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href="#">Contact</a> -->
-          </li>
-        </ul>
-        <div class="dropdown-center">
-  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
-  </button>
-  <ul class="dropdown-menu">
-  <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                // Do not display the "Create Accounts" link
-            } else {
-                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-            // Uncomment this line to show "Create Accounts" to other roles
-            
-            
-        }
-    }
-    ?>
-    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
-  </ul>
-</div>
-    </div>
-    </div>
-  </div>
-</nav>
+                                }
+                            }
+                            ?>
+                            <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
 <div class="search-container">
   <input type="text" id="search-bar" placeholder="Search...">
   <select id="filter-select">
@@ -489,29 +490,34 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
- // Add a click event listener to the clickable cells
-document.querySelectorAll('.clickable-cell').forEach(function(cell) {
-    cell.addEventListener('click', function() {
+ document.querySelectorAll('.clickable-cell').forEach(function (cell) {
+    cell.addEventListener('click', function () {
         // Get the row data JSON string from the clicked cell's data-rowdata attribute
         var rowData = cell.getAttribute('data-rowdata');
-        
-        // Redirect to the details page with the row data as a query parameter
-        // Exclude the bx-archive-in button from the row data
-        var parsedRowData = JSON.parse(rowData);
-        delete parsedRowData.is_settled; // Remove the is_settled property
-        window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
+
+        // Instead of appending data to the URL, send it to the server using AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'storeInSession.php', // This is a new PHP file you'll create to handle storing data in the session
+            data: {rowData: rowData},
+            dataType: 'json',
+            success: function(response) {
+                // Check the response from the server
+                if (response.success) {
+                    // Redirect to the details page
+                    window.location.href = 'ticket-details';
+                } else {
+                    // Handle error
+                    console.error('Failed to store data in session.');
+                }
+            },
+    error: function(xhr, status, error) {
+        // Log any error details for debugging
+        console.error('AJAX request failed:', status, error, 'Response:', xhr.responseText);
+    }
+        });
     });
 });
-  function rowClick(row) {
-    // Get the row data JSON string
-    var rowData = row.getAttribute('data-rowdata');
-    
-    // Redirect to the details page with the row data as a query parameter
-    // Exclude the bx-archive-in button from the row data
-    var parsedRowData = JSON.parse(rowData);
-    delete parsedRowData.is_settled; // Remove the is_settled property
-    window.location.href = 'detailarch.php?data=' + encodeURIComponent(JSON.stringify(parsedRowData));
-}
 
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {

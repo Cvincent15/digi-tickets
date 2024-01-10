@@ -5,7 +5,7 @@ include 'database_connect.php';
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
     // Redirect the user to the greeting page if they are not logged in
-    header("Location: index.php");
+    header("Location: login");
     exit();
 }
 
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 // Redirect to a success page or perform any other actions as needed
-                header("Location: ../ctmeupage.php");
+                header("Location: ../records");
                 exit();
             } else {
                 // No rows were affected, indicating a failed insertion

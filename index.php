@@ -24,6 +24,12 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Login</title>
 </head>
+<style>
+    input::-ms-reveal,
+input::-ms-clear {
+   display: none;
+}
+</style>
 
 <body class="sidebar-collapse fixed" style="height: auto;">
 <div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">

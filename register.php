@@ -36,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $affixes = trim($_POST["affixes"]);
     $role = trim($_POST["role"]);
     $username = trim($_POST["username"]);
+    $masterlist = trim($_POST["employeeid"]);
 
     // Set the default password for everyone
     $password = trim($_POST["password"]);
@@ -47,27 +48,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (userExists($firstName, $lastName)) {
         // Display an alert message
         echo "<script>alert('A user with the same first name and last name already exists. Please try with a different name.');</script>";
-        header('Location: ctmeucreate.php');
+        header('Location: user-creation');
     } else {
         // Initialize the count variable
         $count = 0;
 
-        if (($role === "Super Administrator" && ($count = countUsersWithRole("Super Administrator")) >= 2) ||
-            ($role === "IT Administrator" && ($count = countUsersWithRole("IT Administrator")) >= 4)) {
+        if (($role === "Super Administrator" && ($count = countUsersWithRole("Super Administrator")) >= 4) ||
+            ($role === "IT Administrator" && ($count = countUsersWithRole("IT Administrator")) >= 8)) {
             session_start();
             $_SESSION["limit_reached"] = true;
-            header('Location: ctmeucreate.php');
+            header('Location: user-creation');
         } else {
             // Prepare an SQL statement to insert the user data into the database
-            $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password, employee_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
             // Bind the parameters to the statement
-            $stmt->bind_param("sssssss", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword);
+            $stmt->bind_param("sssssssi", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword, $masterlist);
 
             // Execute the statement
             if ($stmt->execute()) {
                 // Registration successful
-                header('Location: ctmeucreate.php');
+                header('Location: user-creation');
             } else {
                 // Registration failed
                 echo "Error: " . $stmt->error;

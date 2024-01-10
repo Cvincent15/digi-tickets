@@ -4,9 +4,9 @@ include 'php/database_connect.php';
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-    // Redirect the user to the greeting page if they are already logged in
-    header("Location: index.php");
-    exit();
+  // Redirect the user to the greeting page if they are already logged in
+  header("Location: login");
+  exit();
 }
 
 // Fetch user data based on the logged-in user's username
@@ -98,12 +98,12 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
     <?php
 
-    // Check if the user is already logged in
-    if (!isset($_SESSION['username'])) {
-        // Redirect the user to the greeting page if they are already logged in
-        header("Location: index.php");
-        exit();
-    }
+// Check if the user is already logged in
+if (!isset($_SESSION['username'])) {
+  // Redirect the user to the greeting page if they are already logged in
+  header("Location: index.php");
+  exit();
+}
 
     // Fetch user data based on the logged-in user's username
     $username = $_SESSION['username'];
@@ -122,109 +122,107 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
     $status = $user['role'];
 
 
-    ?>
-    <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="ctmeupage.php">
-                <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
-                <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub
-                </span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="d-flex">
-                <ul class="navbar-nav me-2">
-                    <?php
-                    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-                    if (isset($_SESSION['role'])) {
-                        $userRole = $_SESSION['role'];
-
-                        //print_r($_SESSION);
-
-                        // Show the "User Account" link only for Enforcer users
-                        if ($userRole === 'Enforcer') {
-                            echo '<li class="nav-item">
+?>
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
+  <div class="container-fluid">
+  <a class="navbar-brand" href="ctmeupage.php">
+  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="d-flex">
+        <ul class="navbar-nav me-2">
+          <?php
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-                        } else {
-                            // For other roles, show the other links
-                            if ($_SESSION['role'] === 'IT Administrator') {
-                                echo '<li class="nav-item">
+        } else {
+            // For other roles, show the other links
+            if ($_SESSION['role'] === 'IT Administrator') {
+                echo '<li class="nav-item">
             <a class="nav-link active" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-                                //Reports page temporary but only super admin has permission
-                                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-                            } else {
-                                // Display the "Create Accounts" link
-                                //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
-                    
+          //Reports page temporary but only super admin has permission
+                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+            } else {
+                // Display the "Create Accounts" link
+            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
 
-                                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
-                                echo '<li class="nav-item">
+            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+
+            echo '<li class="nav-item">
           <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
         </li>';
 
-                                /* echo '<li class="nav-item">
-                                     <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-                                   </li>'; */
+       /* echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>'; */
 
-                            }
-                            // Uncomment this line to show "Activity Logs" to other roles
-                            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-                            echo '<li class="nav-item">
+            }
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<li class="nav-item">
             <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
           </li>';
 
 
 
-
-                        }
-                    }
-                    ?>
-                    <li class="nav-item">
-                        <!-- <a class="nav-link" href="#">Contact</a> -->
-                    </li>
-                </ul>
-                <div class="dropdown-center">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <?php
-                        // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-                        if (isset($_SESSION['role'])) {
-                            $userRole = $_SESSION['role'];
-
-                            // Show the "User Account" link only for Enforcer users
-                            if ($userRole === 'Enforcer') {
-                                echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-                            } else {
-                                // For other roles, show the other links
-                                if ($_SESSION['role'] === 'IT Administrator') {
-                                    // Do not display the "Create Accounts" link
-                                } else {
-                                    echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-                                    echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
-                                }
-                                // Uncomment this line to show "Activity Logs" to other roles
-                                // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-                                echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-                                // Uncomment this line to show "Create Accounts" to other roles
-                        
-
-                            }
-                        }
-                        ?>
-                        <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        </div>
-    </nav>
+        
+            
+            
+        }
+    }
+    ?>
+          <li class="nav-item">
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </li>
+        </ul>
+        <div class="dropdown-center">
+  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+  </button>
+  <ul class="dropdown-menu">
+  <?php
+    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+    if (isset($_SESSION['role'])) {
+        $userRole = $_SESSION['role'];
+        
+        // Show the "User Account" link only for Enforcer users
+        if ($userRole === 'Enforcer') {
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+        } else {
+            // For other roles, show the other links
+            if ($_SESSION['role'] === 'IT Administrator') {
+                // Do not display the "Create Accounts" link
+            } else {
+                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
+            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
+            }
+            // Uncomment this line to show "Activity Logs" to other roles
+            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
+            // Uncomment this line to show "Create Accounts" to other roles
+            
+            
+        }
+    }
+    ?>
+    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+  </ul>
+</div>
+    </div>
+    </div>
+  </div>
+</nav>
 
     <div class="container card p-5 w-75">
         <h3>Input Ticket Info</h3>

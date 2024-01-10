@@ -6,7 +6,7 @@ include 'php/database_connect.php';
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
   // Redirect the user to the greeting page if they are not logged in
-  header("Location: index.php");
+  header("Location: login");
   exit();
 }
 
@@ -32,7 +32,7 @@ function fetchViolationTickets() {
   global $conn; // Assuming you have a database connection established
 
   // Specify the columns you want to fetch from the violation_tickets table
-  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled
+  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_violation, t.time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled
           FROM violation_tickets AS t
           LEFT JOIN violations AS v ON t.ticket_id = v.ticket_id_violations
           GROUP BY t.ticket_id"; // Modify this query as needed
@@ -145,8 +145,9 @@ $tbl .= '<th width="15%">License No.</th>';
 $tbl .= '<th width="15%">Place Occurred</th>';
 $tbl .= '<th width="10%">Plate</th>';
 $tbl .= '<th width="10%">Vehicle</th>';
-$tbl .= '<th width="15%">Date Occurred</th>';
-$tbl .= '<th width="15%">Account Status</th>';
+$tbl .= '<th width="10%">Date Occurred</th>';
+$tbl .= '<th width="10%">Time Occurred</th>';
+$tbl .= '<th width="10%">Account Status</th>';
 $tbl .= '</tr>';
 
 $ticketNumber = 1; // Initialize ticket number
@@ -163,8 +164,9 @@ foreach ($data as $row) {
   $tbl .= '<td width="15%">' . $row['place_of_occurrence'] . '</td>';
   $tbl .= '<td width="10%">' . $row['plate_no'] . '</td>';
   $tbl .= '<td width="10%">' . $vehicleName . '</td>';
-  $tbl .= '<td width="15%">' . $row['date_time_violation'] . '</td>';
-  $tbl .= '<td width="15%">' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
+  $tbl .= '<td width="10%">' . $row['date_violation'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['time_violation'] . '</td>';
+  $tbl .= '<td width="10%">' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
   $tbl .= '</tr>';
 
   $ticketNumber++; // Increment ticket number
@@ -205,7 +207,7 @@ function filterDataByDate($data, $startMonth, $endMonth, $year) {
   $filteredData = array();
 
   foreach ($data as $row) {
-    $ticketDate = strtotime($row['date_time_violation']);
+    $ticketDate = strtotime($row['date_violation']);
     $ticketMonth = date('m', $ticketDate);
     $ticketYear = date('Y', $ticketDate);
 
@@ -312,105 +314,106 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 <body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
-  <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
-  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
-  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
-</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="d-flex">
-        <ul class="navbar-nav me-2">
-          <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li class="nav-item">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="records">
+                    <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+                    <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data
+                        Hub
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="d-flex">
+                    <ul class="navbar-nav me-2">
+                        <?php
+                        // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                        if (isset($_SESSION['role'])) {
+                            $userRole = $_SESSION['role'];
+
+                            // Show the "User Account" link only for Enforcer users
+                            if ($userRole === 'Enforcer') {
+                                echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                echo '<li class="nav-item">
+                            } else {
+                                // For other roles, show the other links
+                                if ($_SESSION['role'] === 'IT Administrator') {
+                                    echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link active" style="font-weight: 600;">Reports</a>';
-            } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //Reports page temporary but only super admin has permission
+                                    
+                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                } else {
+                                    // Display the "Create Accounts" link
+                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                        
+                                    echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
-
-            echo '<a href="ctmeurecords.php" class="nav-link active" style="font-weight: 600;">Reports</a>';
-
-            echo '<li class="nav-item">
-          <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+                                    echo '<li class="nav-item">
+          <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
         </li>';
 
-       /* echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>'; */
+                                    /* echo '<li class="nav-item">
+                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                       </li>'; */
 
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+                                }
+                                // Uncomment this line to show "Activity Logs" to other roles
+                                // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                echo '<li class="nav-item">
+            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
           </li>';
 
+                            }
+                        }
+                        ?>
+                        <li class="nav-item">
+                            <!-- <a class="nav-link" href="#">Contact</a> -->
+                        </li>
+                    </ul>
+                    <div class="dropdown-center">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <?php
+                            // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                            if (isset($_SESSION['role'])) {
+                                $userRole = $_SESSION['role'];
 
+                                // Show the "User Account" link only for Enforcer users
+                                if ($userRole === 'Enforcer') {
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                } else {
+                                    // For other roles, show the other links
+                                    if ($_SESSION['role'] === 'IT Administrator') {
+                                        // Do not display the "Create Accounts" link
+                                    } else {
+                                        echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
+                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
+                                    }
+                                    // Uncomment this line to show "Activity Logs" to other roles
+                                    // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                    // Uncomment this line to show "Create Accounts" to other roles
+                            
 
-        
-            
-            
-        }
-    }
-    ?>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href="#">Contact</a> -->
-          </li>
-        </ul>
-        <div class="dropdown-center">
-  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
-  </button>
-  <ul class="dropdown-menu">
-  <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                // Do not display the "Create Accounts" link
-            } else {
-                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-            // Uncomment this line to show "Create Accounts" to other roles
-            
-            
-        }
-    }
-    ?>
-    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
-  </ul>
-</div>
-    </div>
-    </div>
-  </div>
-</nav>
+                                }
+                            }
+                            ?>
+                            <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
 
 
 <div class="card">
@@ -429,14 +432,10 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </div>
 
 <div class="container mt-1" style="display:none;">
-<div class="container">
-    <form method="post" target="_blank">
-        <input type="hidden" id="filtered-data" name="filtered-data" value="">
-        <button class="btn btn-light" style="--bs-btn-padding-y: 1.5rem; --bs-btn-padding-x: 8rem; --bs-btn-font-size: 1rem; font-weight: 800; color: #0A157A;" type="submit" name="generate_pdf">
-            <img src="./images/icon file.png">Generate PDF
-        </button>
-    </form>
-</div>
+<form method="post" target="_blank">
+  <input type="hidden" id="filtered-data" name="filtered-data" value="">
+  <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
+</form>
 
 <div class="table-container mb-5">
 <table id="vehicle-violations-table">
@@ -458,6 +457,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             <th>Plate</th>
             <th>Vehicle</th>
             <th>Date Occurred</th>
+            <th>Time Occurred</th>
             <th>Account Status</th>
         </tr>
     </thead>
@@ -485,7 +485,8 @@ foreach ($violationTickets as $index => $ticket) {
     echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
     echo "<td>" . $ticket['plate_no'] . "</td>";
     echo "<td>" . $vehicleName . "</td>";
-    echo "<td>" . $ticket['date_time_violation'] . "</td>";
+    echo "<td>" . $ticket['date_violation'] . "</td>";
+    echo "<td>" . $ticket['time_violation'] . "</td>";
     echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
     echo "</tr>";
 }
@@ -672,7 +673,7 @@ function filterTableByDate(startMonth, endMonth, year) {
 
   rows.forEach(function (row) {
     var rowData = JSON.parse(row.getAttribute('data-rowdata'));
-    var ticketDateStr = rowData['date_time_violation'];
+    var ticketDateStr = rowData['date_violation'];
     var ticketDate = new Date(ticketDateStr);
 
     var ticketMonth = String(ticketDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-based
