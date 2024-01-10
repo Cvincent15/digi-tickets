@@ -3,7 +3,7 @@ session_start();
 include 'database_connect.php';
 
 if (!isset($_SESSION['username'])) {
-    header("Location: ../index.php");
+    header("Location: ../login");
     exit();
 }
 
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         call_user_func_array([$stmt, 'bind_param'], $params);
 
         if ($stmt->execute()) {
-            header("Location: ../ctmeupage.php");
+            header("Location: ../records");
             exit();
         } else {
             echo "Error: " . $stmt->error;

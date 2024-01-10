@@ -16,7 +16,7 @@ $password = trim($_POST['password']);
 if (empty($username) || empty($password)) {
     // Password is incorrect, display an error message
     $_SESSION['login_error'] = "Invalid Input Data.";
-    header('Location: ../index.php');
+    header('Location: ../login');
     exit();
 }
 
@@ -46,21 +46,21 @@ if ($user) {
         $_SESSION['role'] = $user['role'];
 
         if ($_SESSION['role'] == 'Enforcer') {
-            header('Location: ../ctmeuusers.php');
+            header('Location: ../user-profile');
         } else {
-            header('Location: ../ctmeupage.php');
+            header('Location: ../records');
         }
         exit(); // Always exit after a header redirect
     } else {
         // Password is incorrect, display an error message
         $_SESSION['login_error'] = "Invalid username or password";
-        header('Location: ../index.php');
+        header('Location: ../login');
         exit();
     }
 } else {
     // Password is incorrect, display an error message
     $_SESSION['login_error'] = "User not found.";
-    header('Location: ../index.php');
+    header('Location: ../login');
     exit();
 }
 ?>

@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         // Deletion was successful
         echo "User account deleted successfully.";
-        header("Location: ../ctmeucreate.php"); // Change "error.php" to your actual error page
+        header("Location: ../user-creation"); // Change "error.php" to your actual error page
     }
     // Close the database connection
     $stmt->close();

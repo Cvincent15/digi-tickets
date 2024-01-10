@@ -24,17 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($conn->query($sql) === TRUE) {
             // Database update successful
             echo "Database update successful";
-            header('Location: ../ctmeupage.php');
+            header('Location: ../records');
         }
     } else {
         // No checkboxes were selected
         echo "No checkboxes were selected";
-        header('Refresh: 1; URL= ../ctmeupage.php');
+        header('Refresh: 1; URL= ../records');
     }
 } else {
     // Invalid request method
     echo "Invalid request method";
-    header('Refresh: 1; URL= ../ctmeupage.php');
+    header('Refresh: 1; URL= ../records');
 }
 
 $conn->close();

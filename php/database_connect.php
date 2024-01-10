@@ -1,5 +1,5 @@
 <?php
-/*  When Web Hosted
+
 // Database credentials
 $servername = "localhost";
 $username = "root";
@@ -13,9 +13,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-*/
 
 
+/*  When Web Hosted
 // Database credentials
 $servername = "127.0.0.1:3306";
 $username = "u919418953_CTMEUdevs";
@@ -29,6 +29,6 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
+*/
 
 ?>
