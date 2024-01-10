@@ -4,9 +4,9 @@ include 'php/database_connect.php'; // Include your database connection code her
 
 // Check if the user is already logged in
 if (!isset($_SESSION['username'])) {
-  // Redirect the user to the greeting page if they are not logged in
-  header("Location: index.php");
-  exit();
+    // Redirect the user to the greeting page if they are not logged in
+    header("Location: login");
+    exit();
 }
 
 // Check the user's role
@@ -220,25 +220,28 @@ $violationTickets = fetchViolationTickets();
 
 <body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 
-<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
-  <div class="container-fluid">
-  <a class="navbar-brand" href="ctmeupage.php">
-  <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
-  <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data Hub </span>
-</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="d-flex">
-        <ul class="navbar-nav me-2">
-          <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li class="nav-item">
+    <form id="archive-form" action="php/archiverow.php" method="POST">
+    <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="records">
+                    <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
+                    <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;"> Data
+                        Hub
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="d-flex">
+                    <ul class="navbar-nav me-2">
+                        <?php
+                        // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                        if (isset($_SESSION['role'])) {
+                            $userRole = $_SESSION['role'];
+
+                            // Show the "User Account" link only for Enforcer users
+                            if ($userRole === 'Enforcer') {
+                                echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
                             } else {
@@ -247,89 +250,101 @@ $violationTickets = fetchViolationTickets();
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
           </li>';
-          //Reports page temporary but only super admin has permission
-                echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-            } else {
-                // Display the "Create Accounts" link
-            //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //Reports page temporary but only super admin has permission
+                                    
+                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                } else {
+                                    // Display the "Create Accounts" link
+                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                        
+                                    echo '<li class="nav-item">
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+          </li>';
+                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
-
-            echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
-
-            echo '<li class="nav-item">
-          <a class="nav-link" href="ctmeuarchive.php" style="font-weight: 600;">Archive</a>
+                                    echo '<li class="nav-item">
+          <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
         </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
                                        </li>'; */
 
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeupage.php" style="font-weight: 600; ">Records</a>
+                                }
+                                // Uncomment this line to show "Activity Logs" to other roles
+                                // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                echo '<li class="nav-item">
+            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
           </li>';
 
+                            }
+                        }
+                        ?>
+                        <li class="nav-item">
+                            <!-- <a class="nav-link" href="#">Contact</a> -->
+                        </li>
+                    </ul>
+                    <div class="dropdown-center">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <?php
+                            // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
+                            if (isset($_SESSION['role'])) {
+                                $userRole = $_SESSION['role'];
+
+                                // Show the "User Account" link only for Enforcer users
+                                if ($userRole === 'Enforcer') {
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                } else {
+                                    // For other roles, show the other links
+                                    if ($_SESSION['role'] === 'IT Administrator') {
+                                        // Do not display the "Create Accounts" link
+                                    } else {
+                                        echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
+                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
+                                    }
+                                    // Uncomment this line to show "Activity Logs" to other roles
+                                    // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
+                                    echo '<li><a class="dropdown-item" href="user-profile">User Account</a></li>';
+                                    // Uncomment this line to show "Create Accounts" to other roles
+                            
+
+                                }
+                            }
+                            ?>
+                            <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </nav>
+        <div class="ewan">
+            <div class="table-header">
+                <div class="search-container">
+                    <input type="text" id="search-bar" placeholder="Search...">
+                    <select id="filter-select">
+                        <option value="name">Name</option>
+                        <option value="license">License No.</option>
+                        <option value="vehicle">Vehicle</option>
+                        <option value="place of occurrence">Place of Occurrence</option>
+                    </select>
+                </div>
+                <?php
+                // Check if the user is a Super Administrator
+                if ($_SESSION['role'] === 'Super Administrator') {
+                    // Show the archive button, count, and "records are selected"
+                    echo '<div><span id="checkbox-count">0</span> records are selected</div>';
+                    //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+                    echo '<button type="button" id="archiveButton" class="btn btn-primary float-end" data-bs-target="#exampleModal"><i class="bx bx-archive-in"></i></button>';
+                }
 
 
-        
-            
-            
-        }
-    }
-    ?>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href="#">Contact</a> -->
-          </li>
-        </ul>
-        <div class="dropdown-center">
-  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-  <img src="./images/Icon.png" style="margin-right: 10px;"><span id="welcome-text"></span>
-  </button>
-  <ul class="dropdown-menu">
-  <?php
-    // Check the user's role (Assuming you have the role stored in a variable named $_SESSION['role'])
-    if (isset($_SESSION['role'])) {
-        $userRole = $_SESSION['role'];
-        
-        // Show the "User Account" link only for Enforcer users
-        if ($userRole === 'Enforcer') {
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-        } else {
-            // For other roles, show the other links
-            if ($_SESSION['role'] === 'IT Administrator') {
-                // Do not display the "Create Accounts" link
-            } else {
-                echo '<li><a class="dropdown-item" href="ctmeucreate.php">Create Account</a></li>';
-            echo '<li><a class="dropdown-item" href="ctmeusettings.php">Ticket Form</a></li>';
-            }
-            // Uncomment this line to show "Activity Logs" to other roles
-            // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
-            echo '<li><a class="dropdown-item" href="ctmeuusers.php">User Account</a></li>';
-            // Uncomment this line to show "Create Accounts" to other roles
-            
-            
-        }
-    }
-    ?>
-    <li><a class="dropdown-item" id="logout-button" style="cursor: pointer;">Log Out</a></li>
-  </ul>
-</div>
-    </div>
-    </div>
-  </div>
-</nav>
-<div class="search-container mt-5">
-  <input type="text" id="search-bar" placeholder="Search...">
-  <select id="filter-select">
-    <option value="name">Name</option>
-    <option value="license">License No.</option>
-    <option value="vehicle">Vehicle</option>
-    <option value="place of occurrence">Place of Occurrence</option>
-  </select>
-  
-</div>
+                ?>
+            </div>
 
 
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -354,66 +369,75 @@ $violationTickets = fetchViolationTickets();
                 </div>
             </div>
 
-<div class="modal fade" id="successModal">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body d-flex align-items-center justify-content-center">
-                <div class="text-center">
-                    <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
-                    <h5 class="modal-title mb-3" style="font-weight: 800;">Archived!</h5>
-                    <p class="mb-3" style="font-weight: 500;">Selected tickets have been archived successfully</p>
-                    <button type="submit" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal" onclick="submitForm()" style="background-color: #0A157A;">Close</button>
+            <div class="modal fade" id="successModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body d-flex align-items-center justify-content-center">
+                            <div class="text-center">
+                                <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
+                                <h5 class="modal-title mb-3" style="font-weight: 800;">Archived!</h5>
+                                <p class="mb-3" style="font-weight: 500;">Selected tickets have been archived
+                                    successfully
+                                </p>
+                                <button type="submit" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal"
+                                    onclick="submitForm()" style="background-color: #0A157A;">Close</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="noSelectionModal">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body d-flex align-items-center justify-content-center">
-                <div class="text-center">
-                    <h5 class="modal-title mb-3" style="font-weight: 800;">No Selection</h5>
-                    <p class="mb-3" style="font-weight: 500;">Please select at least one ticket to archive.</p>
-                    <button type="button" class="btn btn-primary mb-3" data-bs-dismiss="modal" style="background-color: #0A157A;">OK</button>
+            <div class="modal fade" id="noSelectionModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body d-flex align-items-center justify-content-center">
+                            <div class="text-center">
+                                <h5 class="modal-title mb-3" style="font-weight: 800;">No Selection</h5>
+                                <p class="mb-3" style="font-weight: 500;">Please select at least one ticket to archive.
+                                </p>
+                                <button type="button" class="btn btn-primary mb-3" data-bs-dismiss="modal"
+                                    style="background-color: #0A157A;">OK</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="table-container">
-    <form id="archive-form" action="php/archiverow.php" method="POST">
-    <?php
-    // Check if the user is a Super Administrator
-    if ($_SESSION['role'] === 'Super Administrator') {
-      // Show the archive button, count, and "records are selected"
-      echo '<div style="display: inline-block; background-color: white; padding: 2px 6px; border-radius: 4px;"><span id="checkbox-count">0</span> records are selected</div>';
-      //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
-      echo '<button type="button" id="archiveButton" class="btn btn-primary mb-3 float-end" data-bs-target="#exampleModal"><i class="bx bx-archive-in"></i></button>';
-  }
-
-    ?>
-        <table class="mb-5"> <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
-    <thead>
-        <tr class="align-items-center">
-            <th class="sortable-no" data-column="0">No.</th>
-            <?php
-            // Check if the user is a Super Administrator
-            if ($_SESSION['role'] === 'Super Administrator') {
-                // Show the archive button and checkboxes
-                echo '<th><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>';
-            }
-            ?>
-            <th class="sortable" data-column="2">Name <span class="sort-arrow"></span></th>
-            <th class="sortable" data-column="3">License No. <span class="sort-arrow"></span></th>
-            <th class="sortable" data-column="4">Vehicle <span class="sort-arrow"></span></th>
-            <th class="sortable" data-column="5">Place of Occurrence <span class="sort-arrow"></span></th>
-        </tr>
-    </thead>
-    <tbody class="text-center" id="ticket-table-body">
-        <?php
-        $visibleTicketCount = 0; // Initialize a counter for visible tickets
-        $emptyResult = true;
+            <div class="tableContainer">
+                <table class="mb-5">
+                    <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
+                    <thead>
+                        <tr class="align-items-center">
+                            <th class="sortable-no" data-column="0">Ticket Number</th>
+                            <?php
+                            // Check if the user is a Super Administrator
+                            if ($_SESSION['role'] === 'Super Administrator') {
+                                // Show the archive button and checkboxes
+                                echo '<th><input class="form-check-input" type="checkbox" id="select-all-checkbox"></th>';
+                            }
+                            ?>
+                            <th class="sortable" data-column="2">Date<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="3">Time<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="4">Driver's Name <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="5">Driver's Address<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="6">License No.<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="7">Issuing District<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="8">Type of Vehicle<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="9">Plate No.<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="13">Registered Owner<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="14">Registered Owner's Address<span
+                                    class="sort-arrow"></span>
+                            </th>
+                            <th class="sortable" data-column="10">Place of Occurrence<span class="sort-arrow"></span>
+                            </th>
+                            <th class="sortable" data-column="11">Status<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="12">Issued by<span class="sort-arrow"><span
+                                    class="sort-arrow"></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center" id="ticket-table-body">
+                        <?php
+                        $visibleTicketCount = 0; // Initialize a counter for visible tickets
+                        $emptyResult = true;
 
                         // Define the number of records to display per page
                         $recordsPerPage = 10;
@@ -446,23 +470,36 @@ $violationTickets = fetchViolationTickets();
                                         echo "<td><input class='form-check-input' type='checkbox' name='archive[]' value='" . $ticket['ticket_id'] . "'></td>";
                                     }
 
-                    // Wrap the name in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
-                    // Wrap the license in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
-                    // Wrap the address in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $vehicleName . "</td>";
-                    // Wrap the district in a clickable <td>
-                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
-                    echo "</tr>";
-                }
-            }
-        }
-        ?>
-    </tbody>
-</table>
-      </form>
-      </div>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['date_violation'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['time_violation'] . "</td>";
+                                    // Wrap the name in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_name'] . "</td>";
+                                    // Wrap the license in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_address'] . "</td>";
+                                    // Wrap the address in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+                                    // Wrap the address in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_name'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['plate_no'] . "    </td>";
+                                    // Wrap the district in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['reg_owner'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['reg_owner_address'] . "</td>";
+                                    // Wrap the district in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
+                                    // Wrap the district in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . ($ticket['is_settled'] ? 'Settled' : 'Unsettled') . "</td>";
+                                    // Wrap the district in a clickable <td>
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['first_name'] . " " . $ticket['middle_name'] . " " . $ticket['last_name'] . "</td>";
+                                    // Wrap the district in a clickable <td>
+                                    echo "</tr>";
+                                }
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             <div class="pagination-container">
@@ -595,36 +632,35 @@ $violationTickets = fetchViolationTickets();
           ";
             }
 
-            ?> 
-  document.querySelectorAll('.clickable-cell').forEach(function (cell) {
+            ?>
+            document.querySelectorAll('.clickable-cell').forEach(function (cell) {
     cell.addEventListener('click', function () {
         // Get the row data JSON string from the clicked cell's data-rowdata attribute
         var rowData = cell.getAttribute('data-rowdata');
 
-        // Redirect to the details page with the row data as a query parameter
-        // Exclude the bx-archive-in button from the row data
-        var parsedRowData = JSON.parse(rowData);
-        delete parsedRowData.is_settled; // Remove the is_settled property
-        var queryString = 'data=' + encodeURIComponent(JSON.stringify(parsedRowData));
-        
-        // Redirect to the details page
-        window.location.href = 'detailarch.php?' + queryString;
+        // Instead of appending data to the URL, send it to the server using AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'storeInSession.php', // This is a new PHP file you'll create to handle storing data in the session
+            data: {rowData: rowData},
+            dataType: 'json',
+            success: function(response) {
+                // Check the response from the server
+                if (response.success) {
+                    // Redirect to the details page
+                    window.location.href = 'ticket-details';
+                } else {
+                    // Handle error
+                    console.error('Failed to store data in session.');
+                }
+            },
+    error: function(xhr, status, error) {
+        // Log any error details for debugging
+        console.error('AJAX request failed:', status, error, 'Response:', xhr.responseText);
+    }
+        });
     });
 });
-
-function rowClick(row) {
-    // Get the row data JSON string
-    var rowData = row.getAttribute('data-rowdata');
-
-    // Redirect to the details page with the row data as a query parameter
-    // Exclude the bx-archive-in button from the row data
-    var parsedRowData = JSON.parse(rowData);
-    delete parsedRowData.is_settled; // Remove the is_settled property
-    var queryString = 'data=' + encodeURIComponent(JSON.stringify(parsedRowData));
-    
-    // Redirect to the details page
-    window.location.href = 'detailarch.php?' + queryString;
-}
 
             // Add a click event listener to the logout button
             document.getElementById('logout-button').addEventListener('click', function () {

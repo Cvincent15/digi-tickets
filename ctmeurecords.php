@@ -432,10 +432,14 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 </div>
 
 <div class="container mt-1" style="display:none;">
-<form method="post" target="_blank">
-  <input type="hidden" id="filtered-data" name="filtered-data" value="">
-  <button class="btn btn-primary" type="submit" name="generate_pdf">Generate PDF</button>
-</form>
+<div class="container">
+    <form method="post" target="_blank">
+        <input type="hidden" id="filtered-data" name="filtered-data" value="">
+        <button class="btn btn-light" style="--bs-btn-padding-y: 1.5rem; --bs-btn-padding-x: 8rem; --bs-btn-font-size: 1rem; font-weight: 800; color: #0A157A;" type="submit" name="generate_pdf">
+            <img src="./images/icon file.png">Print Report
+        </button>
+    </form>
+</div>
 
 <div class="table-container mb-5">
 <table id="vehicle-violations-table">
