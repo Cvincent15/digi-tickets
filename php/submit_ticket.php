@@ -21,25 +21,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $regOwner = filter_var($_POST['reg_owner'], FILTER_SANITIZE_STRING);
     $regOwnerAddress = filter_var($_POST['reg_owner_address'], FILTER_SANITIZE_STRING);
     $placeOfOccurrence = filter_var($_POST['place_of_occurrence'], FILTER_SANITIZE_STRING);
-    $date_time = filter_var($_POST['date_time'], FILTER_SANITIZE_STRING);
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
+    $date = filter_var($_POST['date_violation'], FILTER_SANITIZE_STRING);
+    $time = filter_var($_POST['time_violation'], FILTER_SANITIZE_STRING);
+    $currentTicket = $_POST['currentTicket'];
     $user_ctmeu_id = $_POST['user_ctmeu_id']; // Assuming this is an integer
 
     // Insert the form data into the violation_tickets table using prepared statements
-    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_time_violation, place_of_occurrence, email)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, control_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $insertTicketQuery);
 
     if ($stmt) {
         // Bind parameters and execute the statement
-        mysqli_stmt_bind_param($stmt, "isssssssssss", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date_time, $placeOfOccurrence, $email);
+        mysqli_stmt_bind_param($stmt, "isssssssssssi", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date, $time, $placeOfOccurrence, $currentTicket);
 
         if (mysqli_stmt_execute($stmt)) {
             // Check if any rows were affected by the insertion
             if (mysqli_affected_rows($conn) > 0) {
                 // Get the ID of the newly inserted ticket
                 $ticketID = mysqli_insert_id($conn);
+
+                // Increment the currentTicket for the user
+                $incrementTicketQuery = "UPDATE users SET currentTicket = currentTicket + 1 WHERE user_ctmeu_id = ?";
+                $stmtIncrement = mysqli_prepare($conn, $incrementTicketQuery);
+                mysqli_stmt_bind_param($stmtIncrement, "i", $user_ctmeu_id);
+                mysqli_stmt_execute($stmtIncrement);
+                mysqli_stmt_close($stmtIncrement);
 
                 // Insert each selected violation into the violations table with the ticket_id_violations foreign key using prepared statements
                 $insertViolationQuery = "INSERT INTO violations (violationlist_id, ticket_id_violations) VALUES (?, ?)";
