@@ -25,6 +25,7 @@ $firstName = $user['first_name'];
 $lastName = $user['last_name'];
 $status = $user['role'];
 $user_ctmeu_id = $user['user_ctmeu_id'];
+$currentTicket = $user['currentTicket'];
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -232,12 +233,26 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
             <!-- Add a hidden input field for user_ctmeu_id -->
             <input type="hidden" name="user_ctmeu_id" value="<?php echo $user_ctmeu_id; ?>">
             <div class="row">
+            <div class="col">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="dateInput" placeholder="Date" name="date_violation">
+            <label for="dateInput">Date</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="timeInput" placeholder="Time" name="time_violation">
+            <label for="timeInput">Time</label>
+        </div>
+    </div>
+                
+            </div>
+            <div class="row">
                 <div class="col">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="datepicker" minlength="5" maxlength="30"
-                            placeholder="Date" name="date_time">
-                        <label for="floatingInputValue4">Date and Time</label>
-
+                    <div class="form-floating mb-3">
+                        <input type="number" class="form-control" id="floatingInputValue1"
+                            maxlength="30" placeholder="Driver's Name" name="currentTicket" value="<?php echo $currentTicket; ?>" required>
+                        <label for="floatingInputValue1">Control Number</label>
                     </div>
                 </div>
                 <div class="col">
@@ -248,7 +263,7 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
                     </div>
                 </div>
             </div>
-
+            
             <div class="row">
                 <div class="col">
                     <div class="form-floating mb-3">
@@ -533,12 +548,19 @@ $user_ctmeu_id = $user['user_ctmeu_id'];
         const formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
 
         // Initialize flatpickr date and time picker
-        flatpickr('#datepicker', {
-            enableTime: true, // Enable time picker
-            dateFormat: 'Y-m-d h:i K', // Set the desired date and time format
-            maxDate: '2050-12-31', // Set the maximum selectable date
-            minDate: formattedCurrentDate, // Set the minimum selectable date to today
+        // Initialize flatpickr for the date input
+        flatpickr('#dateInput', {
+            dateFormat: 'Y-m-d', // Set the desired date format
         });
+
+        // Initialize flatpickr for the time input
+        flatpickr('#timeInput', {
+            enableTime: true, // Enable time picker
+            noCalendar: true, // Hide the calendar
+            dateFormat: 'h:i K', // Set the desired time format
+            time_24hr: false // Use 12-hour format with AM/PM
+        });
+        
         // Apply symbol restriction to all text input fields
         const form = document.getElementById('ticketmaker');
         const inputs = form.querySelectorAll('input[type="text"]');
