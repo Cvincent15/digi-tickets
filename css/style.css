@@ -55,7 +55,7 @@
 
 .bgslider {
   min-height: 100vh;
-  background: url('../images/placeholderlogin.png') center center / cover no-repeat fixed;
+  background: url('../images/bg.png') center center / cover no-repeat fixed;
 }
 
 .landing{
