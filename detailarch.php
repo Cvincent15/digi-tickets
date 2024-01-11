@@ -41,7 +41,7 @@ function fetchVehicleName($vehicleId, $conn) {
 // Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
     $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name,
-                     GROUP_CONCAT(vl.violation_name SEPARATOR '|||') AS concatenated_violations
+                     GROUP_CONCAT(CONCAT(vl.violation_name, ' - ', vl.violation_section, ' - ', vl.violation_fine) SEPARATOR '|||') AS concatenated_violations
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
               LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
@@ -106,6 +106,14 @@ unset($_SESSION['rowData']);
 .hidden-label {
     display: none; /* Hide the label */
   }
+
+  .fine-right {
+    float: right; /* Align the fines to the right */
+}
+
+.total-fines {
+    text-align: right; /* Align the total fines text to the right */
+}
 </style>
 <body>
 
@@ -301,20 +309,28 @@ unset($_SESSION['rowData']);
         <td colspan="3">
         <?php
        // Encode the entire concatenated violation names string
+       $totalFines = 0;
 $encodedViolationNames = htmlspecialchars($ticketDetails['concatenated_violations']);
 
 // Display the encoded string as bullet points
 echo '<ul>';
-$violationsList = explode('|||', $encodedViolationNames);
+$violationsList = explode('|||', $ticketDetails['concatenated_violations']);
 foreach ($violationsList as $violation) {
-    echo '<li>' . $violation . '</li>';
+    list($violationName, $violationSection, $violationFine) = explode(' - ', $violation);
+    $totalFines += floatval($violationFine); // Accumulate the total fines
+    echo '<li> Violation: ' . htmlspecialchars($violationName) . ' - Section: ' . htmlspecialchars($violationSection) . '<span class="fine-right">' . htmlspecialchars(number_format($violationFine, 2)) . '</span></li>';
 }
 echo '</ul>';
+
+// Display the total fines at the bottom
+echo '<p class="total-fines">Total Fines: <span class="fine-right">' . htmlspecialchars(number_format($totalFines, 2)) . '</span></p>';
+
         ?>
 </td>
 
     </tr>
         <!-- Add more rows for additional fields as needed -->
+        
         <tr id="edit-row">
             <td></td>
             <td></td>

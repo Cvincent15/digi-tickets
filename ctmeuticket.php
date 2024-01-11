@@ -97,6 +97,27 @@ $currentTicket = $user['currentTicket'];
 </style>
 
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
+<?php if (isset($_GET['error']) && $_GET['error'] == 'maxTicketReached'): ?>
+<script>
+    $(document).ready(function() {
+        // Show Bootstrap modal with the error message
+        $('#maxTicketReachedModal').modal('show');
+    });
+</script>
+<div class="modal fade" id="maxTicketReachedModal" tabindex="-1" aria-labelledby="maxTicketReachedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="maxTicketReachedModalLabel">Ticket Submission Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Error creating ticket: Max ticket reached. Please contact an IT Admin to renew your account.
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
     <?php
 
     // Check if the user is already logged in
@@ -388,7 +409,7 @@ $currentTicket = $user['currentTicket'];
                     <table id="selectedOptionsTable" style="margin-top:20px; margin-bottom:20px;">
                         <thead>
                             <tr>
-                                <th>Violation Name</th>
+                                <th>Violation Name - Section</th>
                                 <th>Action</th>
                                 <!-- Hidden column for violations[] -->
                                 <th style="display: none;">Violations</th>
@@ -399,11 +420,18 @@ $currentTicket = $user['currentTicket'];
                         </tbody>
                     </table>
                     <script>
+                        // Event listener for the search input
+                        $('#searchInput').on('input', function () {
+                            const searchTerm = $(this).val();
+                            populateDropdownFromServer(searchTerm); // Pass the search term to the server
+                        });
+
                         // Function to populate the dropdown with data from the server
-                        function populateDropdownFromServer() {
+                        function populateDropdownFromServer(searchTerm) {
                             $.ajax({
                                 url: 'php/getViolations.php', // Change this to your server-side script
                                 type: 'GET',
+                                data: { section: searchTerm }, // Pass the search term as a query parameter
                                 dataType: 'json',
                                 success: function (data) {
                                     const dropdownContent = $('.dropdown-content');
@@ -411,7 +439,7 @@ $currentTicket = $user['currentTicket'];
 
                                     data.forEach((violation) => {
                                         dropdownContent.append(
-                                            `<a href="#" data-id="${violation.violation_list_ids}" onclick="selectOption(${violation.violation_list_ids}, '${violation.violation_name}')">${violation.violation_name}</a>`
+                                            `<a href="#" data-id="${violation.violation_list_ids}" onclick="selectOption(${violation.violation_list_ids}, '${violation.violation_name}', '${violation.violation_section}')">${violation.violation_name} - ${violation.violation_section}</a>`
                                         );
                                     });
                                 },
@@ -421,19 +449,18 @@ $currentTicket = $user['currentTicket'];
                             });
                         }
 
-                        function selectOption(violationListId, violationName) {
+                        function selectOption(violationListId, violationName, violationSection) {
                             const selectedOptionsTable = $('#selectedOptionsTable');
                             const selectedOptionsBody = $('#selectedOptions');
                             const selectedViolationsInput = $('#selectedViolationsInput');
 
                             // Check if the option is already selected
-                            const isOptionSelected = $(
-                                `#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
+                            const isOptionSelected = $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
 
                             if (!isOptionSelected) {
                                 // Add a new row to the table
                                 selectedOptionsBody.append(`<tr data-id="${violationListId}">
-                                        <td>${violationName}</td>
+                                        <td>${violationName} - ${violationSection}</td>
                                         <td><button onclick="removeOption(${violationListId})">Remove</button></td>
                                         <!-- Hidden input field for violations[] -->
                                         <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
@@ -441,25 +468,9 @@ $currentTicket = $user['currentTicket'];
 
                                 // Show the table row
                                 $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
-
-                                // Update the selectedViolationsInput with the selected violations
-                                let selectedViolations = selectedViolationsInput.val() ||
-                                    ''; // Initialize as string
-                                selectedViolations = selectedViolations.split(',').filter(
-                                    Boolean); // Convert to array
-
-                                // Convert all elements in the array to integers
-                                selectedViolations = selectedViolations.map(id => parseInt(id, 10));
-
-                                selectedViolations.push(violationListId);
-                                selectedViolationsInput.val(selectedViolations.join(
-                                    ',')); // Convert to comma-separated string
-
-                                // Log the selected violations to the console
-                                console.log('Selected Violations:', selectedViolations);
                             } else {
                                 // Provide a visual indication or alert that the option is already selected
-                                alert(`Violation "${violationName}" is already selected.`);
+                                alert(`Violation "${violationName} - ${violationSection}" is already selected.`);
                             }
                         }
 
@@ -537,6 +548,7 @@ $currentTicket = $user['currentTicket'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    
     <script>
         // Get the current date
         const currentDate = new Date();

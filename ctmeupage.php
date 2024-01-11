@@ -25,18 +25,18 @@ function fetchViolationTickets()
 
     // Write a SQL query to fetch data from the violation_tickets table
     $sql = "SELECT 
-                violation_tickets.*,
-                users.first_name,users.middle_name,users.last_name,
-                vehicletype.vehicle_name as vehicle_name,
-                GROUP_CONCAT(violationlists.violation_name SEPARATOR '|||') AS concatenated_violations
-            FROM violation_tickets
-                JOIN vehicletype ON violation_tickets.vehicle_type = vehicletype.vehicle_id
-                LEFT JOIN violations ON violation_tickets.ticket_id = violations.ticket_id_violations
-                LEFT JOIN violationlists ON violations.violationlist_id = violationlists.violation_list_ids
-                LEFT JOIN users ON users.user_ctmeu_id = violation_tickets.user_ctmeu_id
-            WHERE violation_tickets.user_ctmeu_id IS NOT NULL
-            GROUP BY violation_tickets.ticket_id;
-    "; // Modify this query as needed
+            violation_tickets.*,
+            users.first_name, users.middle_name, users.last_name,
+            vehicletype.vehicle_name as vehicle_name,
+            GROUP_CONCAT(DISTINCT violationlists.violation_section SEPARATOR ', ') AS concatenated_sections
+        FROM violation_tickets
+            JOIN vehicletype ON violation_tickets.vehicle_type = vehicletype.vehicle_id
+            LEFT JOIN violations ON violation_tickets.ticket_id = violations.ticket_id_violations
+            LEFT JOIN violationlists ON violations.violationlist_id = violationlists.violation_list_ids
+            LEFT JOIN users ON users.user_ctmeu_id = violation_tickets.user_ctmeu_id
+        WHERE violation_tickets.user_ctmeu_id IS NOT NULL
+        GROUP BY violation_tickets.ticket_id;
+"; // Modify this query as needed
 
     // Execute the query
     $result = mysqli_query($conn, $sql);
@@ -422,14 +422,17 @@ $violationTickets = fetchViolationTickets();
                             <th class="sortable" data-column="7">Issuing District<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="8">Type of Vehicle<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="9">Plate No.<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="13">Registered Owner<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="14">Registered Owner's Address<span
+                            <th class="sortable" data-column="10">Registered Owner<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="11">Registered Owner's Address<span
                                     class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="10">Place of Occurrence<span class="sort-arrow"></span>
+                            <th class="sortable" data-column="12">Place of Occurrence<span class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="11">Status<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="12">Issued by<span class="sort-arrow"><span
+                            
+                            <th class="sortable" data-column="13">Violations<span class="sort-arrow"></span></th>
+
+                            <th class="sortable" data-column="14">Status<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="15">Issued by<span class="sort-arrow"><span
                                     class="sort-arrow"></span>
                             </th>
                         </tr>
@@ -440,7 +443,7 @@ $violationTickets = fetchViolationTickets();
                         $emptyResult = true;
 
                         // Define the number of records to display per page
-                        $recordsPerPage = 10;
+                        $recordsPerPage = 50;
 
                         // Get the current page from the URL (default to page 1)
                         $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -487,6 +490,8 @@ $violationTickets = fetchViolationTickets();
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['reg_owner_address'] . "</td>";
                                     // Wrap the district in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['place_of_occurrence'] . "</td>";
+
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['concatenated_sections'] . "</td>";
                                     // Wrap the district in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . ($ticket['is_settled'] ? 'Settled' : 'Unsettled') . "</td>";
                                     // Wrap the district in a clickable <td>
