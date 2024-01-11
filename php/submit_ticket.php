@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $regOwner = filter_var($_POST['reg_owner'], FILTER_SANITIZE_STRING);
     $regOwnerAddress = filter_var($_POST['reg_owner_address'], FILTER_SANITIZE_STRING);
     $placeOfOccurrence = filter_var($_POST['place_of_occurrence'], FILTER_SANITIZE_STRING);
+    $remarks = filter_var($_POST['remarks'], FILTER_SANITIZE_STRING);
     $date = filter_var($_POST['date_violation'], FILTER_SANITIZE_STRING);
     $time = filter_var($_POST['time_violation'], FILTER_SANITIZE_STRING);
     $currentTicket = $_POST['currentTicket'];
@@ -42,14 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert the form data into the violation_tickets table using prepared statements
-    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, control_number)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, remarks, control_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $insertTicketQuery);
 
     if ($stmt) {
         // Bind parameters and execute the statement
-        mysqli_stmt_bind_param($stmt, "isssssssssssi", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date, $time, $placeOfOccurrence, $currentTicket);
+        mysqli_stmt_bind_param($stmt, "issssssssssssi", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date, $time, $placeOfOccurrence, $remarks, $currentTicket);
 
         if (mysqli_stmt_execute($stmt)) {
             // Check if any rows were affected by the insertion
@@ -90,9 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             // Check for errors in execution
                             if (mysqli_stmt_errno($stmtViolation) != 0) {
-                                // Handle the error (you can log it or echo for debugging)
-                                echo "Error inserting violation: " . mysqli_stmt_error($stmtViolation);
-                                break;  // Exit the loop on error
+                                continue;
                             }
                         }
                     }
