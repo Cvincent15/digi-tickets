@@ -26,6 +26,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $currentTicket = $_POST['currentTicket'];
     $user_ctmeu_id = $_POST['user_ctmeu_id']; // Assuming this is an integer
 
+    // Check if the currentTicket is less than or equal to endTicket
+    $queryCheckTicketRange = "SELECT currentTicket, endTicket FROM users WHERE user_ctmeu_id = ?";
+    $stmtCheckTicketRange = mysqli_prepare($conn, $queryCheckTicketRange);
+    mysqli_stmt_bind_param($stmtCheckTicketRange, "i", $user_ctmeu_id);
+    mysqli_stmt_execute($stmtCheckTicketRange);
+    mysqli_stmt_bind_result($stmtCheckTicketRange, $currentTicketValue, $endTicketValue);
+    mysqli_stmt_fetch($stmtCheckTicketRange);
+    mysqli_stmt_close($stmtCheckTicketRange);
+
+    if ($currentTicketValue >= $endTicketValue) {
+        // Redirect back to ctmeuticket.php with an error message
+        header("Location: ../ctmeuticket.php?error=maxTicketReached");
+        exit();
+    }
+
     // Insert the form data into the violation_tickets table using prepared statements
     $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, control_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

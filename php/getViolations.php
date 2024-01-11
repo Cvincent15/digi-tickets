@@ -2,38 +2,46 @@
 
 include 'database_connect.php';
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Get the search term from the query parameter if it exists
+$searchTerm = isset($_GET['section']) ? $_GET['section'] : '';
+
+// Prepare the SQL query
+$query = "SELECT violation_list_ids, violation_name, violation_section FROM violationlists";
+$params = [];
+
+if (!empty($searchTerm)) {
+    // If a search term is provided, search for an exact match in violation_section
+    $query .= " WHERE violation_section = ?";
+    $params[] = $searchTerm;
 }
 
-// Fetch data from the database
-$query = "SELECT violation_list_ids, violation_name FROM violationlists";
-$result = mysqli_query($conn, $query);
+$stmt = mysqli_prepare($conn, $query);
+
+// Bind the search term parameter if it exists
+if (!empty($searchTerm)) {
+    mysqli_stmt_bind_param($stmt, "s", ...$params);
+}
+
+// Execute the query
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 $data = array();
 
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
-        // Sanitize the data before using it
-        $violationListId = mysqli_real_escape_string($conn, $row['violation_list_ids']);
-        $violationName = mysqli_real_escape_string($conn, $row['violation_name']);
-
-        // Add sanitized data to the array
         $data[] = array(
-            'violation_list_ids' => $violationListId,
-            'violation_name' => $violationName
+            'violation_list_ids' => $row['violation_list_ids'],
+            'violation_name' => $row['violation_name'],
+            'violation_section' => $row['violation_section']
         );
     }
 } else {
-    // Return a default value or handle the error as needed
-    $data[] = array(
-        'violation_list_ids' => 0,
-        'violation_name' => "Violation not found"
-    );
+    // No results found, handle as needed
 }
 
-// Close the connection
+// Close the statement and connection
+mysqli_stmt_close($stmt);
 $conn->close();
 
 // Return data as JSON
