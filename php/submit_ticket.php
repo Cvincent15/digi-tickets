@@ -36,8 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_stmt_close($stmtCheckTicketRange);
 
     if ($currentTicketValue >= $endTicketValue) {
-        // Redirect back to ctmeuticket.php with an error message
-        header("Location: ../ctmeuticket.php?error=maxTicketReached");
+        // Redirect back to ticket-creation with an error message
+        header("Location: ../ticket-creation?error=maxTicketReached");
         exit();
     }
 
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_close($stmtViolation);
 
                     // Redirect to a success page or perform any other actions as needed
-                    header("Location: ../ctmeuticket.php");
+                    header("Location: ../ticket-creation");
                     exit();
                 } else {
                     // Handle the prepared statement error for violation insertion
