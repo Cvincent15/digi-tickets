@@ -395,8 +395,15 @@ $currentTicket = $user['currentTicket'];
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
-                            maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence" reg_owner>
-                        <label for="floatingInputValue1">Place of Occurrence</label>
+                            maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence">
+                        <label for="floatingInputValue1">Place of Violation</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="floatingInputValue1" required
+                            maxlength="30" placeholder="Remarks" name="remarks">
+                        <label for="floatingInputValue1">Remarks</label>
                     </div>
                 </div>
             
@@ -405,7 +412,7 @@ $currentTicket = $user['currentTicket'];
             <div class="row">
                 <div class="col">
                     <button type="button" onclick="removeSelected()" style="margin-top:20px;">Remove
-                        Selected</button>
+                        All</button>
                     <table id="selectedOptionsTable" style="margin-top:20px; margin-bottom:20px;">
                         <thead>
                             <tr>
@@ -453,27 +460,31 @@ $currentTicket = $user['currentTicket'];
                             const selectedOptionsTable = $('#selectedOptionsTable');
                             const selectedOptionsBody = $('#selectedOptions');
                             const selectedViolationsInput = $('#selectedViolationsInput');
-
+                            
                             // Check if the option is already selected
                             const isOptionSelected = $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
 
                             if (!isOptionSelected) {
-                                // Add a new row to the table
-                                selectedOptionsBody.append(`<tr data-id="${violationListId}">
-                                        <td>${violationName} - ${violationSection}</td>
-                                        <td><button onclick="removeOption(${violationListId})">Remove</button></td>
-                                        <!-- Hidden input field for violations[] -->
-                                        <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
-                                    </tr>`);
+                            // Remove any existing hidden input fields for the same violation
+                            $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"] td input[name="violations[]"]`).detach();
 
-                                // Show the table row
-                                $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
+                            // Add a new row to the table
+                            selectedOptionsBody.append(`<tr data-id="${violationListId}">
+                                <td>${violationName} - ${violationSection}</td>
+                                <td><button onclick="removeOption(${violationListId})">Remove</button></td>
+                                <!-- Hidden input field for violations[] -->
+                                <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
+                            </tr>`);
+                           
+                            // Show the table row
+                            $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
+
                             } else {
-                                // Provide a visual indication or alert that the option is already selected
-                                alert(`Violation "${violationName} - ${violationSection}" is already selected.`);
+                            // Provide a visual indication or alert that the option is already selected
+                            alert(`Violation "${violationName} - ${violationSection}" is already selected.`);
                             }
-                        }
 
+                        }
 
 
 
@@ -523,7 +534,7 @@ $currentTicket = $user['currentTicket'];
                         <label class="input-group-text form-control" for="inputGroupSelect01" name="violationlabel"
                             style="font-size: 1rem; width: 30px;">Violation/s</label>
                         <div class="dropdown" id="inputGroupSelect01">
-                            <input type="hidden" id="selectedViolationsInput" name="violations[]" />
+                            
                             <input type="text" id="searchInput" onclick="toggleDropdown()"
                                 class="dropbtn input-group-text" style="width:300px;padding: 1rem .75rem;
     padding-top: 1rem; padding-right: 0.75rem; padding-bottom: 1rem; padding-left: 0.75rem;"

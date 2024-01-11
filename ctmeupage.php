@@ -325,12 +325,23 @@ $violationTickets = fetchViolationTickets();
         <div class="ewan">
             <div class="table-header">
                 <div class="search-container">
-                    <input type="text" id="search-bar" placeholder="Search...">
+                    <input type="text" id="search-bar" placeholder="Search..." style="width: 300px;">
                     <select id="filter-select">
-                        <option value="name">Name</option>
+                        <option value="ticket number">Ticket Number</option>
+                        <option value="date">Date</option>
+                        <option value="time">Time</option>
+                        <option value="driver's name">Driver's Name</option>
+                        <option value="driver's address">Driver's Address</option>
                         <option value="license">License No.</option>
-                        <option value="vehicle">Vehicle</option>
+                        <option value="issuing district">Issuing District</option>
+                        <option value="vehicle">Type of Vehicle</option>
+                        <option value="plate no.">Plate No.</option>
+                        <option value="registered owner">Registered Owner</option>
+                        <option value="registered owner's address">Registered Owner's Address</option>
                         <option value="place of occurrence">Place of Occurrence</option>
+                        <option value="violations">Violations</option>
+                        <option value="status">Status</option>
+                        <option value="issued by">Issued by</option>
                     </select>
                 </div>
                 <?php
@@ -377,7 +388,7 @@ $violationTickets = fetchViolationTickets();
                                 <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
                                 <h5 class="modal-title mb-3" style="font-weight: 800;">Archived!</h5>
                                 <p class="mb-3" style="font-weight: 500;">Selected tickets have been archived
-                                    successfully
+                                    successfully.
                                 </p>
                                 <button type="submit" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal"
                                     onclick="submitForm()" style="background-color: #0A157A;">Close</button>
@@ -465,7 +476,7 @@ $violationTickets = fetchViolationTickets();
 
                                     echo "<tr class='clickable-row' data-index='$index' data-rowdata='$rowData' id='row-$index'>";
                                     // Display the visible ticket count in the "No." column
-                                    echo "<td class='td-count'>" . $visibleTicketCount . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
+                                    echo "<td class='td-count'>" . $ticket['control_number'] . "<input type='hidden' value='" . $ticket['ticket_id'] . "'></td>";
 
                                     // Check the user's role to decide whether to show checkboxes
                                     if ($_SESSION['role'] === 'Super Administrator') {
@@ -684,46 +695,53 @@ $violationTickets = fetchViolationTickets();
             <?php } ?>
 
             function filterTable() {
-                var filterSelect = document.getElementById('filter-select');
-                var searchInput = document.getElementById('search-bar').value.toLowerCase();
+            var filterSelect = document.getElementById('filter-select');
+            var searchInput = document.getElementById('search-bar').value.toLowerCase();
 
-                // Define an object to map filter keys to column names
-                var columnMap = {
-                    'name': 'driver_name',
-                    'license': 'driver_license',
-                    'vehicle': 'vehicle_type',
-                    'place of occurrence': 'place_of_occurrence'
-                };
+            // Define an object to map filter keys to column names
+            var columnMap = {
+                'ticket number': 'control_number',
+                'date': 'date_violation',
+                'time': 'time_violation',
+                'driver\'s name': 'driver_name',
+                'driver\'s address': 'driver_address',
+                'license': 'driver_license',
+                'issuing district': 'issuing_district',
+                'vehicle': 'vehicle_type',
+                'plate no.': 'plate_no',
+                'registered owner': 'reg_owner',
+                'registered owner\'s address': 'reg_owner_address',
+                'place of occurrence': 'place_of_occurrence',
+                'violations': 'concatenated_sections',
+                'status': 'is_settled',
+                'issued by': 'first_name' // Assuming 'issued by' refers to the first name of the issuer
+            };
 
-                // Get the column name based on the selected filter key
-                var columnName = columnMap[filterSelect.value];
+            // Get the column name based on the selected filter key
+            var columnName = columnMap[filterSelect.value];
 
-                // Loop through the table rows and filter based on the selected column
-                var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
-                rows.forEach(function (row) {
-                    var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+            // Loop through the table rows and filter based on the selected column
+            var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+            rows.forEach(function (row) {
+                var rowData = JSON.parse(row.getAttribute('data-rowdata'));
 
-                    // Get the cell value based on the selected column name
-                    var cellValue = String(rowData[columnName]).toLowerCase();
+                // Get the cell value based on the selected column name
+                var cellValue = String(rowData[columnName]).toLowerCase();
 
-                    console.log("Search Input: " + searchInput);
-                    console.log("CellValue: " + cellValue);
-                    console.log("Filter Key: " + filterSelect.value);
-                    console.log("Row Data: ", rowData);
-
-                    if (cellValue.startsWith(searchInput)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            }
+                if (cellValue.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
 
 
 
             // Add event listeners to trigger filtering
             document.getElementById('filter-select').addEventListener('change', filterTable);
             document.getElementById('search-bar').addEventListener('input', filterTable);
+            
         </script>
         <script>
             $(document).ready(function () {

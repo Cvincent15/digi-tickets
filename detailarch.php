@@ -41,7 +41,7 @@ function fetchVehicleName($vehicleId, $conn) {
 // Function to fetch ticket details including violation names based on ticket_id
 function fetchTicketDetails($ticketId, $conn) {
     $query = "SELECT vt.ticket_id, vt.is_settled, u.first_name, u.last_name,
-                     GROUP_CONCAT(CONCAT(vl.violation_name, ' - ', vl.violation_section, ' - ', vl.violation_fine) SEPARATOR '|||') AS concatenated_violations
+                     GROUP_CONCAT(CONCAT(vl.violation_name, ' | ', vl.violation_section, ' | ', vl.violation_fine) SEPARATOR '|||') AS concatenated_violations
               FROM violation_tickets vt
               INNER JOIN users u ON vt.user_ctmeu_id = u.user_ctmeu_id
               LEFT JOIN violations v ON vt.ticket_id = v.ticket_id_violations
@@ -267,14 +267,14 @@ unset($_SESSION['rowData']);
         <tr>
         <tr><td><label for="date_violation">Date of Violation:</label></td>
 <td><?php echo $rowData['date_violation']; ?></td>
-<td><label for="place_of_occurrence">Place of Occurrence:</label></td>
+<td><label for="place_of_occurrence">Place of Violation:</label></td>
 <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" minlength="10" maxlength="50" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly required></td>
 </tr>
 
-
-            
 <td><label for="time_violation">Time of Violation:</label></td>
 <td><?php echo $rowData['time_violation']; ?></td>
+<td><label for="time_violation">Remarks:</label></td>
+<td><?php echo $rowData['remarks']; ?></td>
         </tr>
         <tr>
             <td><label for="is_settled">Account Status:</label></td>
@@ -316,14 +316,15 @@ $encodedViolationNames = htmlspecialchars($ticketDetails['concatenated_violation
 echo '<ul>';
 $violationsList = explode('|||', $ticketDetails['concatenated_violations']);
 foreach ($violationsList as $violation) {
-    list($violationName, $violationSection, $violationFine) = explode(' - ', $violation);
+    list($violationName, $violationSection, $violationFine) = explode(' | ', $violation);
     $totalFines += floatval($violationFine); // Accumulate the total fines
-    echo '<li> Violation: ' . htmlspecialchars($violationName) . ' - Section: ' . htmlspecialchars($violationSection) . '<span class="fine-right">' . htmlspecialchars(number_format($violationFine, 2)) . '</span></li>';
+    echo '<li> Violation: ' . htmlspecialchars($violationName) . ' | Section: ' . htmlspecialchars($violationSection) . '<span class="fine-right">' . htmlspecialchars(number_format($violationFine, 2)) . '</span></li>';
 }
+
 echo '</ul>';
 
 // Display the total fines at the bottom
-echo '<p class="total-fines">Total Fines: <span class="fine-right">' . htmlspecialchars(number_format($totalFines, 2)) . '</span></p>';
+echo '<p class="total-fines"><b>Total Fines:</b> <span class="fine-right">' . htmlspecialchars(number_format($totalFines, 2)) . '</span></p>';
 
         ?>
 </td>
