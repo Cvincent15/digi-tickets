@@ -100,13 +100,13 @@ $status = $user['role'];
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -116,7 +116,7 @@ $status = $user['role'];
                                     //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
@@ -125,7 +125,7 @@ $status = $user['role'];
         </li>';
 
                                     /* echo '<li class="nav-item">
-                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                         <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
                                        </li>'; */
 
                                 }
@@ -240,18 +240,26 @@ $status = $user['role'];
             </div>
         </div>
 
-        <div class="card text-center mb-3" style="width: 95%; margin-top:10px;">
-   <div class="card-body">
-       <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Ticket Control Number</h2>
-       <div class="table-container">
-       <select id="userSelect">
-         <option value="" disabled selected>Select a user</option>
-         <?php foreach ($users as $user): ?>
-             <option value="<?php echo $user['user_ctmeu_id']; ?>">
-                <?php echo $user['username'] . ' (' . $user['first_name'] . ' ' . $user['last_name'] . ') ' . $user['role']; ?>
-             </option>
-         <?php endforeach; ?>
-     </select>
+<!-- Ticket Control Number card -->
+<div class="card text-center mb-3" style="width: 95%; margin-top:10px;">
+  <div class="card-body">
+      <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Ticket Control Number</h2>
+      <div class="table-container">
+          <select id="userSelect">
+              <option value="" disabled selected>Select a user</option>
+              <?php foreach ($users as $user): ?>
+                <option value="<?php echo $user['user_ctmeu_id']; ?>">
+                    <?php echo $user['username'] . ' (' . $user['first_name'] . ' ' . $user['last_name'] . ') ' . $user['role']; ?>
+                </option>
+              <?php endforeach; ?>
+          </select>
+          <p>Start Ticket: <input type="number" id="startTicket" readonly></p>
+          <p>End Ticket: <input type="number" id="endTicket" readonly></p>
+          <button id="updateButton">Update</button>
+      </div>
+  </div>
+</div>
+       </div>
    </div>
 </div>
 
@@ -352,11 +360,62 @@ document.getElementById('logout-button').addEventListener('click', function() {
         window.location.href = 'php/logout.php';
     });
 
+    document.getElementById('updateButton').addEventListener('click', function() {
+      var userId = document.getElementById('userSelect').value;
+      var startTicket = document.getElementById('startTicket').value;
+      var endTicket = document.getElementById('endTicket').value;
+
+      if (userId !== "" && startTicket !== "" && endTicket !== "") {
+          fetch('php/update_ticket_range.php', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ userId, startTicket, endTicket }),
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert("Ticket range updated successfully.");
+              } else {
+                  alert("Failed to update ticket range. Please try again.");
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert("An error occurred. Please try again.");
+          });
+      } else {
+          alert("Please select a user and enter valid ticket numbers.");
+      }
+    });
     // Check if the user is logged in and update the welcome message
     <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
         var role = '<?php echo $_SESSION['role']; ?>';
         var firstName = '<?php echo $_SESSION['first_name']; ?>';
         var lastName = '<?php echo $_SESSION['last_name']; ?>';
+        
+document.getElementById('userSelect').addEventListener('change', function() {
+   var userId = this.value;
+   if (userId !== "") {
+       fetch('php/get_ticket_range.php', {
+           method: 'POST',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({ userId }),
+       })
+       .then(response => response.json())
+       .then(data => {
+           document.getElementById('startTicket').value = data.startTicket;
+           document.getElementById('endTicket').value = data.endTicket;
+       })
+       .catch(error => {
+           console.error('Error:', error);
+           alert("An error occurred. Please try again.");
+       });
+   }
+});
 
         document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
     <?php } ?>

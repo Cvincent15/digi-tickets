@@ -334,13 +334,13 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -350,7 +350,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
                                     //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
@@ -359,7 +359,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
         </li>';
 
                                     /* echo '<li class="nav-item">
-                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                         <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
                                        </li>'; */
 
                                 }

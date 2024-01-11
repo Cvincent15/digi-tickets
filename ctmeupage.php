@@ -12,7 +12,7 @@ if (!isset($_SESSION['username'])) {
 // Check the user's role
 if ($_SESSION['role'] === 'Enforcer') {
     // Redirect the user to ctmeutickets.php if their role is Enforcer
-    header("Location: ctmeuticket.php");
+    header("Location: ticket-creation");
     exit();
 }
 
@@ -242,13 +242,13 @@ $violationTickets = fetchViolationTickets();
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -258,7 +258,7 @@ $violationTickets = fetchViolationTickets();
                                     //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
                                     echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
@@ -267,7 +267,7 @@ $violationTickets = fetchViolationTickets();
         </li>';
 
                                     /* echo '<li class="nav-item">
-                                         <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+                                         <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
                                        </li>'; */
 
                                 }
