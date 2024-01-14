@@ -407,6 +407,7 @@ if (!$hasSettledTickets) {
 } else {
                     
                 ?>
+                 <div class="ewan">
             <div class="table-header">
                 <div class="search-container">
                     <input type="text" id="search-bar" placeholder="Search...">
@@ -537,7 +538,7 @@ if (!$hasSettledTickets) {
                 </table>
                 
             </div>
-
+                   
             <!-- Pagination -->
             <div class="pagination-container">
                 <div class="pagination">
@@ -554,6 +555,7 @@ if (!$hasSettledTickets) {
                     }
                     ?>
                 </div>
+            </div>
             </div>
             <?php } ?>
         </div>
