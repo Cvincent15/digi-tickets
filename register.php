@@ -70,11 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    header('Location: user-creation');
 }  else {
             // Prepare an SQL statement to insert the user data into the database
-            $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password, employee_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-
-            // Bind the parameters to the statement
-            $stmt->bind_param("sssssssi", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword, $masterlist);
-
+if (empty($masterlist)) {
+    $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword);
+ } else {
+    $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password, employee_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssi", $firstName, $middleName, $lastName, $affixes, $role, $username, $hashedPassword, $masterlist);
+ }
             // Execute the statement
             if ($stmt->execute()) {
                 // Registration successful
