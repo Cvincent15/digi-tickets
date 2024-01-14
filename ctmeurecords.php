@@ -500,6 +500,15 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
         </select>
     </div>
 </div>
+<!-- Account Status Filter -->
+<div class="col-sm mb-3 ms-3">
+    <label for="account-status-filter" class="form-label">Account Status</label>
+    <select class="form-control" id="account-status-filter" name="account_status_filter">
+        <option value="">All Statuses</option>
+        <option value="1">Settled</option>
+        <option value="0">Unsettled</option>
+    </select>
+</div>
 
 </div>
 </div>
@@ -678,7 +687,7 @@ function calculateStatusCounts() {
 
   
 
-  function filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter) {
+  function filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter, accountStatusFilter) {
    var startDateTime = startDate && startTime ? new Date(startDate + 'T' + startTime) : null;
    var endDateTime = endDate && endTime ? new Date(endDate + 'T' + endTime) : null;
 
@@ -695,6 +704,7 @@ function calculateStatusCounts() {
 
         var matchesVehicleType = !vehicleType || rowData['vehicle_type'] == vehicleType;
         var matchesViolation = true; // Assume true until proven otherwise
+        var matchesAccountStatus = !accountStatusFilter || rowData['is_settled'].toString() === accountStatusFilter;
 
         // If a violation filter is set, split the concatenated sections and check for an exact match
         if (violationFilter) {
@@ -706,7 +716,7 @@ function calculateStatusCounts() {
             (!startDateTime || ticketDateTime >= startDateTime) &&
             (!endDateTime || ticketDateTime <= endDateTime) &&
             matchesVehicleType &&
-            matchesViolation
+            matchesViolation && matchesAccountStatus
         ) {
             row.style.display = ''; // Show the row if it matches the filter
             dataFound = true; // Data is found
@@ -732,6 +742,7 @@ document.getElementById('filter-button').addEventListener('click', function() {
    var endTime = document.getElementById('end-time').value;
    var vehicleType = document.getElementById('vehicle-filter').value;
    var violationFilter = $('#violations-filter').val();
+   var accountStatusFilter = document.getElementById('account-status-filter').value;
 
    var startDateTime = startDate && startTime ? new Date(startDate + 'T' + startTime) : null;
    var endDateTime = endDate && endTime ? new Date(endDate + 'T' + endTime) : null;
@@ -743,8 +754,8 @@ document.getElementById('filter-button').addEventListener('click', function() {
    }
 
    // Filter the table based on the selected date range
-   filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter);
-   toggleTableAndPDFVisibility(filteredData.length > 0);
+   filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter, accountStatusFilter);
+    toggleTableAndPDFVisibility(filteredData.length > 0);
 });
 
 
