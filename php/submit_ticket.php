@@ -58,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Get the ID of the newly inserted ticket
                 $ticketID = mysqli_insert_id($conn);
 
+
                 // Increment the currentTicket for the user
                 $incrementTicketQuery = "UPDATE users SET currentTicket = currentTicket + 1 WHERE user_ctmeu_id = ?";
                 $stmtIncrement = mysqli_prepare($conn, $incrementTicketQuery);
@@ -86,15 +87,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         mysqli_stmt_close($stmtCheckViolation);
 
                         if ($violationCount == 0) {
+                            // Fetch violation_name, violation_fine, and violation_section from violationlists table
+                            $fetchViolationInfoQuery = "SELECT violation_name, violation_fine, violation_section FROM violationlists WHERE violation_list_ids = ?";
+                            $stmtFetchViolationInfo = mysqli_prepare($conn, $fetchViolationInfoQuery);
+                            mysqli_stmt_bind_param($stmtFetchViolationInfo, "i", $violationId);
+                            mysqli_stmt_execute($stmtFetchViolationInfo);
+                            mysqli_stmt_bind_result($stmtFetchViolationInfo, $violationName, $violationFine, $violationSection);
+                            mysqli_stmt_fetch($stmtFetchViolationInfo);
+                            mysqli_stmt_close($stmtFetchViolationInfo);
+                     
+                            // Insert the fetched data into the violator_info table
+                            $insertViolatorInfoQuery = "INSERT INTO violator_info (TCT_NUMBER, DRIVER_NAME, VIOLATION_NAME, VIOLATION_DATE, VIOLATION_TIME, VIOLATION_FINE, VIOLATION_SECTION, violationL_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                            $stmtInsertViolatorInfo = mysqli_prepare($conn, $insertViolatorInfoQuery);
+                            mysqli_stmt_bind_param($stmtInsertViolatorInfo, "issssssi", $currentTicket, $driverName, $violationName, $date, $time, $violationFine, $violationSection, $violationId);
+                            mysqli_stmt_execute($stmtInsertViolatorInfo);
+                            mysqli_stmt_close($stmtInsertViolatorInfo);
+                     
                             // Execute the prepared statement for each violation only if it doesn't exist for the ticket
                             mysqli_stmt_execute($stmtViolation);
-
+                     
                             // Check for errors in execution
                             if (mysqli_stmt_errno($stmtViolation) != 0) {
                                 continue;
                             }
                         }
-                    }
+                     }
 
                     // Close the statement after the loop
                     mysqli_stmt_close($stmtViolation);
