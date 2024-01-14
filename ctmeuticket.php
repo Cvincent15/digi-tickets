@@ -94,6 +94,22 @@ $currentTicket = $user['currentTicket'];
         padding: 12px 30px;
         /* Adjust the padding as needed */
     }
+
+    #submitBtn:disabled {
+   cursor: not-allowed;
+}
+
+#submitBtn:disabled:hover::after {
+   content: "Contact your IT Administrator to generate your Control Number to create a ticket.";
+   position: absolute;
+   top: 100%;
+   left: 50%;
+   transform: translate(-50%, 0);
+   background-color: #fff;
+   border: 1px solid #ccc;
+   padding: 10px;
+   z-index: 1;
+}
 </style>
 
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
@@ -176,15 +192,15 @@ $currentTicket = $user['currentTicket'];
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
@@ -269,12 +285,12 @@ $currentTicket = $user['currentTicket'];
                 
             </div>
             <div class="row">
-                <div class="col">
-                    <div class="form-floating mb-3">
-                        <input type="number" class="form-control" id="floatingInputValue1"
-                            maxlength="30" placeholder="Driver's Name" name="currentTicket" value="<?php echo $currentTicket; ?>" required>
-                        <label for="floatingInputValue1">Control Number</label>
-                    </div>
+            <div class="col">
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="floatingInputValue1"
+                        maxlength="30" placeholder="Driver's Name" name="currentTicket" value="<?php echo $currentTicket; ?>" required readonly>
+                    <label for="floatingInputValue1">Control Number</label>
+                </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
@@ -549,7 +565,8 @@ $currentTicket = $user['currentTicket'];
 
             </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            <button type="submit" class="btn btn-primary mt-3" id="submitBtn">Submit</button>
+<span id="controlNumberMessage" style="display: none; margin-left: 10px; color: red;">Contact your IT Administrator to generate your Control Number to create a ticket.</span>
         </form>
     </div>
 
@@ -561,6 +578,29 @@ $currentTicket = $user['currentTicket'];
 
     
     <script>
+window.onload = function() {
+   var controlNumberInput = document.getElementById('floatingInputValue1');
+   var submitButton = document.getElementById('submitBtn');
+   var controlNumberMessage = document.getElementById('controlNumberMessage');
+
+   // Function to toggle the disabled state of the submit button and message display
+   function toggleSubmitButton() {
+       if (controlNumberInput.value === '') {
+           submitButton.disabled = true;
+           controlNumberMessage.style.display = 'inline';
+       } else {
+           submitButton.disabled = false;
+           controlNumberMessage.style.display = 'none';
+       }
+   }
+
+   // Initial check
+   toggleSubmitButton();
+
+   // Listen for changes to the Control Number input field
+   controlNumberInput.addEventListener('input', toggleSubmitButton);
+};
+
         // Get the current date
         const currentDate = new Date();
 

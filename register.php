@@ -44,6 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Hash the password (for security)
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
+    // Fetch the current counts of IT Administrators and Super Administrators from the maxaccess table
+   $query = "SELECT maxITSA, maxEncoder FROM maxaccess where access_id = 1";
+   $result = mysqli_query($conn, $query);
+   $access = mysqli_fetch_assoc($result);
+   $maxITSA = $access['maxITSA'];
+   $maxEncoder = $access['maxEncoder'];
+   
+   // Count the number of existing users with the selected role
+   $existingCount = countUsersWithRole($role);
+
     // Check if a user with the same first name and last name already exists
     if (userExists($firstName, $lastName)) {
         // Display an alert message
@@ -53,12 +63,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Initialize the count variable
         $count = 0;
 
-        if (($role === "Super Administrator" && ($count = countUsersWithRole("Super Administrator")) >= 4) ||
-            ($role === "IT Administrator" && ($count = countUsersWithRole("IT Administrator")) >= 8)) {
-            session_start();
-            $_SESSION["limit_reached"] = true;
-            header('Location: user-creation');
-        } else {
+        // Check if the limit for the selected role has been reached
+   if (($role === "Super Administrator" && $existingCount >= $maxITSA) ||
+   ($role === "IT Administrator" && $existingCount >= $maxEncoder)) {
+   echo "<script>alert('The limit for this role has been reached. Please choose a different role.');</script>";
+   header('Location: user-creation');
+}  else {
             // Prepare an SQL statement to insert the user data into the database
             $stmt = $conn->prepare("INSERT INTO users (first_name, middle_name, last_name, affixes, role, username, password, employee_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 

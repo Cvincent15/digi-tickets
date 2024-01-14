@@ -366,7 +366,6 @@ if ($unsettledTicketCount > 0) {
 </div>
     <script>
       const receiptSection = document.getElementById('ticket-receipt');
-console.log(receiptSection);
 document.addEventListener('DOMContentLoaded', function () {
     const clickableCells = document.querySelectorAll('.clickable-cell');
     const receiptSection = document.getElementById('ticket-receipt');

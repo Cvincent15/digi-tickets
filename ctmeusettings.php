@@ -22,6 +22,17 @@ $users = [];
 while ($row = mysqli_fetch_assoc($result)) {
   $users[] = $row;
 }
+// Fetch violations from the database
+$violationQuery = "SELECT violation_name, violation_section FROM violationlists";
+$violationResult = mysqli_query($conn, $violationQuery);
+
+// Fetch maxITSA and maxEncoder from the maxaccess table
+$query = "SELECT maxITSA, maxEncoder FROM maxaccess";
+$result = mysqli_query($conn, $query);
+if (!$result) {
+   die("Database query failed: " . mysqli_error($conn));
+}
+$access = mysqli_fetch_assoc($result);
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -110,15 +121,15 @@ $status = $user['role'];
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
@@ -233,15 +244,41 @@ $status = $user['role'];
         
 
         <!-- Second Card -->
-        <div class="card text-center mb-3" style="width: 45%;">
-            <div class="card-body">
-                <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Violations</h1>
-                
-            </div>
-        </div>
+<!-- Violations Table Card -->
 
+<div class="card text-center mb-3" style="width: 45%;">
+    <div class="card-body">
+        <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Violations</h2>
+        <!-- Search input -->
+        <input type="text" id="violationSearchInput" onkeyup="searchViolations()" placeholder="Search for violations..." class="form-control mb-3">
+        <table id='violationTable'>
+            <thead>
+                <tr>
+                    <th>Violation Name</th>
+                    <th>Violation Section</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="max-height: 300px; overflow-y: auto;">
+            <table class="table">
+                <tbody>
+                    <?php
+                    while ($violationRow = mysqli_fetch_assoc($violationResult)) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($violationRow['violation_name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($violationRow['violation_section']) . "</td>";
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
 <!-- Ticket Control Number card -->
-<div class="card text-center mb-3" style="width: 95%; margin-top:10px;">
+<div class="card text-center mb-3 mr-3" style="width: 45%; margin-top:10px;">
   <div class="card-body">
       <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Ticket Control Number</h2>
       <div class="table-container">
@@ -259,6 +296,54 @@ $status = $user['role'];
       </div>
   </div>
 </div>
+<!-- Max Personnel card -->
+<div class="card text-center mb-3 ml-10" style="width: 45%; margin-top:10px;">
+ <div class="card-body">
+     <h2 class="card-title m-4" style="color: #1A3BB1; font-weight: 800;">Max Personnel</h2>
+     <div class="table-container">
+         <p>Maximum IT Admin/Super Admin: <input type="number" id="maxITSA" name="maxITSA" value="<?php echo $access['maxITSA']; ?>"></p>
+         <p>Maximum Encoder: <input type="number" id="maxEncoder" name="maxEncoder" value="<?php echo $access['maxEncoder']; ?>"></p>
+         <button id="updateMaxPersonnelButton">Update</button>
+     </div>
+ </div>
+</div>
+</div>
+
+<script>
+document.getElementById('maxITSA').value = <?php echo $access['maxITSA']; ?>;
+document.getElementById('maxEncoder').value = <?php echo $access['maxEncoder']; ?>;
+
+document.getElementById('updateMaxPersonnelButton').addEventListener('click', function() {
+ var maxITSA = document.getElementById('maxITSA').value;
+ var maxEncoder = document.getElementById('maxEncoder').value;
+
+ if (maxITSA !== "" && maxEncoder !== "") {
+     fetch('php/update_max_personnel.php', {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ maxITSA, maxEncoder }),
+     })
+     .then(response => response.json())
+     .then(data => {
+         if (data.success) {
+             alert("Max personnel updated successfully.");
+             window.location.reload();
+         } else {
+             alert("Failed to update max personnel. Please try again.");
+         }
+     })
+     .catch(error => {
+         console.error('Error:', error);
+         alert("An error occurred. Please try again.");
+     });
+ } else {
+     alert("Please enter valid values.");
+ }
+});
+</script>
+
        </div>
    </div>
 </div>
@@ -281,9 +366,32 @@ $status = $user['role'];
         </tbody>
     </table>
     </div>
+
+    
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
+ function searchViolations() {
+    var input, filter, tbody, tr, td, i, txtValue;
+    input = document.getElementById("violationSearchInput");
+    filter = input.value.toUpperCase();
+    tbody = document.querySelector("#violationTable + div > table > tbody");
+    tr = tbody.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        if (td.length > 0) { // Ensure that the row has cells
+            // Concatenate the text from the 'Violation Name' and 'Violation Section' columns
+            txtValue = td[0].textContent + " " + td[1].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
     function addVehicle() {
       var vehicleNameInput = document.getElementById("vehicleName");
       var vehicleName = vehicleNameInput.value.trim();
@@ -377,6 +485,7 @@ document.getElementById('logout-button').addEventListener('click', function() {
           .then(data => {
               if (data.success) {
                   alert("Ticket range updated successfully.");
+                  window.location.reload();
               } else {
                   alert("Failed to update ticket range. Please try again.");
               }

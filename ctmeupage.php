@@ -19,6 +19,38 @@ if ($_SESSION['role'] === 'Enforcer') {
 
 
 // Define a function to fetch data from the violation_tickets table
+// Define a function to fetch data from the violator_info table
+function fetchViolatorInfo()
+{
+    global $conn; // Assuming you have a database connection established
+
+    // Write a SQL query to fetch data from the violator_info table
+    $sql = "SELECT * FROM violator_info;"; // Modify this query as needed
+
+    // Execute the query
+    $result = mysqli_query($conn, $sql);
+
+    // Check if the query was successful
+    if ($result) {
+        // Initialize an empty array to store the fetched data
+        $data = array();
+
+        // Fetch data and store it in the array
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+
+        // Return the fetched data
+        return $data;
+    } else {
+        // Handle the error, e.g., display an error message
+        echo "Error: " . mysqli_error($conn);
+        return array(); // Return an empty array if there was an error
+    }
+}
+
+// Fetch the violator info data
+$violatorInfo = fetchViolatorInfo();
 function fetchViolationTickets()
 {
     global $conn; // Assuming you have a database connection established
@@ -96,7 +128,7 @@ $violationTickets = fetchViolationTickets();
     .ewan {
         background: white;
         border-radius: 20px;
-        width: 80%;
+        width: 95%;
         max-width: 1900px;
         margin: 0 auto;
         margin-top: 40px;
@@ -216,6 +248,11 @@ $violationTickets = fetchViolationTickets();
     .clickable-row {
         display: table-row;
     }
+    .text-blue {
+    color: #1A3BB1;
+    font-size: 20px;
+    text-align:center;
+}
 </style>
 
 <body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
@@ -252,15 +289,15 @@ $violationTickets = fetchViolationTickets();
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
@@ -322,6 +359,18 @@ $violationTickets = fetchViolationTickets();
             </div>
             </div>
         </nav>
+        <?php 
+        // Check if there is no data in both violator info and violation tickets
+if (empty($violatorInfo) && empty($violationTickets)) {
+    // Display the image in a card
+    echo '<div class="card" style="width: 700px; margin: auto; margin-top: 50px; border: none; height: 600px;">';
+    echo '<img src="images/empty-folder-svg.png" class="card-img-top" alt="No Records" style="width:100%; height:100%;">';
+    echo '<div class="card-body">';
+    echo '<p class="card-text text-blue"><b>No ticket data yet.</b></p>';
+    echo '</div>';
+    echo '</div>';
+} else {
+    ?>
         <div class="ewan">
             <div class="table-header">
                 <div class="search-container">
@@ -338,7 +387,7 @@ $violationTickets = fetchViolationTickets();
                         <option value="plate no.">Plate No.</option>
                         <option value="registered owner">Registered Owner</option>
                         <option value="registered owner's address">Registered Owner's Address</option>
-                        <option value="place of occurrence">Place of Occurrence</option>
+                        <option value="place of occurrence">Place of Violation</option>
                         <option value="violations">Violations</option>
                         <option value="status">Status</option>
                         <option value="issued by">Issued by</option>
@@ -412,6 +461,8 @@ $violationTickets = fetchViolationTickets();
                     </div>
                 </div>
             </div>
+            <!-- Button to switch between tables -->
+<button type="button" id="switch-tables-button" class="btn btn-primary mb-3">Switch to Violator Info</button>
             <div class="tableContainer">
                 <table class="mb-5">
                     <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
@@ -437,7 +488,7 @@ $violationTickets = fetchViolationTickets();
                             <th class="sortable" data-column="11">Registered Owner's Address<span
                                     class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="12">Place of Occurrence<span class="sort-arrow"></span>
+                            <th class="sortable" data-column="12">Place of Violation<span class="sort-arrow"></span>
                             </th>
                             
                             <th class="sortable" data-column="13">Violations<span class="sort-arrow"></span></th>
@@ -450,6 +501,7 @@ $violationTickets = fetchViolationTickets();
                     </thead>
                     <tbody class="text-center" id="ticket-table-body">
                         <?php
+                        
                         $visibleTicketCount = 0; // Initialize a counter for visible tickets
                         $emptyResult = true;
 
@@ -517,6 +569,38 @@ $violationTickets = fetchViolationTickets();
                 </table>
             </div>
 
+<!-- Container for the new violator info table -->
+<div id="violator-info-container" class="tableContainer hidden">
+    <table class="mb-5">
+        <thead>
+            <tr class="align-items-center">
+                <th>TCT Number</th>
+                <th>Driver's Name</th>
+                <th>Violation Name</th>
+                <th>Violation Date</th>
+                <th>Violation Time</th>
+                <th>Violation Fine</th>
+                <th>Violation Section</th>
+            </tr>
+        </thead>
+        <tbody class="text-center" id="violator-info-table-body">
+            <?php
+            // Loop through the fetched violator info data and populate the table rows
+            foreach ($violatorInfo as $violator) {
+                echo "<tr>";
+                echo "<td>" . $violator['TCT_NUMBER'] . "</td>";
+                echo "<td>" . $violator['DRIVER_NAME'] . "</td>";
+                echo "<td>" . $violator['VIOLATION_NAME'] . "</td>";
+                echo "<td>" . $violator['VIOLATION_DATE'] . "</td>";
+                echo "<td>" . $violator['VIOLATION_TIME'] . "</td>";
+                echo "<td>" . $violator['VIOLATION_FINE'] . "</td>";
+                echo "<td>" . $violator['VIOLATION_SECTION'] . "</td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
             <!-- Pagination -->
             <div class="pagination-container">
                 <div class="pagination">
@@ -535,9 +619,28 @@ $violationTickets = fetchViolationTickets();
                 </div>
             </div>
         </div>
+        <?php }?>
         <script src="js/script.js"></script>
         <script src="js/jquery-3.6.4.js"></script>
         <script>
+            <?php if (!empty($violatorInfo) && !empty($violationTickets)) { ?>
+            document.getElementById('switch-tables-button').addEventListener('click', function() {
+    var ticketTableContainer = document.querySelector('.tableContainer');
+    var violatorInfoContainer = document.getElementById('violator-info-container');
+    var switchButton = document.getElementById('switch-tables-button');
+
+    // Toggle visibility of the tables
+    ticketTableContainer.classList.toggle('hidden');
+    violatorInfoContainer.classList.toggle('hidden');
+
+    // Update the button text based on which table is currently visible
+    if (ticketTableContainer.classList.contains('hidden')) {
+        switchButton.textContent = 'Switch to Ticket Table';
+    } else {
+        switchButton.textContent = 'Switch to Violator Info';
+    }
+});
+
             // Apply symbol restriction to all text input fields
             const form = document.getElementById('search-bar');
             const inputs = form.querySelectorAll('input[type="text"]');
@@ -550,7 +653,7 @@ $violationTickets = fetchViolationTickets();
                     e.target.value = sanitizedValue;
                 });
             });
-
+            <?php }?>
             document.addEventListener("DOMContentLoaded", function () {
                 const tableBody = document.getElementById("ticket-table-body");
                 const headers = document.querySelectorAll(".sortable");
@@ -637,7 +740,7 @@ $violationTickets = fetchViolationTickets();
 
             <?php
             // Check if the user is a Super Administrator
-            if ($_SESSION['role'] === 'Super Administrator') {
+            if ($_SESSION['role'] === 'Super Administrator' && !empty($violatorInfo) && !empty($violationTickets)) {
                 // Show the archive button and checkboxes
                 echo "document.getElementById('select-all-checkbox').addEventListener('change', function () {
                   var checkboxes = document.querySelectorAll('tbody input[type=" . "checkbox" . "]');
@@ -737,11 +840,11 @@ $violationTickets = fetchViolationTickets();
         }
 
 
-
+        <?php if (!empty($violatorInfo) && !empty($violationTickets)) { ?>
             // Add event listeners to trigger filtering
             document.getElementById('filter-select').addEventListener('change', filterTable);
             document.getElementById('search-bar').addEventListener('input', filterTable);
-            
+            <?php }?>
         </script>
         <script>
             $(document).ready(function () {
@@ -760,7 +863,7 @@ $violationTickets = fetchViolationTickets();
         </script>
 
         <script>
-            
+            <?php if (!empty($violatorInfo) && !empty($violationTickets)) { ?>
             // Add an event listener to the "Yes" button in the "Archive" modal
             document.getElementById('archiveButton').addEventListener('click', function () {
                 // Check if at least one checkbox is selected
@@ -777,7 +880,7 @@ $violationTickets = fetchViolationTickets();
                     $('#exampleModal').modal('show');
                 }
             });
-
+            
             // Add an event listener to the "Yes" button in the "Archive" modal
             document.getElementById('archive-confirmation-button').addEventListener('click', function () {
                 // Perform the necessary actions when the user clicks "Yes" in the "Archive" modal
@@ -789,13 +892,13 @@ $violationTickets = fetchViolationTickets();
                 // Show the "Success" modal only if the user clicked "Yes" in the "Archive" modal
                 $('#successModal').modal('show');
             });
-
+           
             // Add an event listener to the "No" button in the "Archive" modal
             document.getElementById('archive-cancel-button').addEventListener('click', function () {
                 // If the user clicks "No" in the "Archive" modal, do not proceed to the "Success" modal
                 $('#exampleModal').modal('hide');
             });
-
+            <?php }?>
             // Function to refresh the page
             function refreshPage() {
                 location.reload(true);

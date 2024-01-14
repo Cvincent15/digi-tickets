@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 10, 2024 at 04:33 PM
+-- Generation Time: Jan 14, 2024 at 07:32 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -190,6 +190,25 @@ INSERT INTO `employee_masterlist` (`masterlist_id`, `Employee_ID`, `First_name`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `maxaccess`
+--
+
+CREATE TABLE `maxaccess` (
+  `access_id` int(11) NOT NULL,
+  `maxITSA` int(30) NOT NULL,
+  `maxEncoder` int(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `maxaccess`
+--
+
+INSERT INTO `maxaccess` (`access_id`, `maxITSA`, `maxEncoder`) VALUES
+(1, 4, 8);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `motorist_info`
 --
 
@@ -242,8 +261,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `currentTicket`, `email`, `employee_id`, `is_activated`, `apiKey`) VALUES
-(1, 'Vincent Andrei', '', 'Cosio', '', 'VanillaC', '$2y$10$wr.wTumAsDICvNPpWek8IeRYiG8ldm/qwBUdsTLzE7h1ANmozXG1q', 'Super Administrator', NULL, NULL, NULL, 'vincent.andrei15@gmail.com', NULL, 0, ''),
-(101, 'eddie', 'alibusan', 'colarina', '', 'edscolarina', '$2y$10$b/G/TZG1b0aZAY0d1CAbeehcamsohCpmRbSZpr8nP53W9Sc4b61YK', 'Enforcer', NULL, NULL, NULL, '', NULL, 0, NULL);
+(2, 'Backdoor', '', 'CTMEU', '', 'devCTMEU', '$2y$10$x8WM5JG8q7lsEjpq9UkmbO4zUJrooQ42WM1iatM/g6aS5ROTNb0sS', 'Backdoor', NULL, NULL, NULL, '', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -315,11 +333,11 @@ CREATE TABLE `violationlists` (
 INSERT INTO `violationlists` (`violation_list_ids`, `violation_section`, `responsible`, `violation_name`, `violation_fine`) VALUES
 (1, '1', 'Driver', 'Driving without license', '500'),
 (2, '2', 'Driver', 'Driving with a delinquent, invalid, suspended ineffectual or revoked license', '200'),
-(3, 'KP 1471-2006', 'Driver', 'SHUTTLE POINT TO POINT', NULL),
-(4, 'KP 1265-2003', 'Driver', 'Coding', NULL),
-(5, 'KP 1465-2006', 'Driver', 'ILLEGAL TERMINAL', NULL),
-(6, 'KP 1418-2005', 'Driver', 'TRUCK BAN', NULL),
-(7, 'KP 1721-2011', 'Driver', 'TOWING', NULL),
+(3, 'KP 1471-2006', 'Driver', 'SHUTTLE POINT TO POINT', '0'),
+(4, 'KP 1265-2003', 'Driver', 'Coding', '0'),
+(5, 'KP 1465-2006', 'Driver', 'ILLEGAL TERMINAL', '0'),
+(6, 'KP 1418-2005', 'Driver', 'TRUCK BAN', '0'),
+(7, 'KP 1721-2011', 'Driver', 'TOWING', '0'),
 (8, '3A', 'Driver', 'Failure to show or surrender license', '100'),
 (9, '3B', 'Driver', 'Failure to carry drivers license', '100'),
 (10, '3C', 'Driver', 'Failure to sign drivers license', '100'),
@@ -483,15 +501,6 @@ CREATE TABLE `violations` (
   `ticket_id_violations` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `violations`
---
-
-INSERT INTO `violations` (`violation_id`, `violationlist_id`, `ticket_id_violations`) VALUES
-(3, 99, 2),
-(4, 1, 2),
-(5, 1, 3);
-
 -- --------------------------------------------------------
 
 --
@@ -512,21 +521,12 @@ CREATE TABLE `violation_tickets` (
   `time_violation` time NOT NULL,
   `date_time_violation_edit` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `place_of_occurrence` varchar(50) NOT NULL,
-  `tct_number` varchar(255) NOT NULL,
+  `control_number` varchar(255) DEFAULT NULL,
+  `remarks` varchar(255) NOT NULL,
   `user_ctmeu_id` int(11) DEFAULT NULL,
   `user_id_motorists` int(11) DEFAULT NULL,
   `is_settled` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `violation_tickets`
---
-
-INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `issuing_district`, `driver_address`, `vehicle_type`, `plate_no`, `reg_owner`, `reg_owner_address`, `date_violation`, `time_violation`, `date_time_violation_edit`, `place_of_occurrence`, `tct_number`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
-(2, 'Juan Dela Cruz', 'DO4-45-709665', 'Cabuyao', 'Market Area lakeville', 2, 'ABC1234', 'Dela Cruz Juan', 'Market Area lakeville', '2024-12-27', '00:00:00', '2024-01-10 08:51:53', 'SM', 'motorist1@gmail.com', 101, NULL, 0),
-(3, 'tom', 'do412345', 'cabuyao', 'aplaya', 1, 'dxn1244', 'ddosjs', 'wiehgei', '2024-01-03', '00:00:00', '2024-01-05 09:17:34', 'simbahan', 'edscolarina@gmail.co', 101, NULL, 0),
-(4, 'Juan Dela Cruz', 'DO4-45-709665', 'Cabuyao', 'Market Area lakeville', 2, 'ABC1234', 'Dela Cruz Juan', 'Market Area lakeville', '2024-12-27', '00:00:00', '2024-01-10 08:54:34', 'SM', 'motorist1@gmail.com', 101, NULL, 1),
-(5, 'tom', 'do412345', 'cabuyao', 'aplaya', 1, 'dxn1244', 'ddosjs', 'wiehgei', '2024-01-03', '00:00:00', '2024-01-10 08:54:40', 'simbahan', 'edscolarina@gmail.co', 101, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -537,8 +537,8 @@ INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `
 CREATE TABLE `violator_info` (
   `violator_id` int(11) NOT NULL,
   `TCT_NUMBER` int(50) NOT NULL,
-  `DRIVER_NAME` varchar(30) NOT NULL,
-  `VIOLATION_NAME` varchar(30) NOT NULL,
+  `DRIVER_NAME` varchar(100) NOT NULL,
+  `VIOLATION_NAME` varchar(100) NOT NULL,
   `VIOLATION_DATE` date NOT NULL,
   `VIOLATION_TIME` time NOT NULL,
   `VIOLATION_FINE` varchar(50) NOT NULL,
@@ -555,6 +555,12 @@ CREATE TABLE `violator_info` (
 --
 ALTER TABLE `employee_masterlist`
   ADD PRIMARY KEY (`masterlist_id`);
+
+--
+-- Indexes for table `maxaccess`
+--
+ALTER TABLE `maxaccess`
+  ADD PRIMARY KEY (`access_id`);
 
 --
 -- Indexes for table `motorist_info`
@@ -623,6 +629,12 @@ ALTER TABLE `employee_masterlist`
   MODIFY `masterlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
+-- AUTO_INCREMENT for table `maxaccess`
+--
+ALTER TABLE `maxaccess`
+  MODIFY `access_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `motorist_info`
 --
 ALTER TABLE `motorist_info`
@@ -632,7 +644,7 @@ ALTER TABLE `motorist_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
@@ -656,13 +668,13 @@ ALTER TABLE `violationlists`
 -- AUTO_INCREMENT for table `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `violation_tickets`
 --
 ALTER TABLE `violation_tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `violator_info`

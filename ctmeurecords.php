@@ -26,37 +26,54 @@ function fetchVehicleName($vehicleId, $conn) {
   }
 }
 
+// Fetch violation types from the database
+$violationQuery = "SELECT violation_name, violation_section FROM violationlists";
+$violationResult = mysqli_query($conn, $violationQuery);
+$violations = [];
+while ($violationRow = mysqli_fetch_assoc($violationResult)) {
+    $violations[] = $violationRow;
+}
 
-// Define a function to fetch data from the violation_tickets table
-function fetchViolationTickets() {
-  global $conn; // Assuming you have a database connection established
 
-  // Specify the columns you want to fetch from the violation_tickets table
-  $sql = "SELECT t.ticket_id, t.driver_name,  t.driver_license, t.vehicle_type, t.plate_no, t.date_violation, t.time_violation, t.place_of_occurrence, t.user_ctmeu_id, t.user_id_motorists, t.is_settled
-          FROM violation_tickets AS t
-          LEFT JOIN violations AS v ON t.ticket_id = v.ticket_id_violations
-          GROUP BY t.ticket_id"; // Modify this query as needed
+function fetchViolationTickets()
+{
+    global $conn; // Assuming you have a database connection established
 
-  // Execute the query
-  $result = mysqli_query($conn, $sql);
+    // Write a SQL query to fetch data from the violation_tickets table
+    $sql = "SELECT 
+            violation_tickets.*,
+            CONCAT(users.first_name, ' ', IFNULL(users.middle_name, ''), ' ', users.last_name) AS driver_name,
+            vehicletype.vehicle_name as vehicle_name,
+            GROUP_CONCAT(DISTINCT violationlists.violation_section SEPARATOR ', ') AS concatenated_sections
+        FROM violation_tickets
+            JOIN vehicletype ON violation_tickets.vehicle_type = vehicletype.vehicle_id
+            LEFT JOIN violations ON violation_tickets.ticket_id = violations.ticket_id_violations
+            LEFT JOIN violationlists ON violations.violationlist_id = violationlists.violation_list_ids
+            LEFT JOIN users ON users.user_ctmeu_id = violation_tickets.user_ctmeu_id
+        WHERE violation_tickets.user_ctmeu_id IS NOT NULL
+        GROUP BY violation_tickets.ticket_id;
+    "; // Modify this query as needed
 
-  // Check if the query was successful
-  if ($result) {
-    // Initialize an empty array to store the fetched data
-    $data = array();
+    // Execute the query
+    $result = mysqli_query($conn, $sql);
 
-    // Fetch data and store it in the array
-    while ($row = mysqli_fetch_assoc($result)) {
-      $data[] = $row;
+    // Check if the query was successful
+    if ($result) {
+        // Initialize an empty array to store the fetched data
+        $data = array();
+
+        // Fetch data and store it in the array
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+
+        // Return the fetched data
+        return $data;
+    } else {
+        // Handle the error, e.g., display an error message
+        echo "Error: " . mysqli_error($conn);
+        return array(); // Return an empty array if there was an error
     }
-
-    // Return the fetched data
-    return $data;
-  } else {
-    // Handle the error, e.g., display an error message
-    echo "Error: " . mysqli_error($conn);
-    return array(); // Return an empty array if there was an error
-  }
 }
 
 // Fetch the violation ticket data
@@ -131,7 +148,7 @@ $pdf->SetFont('helvetica', '', 8);
 $pdf->MultiCell(0, 8, "(CITY TRAFFIC MANAGEMENT AND ENFORCEMENT UNIT)", 0, 'C');
 
 // Reset font for the rest of the content
-$pdf->SetFont('helvetica', '', 10);
+$pdf->SetFont('helvetica', '', 8);
 
   // Remove the line above the header
 $pdf->SetLineStyle(array('width' => 0)); // Set line width to 0
@@ -139,40 +156,50 @@ $pdf->SetLineStyle(array('width' => 0)); // Set line width to 0
 // Define the table layout
 $tbl = '<table width="100%" cellspacing="0" cellpadding="4" border="1">';
 $tbl .= '<tr bgcolor="#cccccc">';
-$tbl .= '<th style="width:5%;">No.</th>'; // Adjust the width as needed
-$tbl .= '<th width="15%">Name</th>';
-$tbl .= '<th width="15%">License No.</th>';
-$tbl .= '<th width="15%">Place Occurred</th>';
-$tbl .= '<th width="10%">Plate</th>';
-$tbl .= '<th width="10%">Vehicle</th>';
-$tbl .= '<th width="10%">Date Occurred</th>';
-$tbl .= '<th width="10%">Time Occurred</th>';
-$tbl .= '<th width="10%">Account Status</th>';
+$tbl .= '<th style="width:2%;">#</th>'; // Adjust the width as needed
+$tbl .= '<th width="5%">Ticket No.</th>';
+$tbl .= '<th width="5%">Date Occurred</th>';
+$tbl .= '<th width="5%">Time Occurred</th>';
+$tbl .= '<th width="10%">Driver\'s Name</th>';
+$tbl .= '<th width="10%">Driver\'s Address</th>';
+$tbl .= '<th width="10%">License No.</th>';
+$tbl .= '<th width="8%">Issuing District</th>';
+$tbl .= '<th width="7%">Vehicle</th>';
+$tbl .= '<th width="5%">Plate No.</th>';
+$tbl .= '<th width="10%">Registered Owner</th>';
+$tbl .= '<th width="10%">Registered Owner\'s Address</th>';
+$tbl .= '<th width="5%">Place of Violation</th>';
+$tbl .= '<th width="5%">Violations</th>';
+$tbl .= '<th width="6%">Account Status</th>';
 $tbl .= '</tr>';
 
 $ticketNumber = 1; // Initialize ticket number
 
 // Populate the table rows with data
 foreach ($data as $row) {
-  include 'php/database_connect.php';
-  $vehicleId = $row['vehicle_type'];
-  $vehicleName = fetchVehicleName($vehicleId, $conn);
+
   $tbl .= '<tr>';
-  $tbl .= '<td style="width:5%;">' . $ticketNumber . '</td>'; // Use the ticket number as No.
-  $tbl .= '<td width="15%">' . $row['driver_name'] . '</td>';
-  $tbl .= '<td width="15%">' . $row['driver_license'] . '</td>';
-  $tbl .= '<td width="15%">' . $row['place_of_occurrence'] . '</td>';
-  $tbl .= '<td width="10%">' . $row['plate_no'] . '</td>';
-  $tbl .= '<td width="10%">' . $vehicleName . '</td>';
-  $tbl .= '<td width="10%">' . $row['date_violation'] . '</td>';
-  $tbl .= '<td width="10%">' . $row['time_violation'] . '</td>';
-  $tbl .= '<td width="10%">' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
+  $tbl .= '<td style="width:2%;">' . $ticketNumber . '</td>'; // Use the ticket number as No.
+  $tbl .= '<td width="5%">' . $row['control_number'] . '</td>';
+  $tbl .= '<td width="5%">' . $row['date_violation'] . '</td>';
+  $tbl .= '<td width="5%">' . $row['time_violation'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['driver_name'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['driver_address'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['driver_license'] . '</td>';
+  $tbl .= '<td width="8%">' . $row['issuing_district'] . '</td>';
+  $tbl .= '<td width="7%">' . $row['vehicle_name'] . '</td>';
+  $tbl .= '<td width="5%">' . $row['plate_no'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['reg_owner'] . '</td>';
+  $tbl .= '<td width="10%">' . $row['reg_owner_address'] . '</td>';
+  $tbl .= '<td width="5%">' . $row['place_of_occurrence'] . '</td>';
+  $tbl .= '<td width="5%">'. $row['concatenated_sections'] .'</td>';
+  $tbl .= '<td width="6%">' . ($row['is_settled'] == 0 ? 'Unsettled' : 'Settled') . '</td>';
   $tbl .= '</tr>';
-
+ 
   $ticketNumber++; // Increment ticket number
-}
-
-$tbl .= '</table>';
+ }
+ 
+ $tbl .= '</table>';
 
 // Output the table to the PDF
 $pdf->writeHTML($tbl, true, false, false, false, '');
@@ -197,32 +224,43 @@ $filteredData = isset($_SESSION['filtered_data']) ? $_SESSION['filtered_data'] :
 
 if (isset($_POST['generate_pdf'])) {
   // Generate the PDF using the filtered data
+  $filteredData = json_decode($_POST['filtered-data'], true);
+  $violationFilter = $_POST['violation_filter'];
+  $filteredData = filterDataByDate($filteredData, null, null, null, $violationFilter);
   $_SESSION['preview_pdf_content'] = generatePDF($filteredData);
   header("Location: previewreport.php");
   exit();
 }
 
-// Define a function to filter data by date range
-function filterDataByDate($data, $startMonth, $endMonth, $year) {
+// Define a function to filter data by date range, vehicle type, and violation
+function filterDataByDate($data, $startDate, $endDate, $vehicleType, $violationFilter) {
   $filteredData = array();
 
   foreach ($data as $row) {
-    $ticketDate = strtotime($row['date_violation']);
-    $ticketMonth = date('m', $ticketDate);
-    $ticketYear = date('Y', $ticketDate);
+      $ticketDateTimeStr = $row['date_violation'] . ' ' . $row['time_violation'];
+      $ticketDateTime = strtotime($ticketDateTimeStr);
 
-    // Compare ticket month and year with the selected date range
-    if (
-      ($ticketYear == $year) &&
-      ($ticketMonth >= $startMonth) &&
-      ($ticketMonth <= $endMonth)
-    ) {
-      $filteredData[] = $row;
-    }
+      $startDateTime = strtotime($startDate);
+      $endDateTime = strtotime($endDate);
+
+      // Check if the violation matches the selected violation (if any)
+      $matchesViolation = !$violationFilter || strpos($row['concatenated_sections'], $violationFilter) !== false;
+
+      // Compare ticket date and time with the selected date and time range
+      // and check if the vehicle type and violation match the selected filters (if any)
+      if (
+          (!$startDate || $ticketDateTime >= $startDateTime) &&
+          (!$endDate || $ticketDateTime <= $endDateTime) &&
+          (!$vehicleType || $row['vehicle_type'] == $vehicleType) &&
+          $matchesViolation
+      ) {
+          $filteredData[] = $row;
+      }
   }
 
   return $filteredData;
 }
+
 
 $dataFound = false;
 
@@ -231,9 +269,10 @@ if (isset($_POST['filter-button'])) {
   $startMonth = $_POST['start-month'];
   $endMonth = $_POST['end-month'];
   $year = $_POST['year'];
+  $vehicleType = $_POST['vehicle_filter']; // Get the selected vehicle type from the POST data
 
-  // Filter the data based on the selected date range
-  $filteredData = filterDataByDate($violationTickets, $startMonth, $endMonth, $year);
+  // Filter the data based on the selected date range and vehicle type
+  $filteredData = filterDataByDate($violationTickets, $startMonth, $endMonth, $year, $vehicleType);
 
   // Check if any data is found after filtering
   if (!empty($filteredData)) {
@@ -260,7 +299,8 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
     <script src="./js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
 </head>
@@ -290,13 +330,13 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 
   .card {
         margin: 2.5% auto;
-        width: 700px; /* Adjust the width as needed */
+        width: 800px; /* Adjust the width as needed */
         height: auto; /* Adjust the height as needed */
         text-align: left;
     }
     .table-container {
         max-width: 100%;
-        overflow-x: hidden;
+        overflow-x: scroll;
     }
     .container {
             display: flex;
@@ -311,7 +351,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 
   
 </style>
-<body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
+<body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
             <div class="container-fluid">
@@ -344,15 +384,15 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
@@ -418,50 +458,87 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 
 <div class="card">
 <div class="date-filter-container mx-auto">
-  <div class="row">
-    <div class="col-sm-4 mt-3 mb-3 ms-3" style="font-weight: 700;">Start Date</div>
-    <div class="col-sm-7 mt-3 mb-3" style="font-weight: 700;">End Date</div>
-  </div>
-  <div class="row">
-    <div class="col-sm mb-3 ms-3"><select id="start-month" class="form-select form-select-lg mb-3"></select></div>
-    <div class="col-sm"><select id="end-month" class="form-select form-select-lg mb-3"></select></div>
-    <div class="col-sm"><select id="year" class="form-select form-select-lg"></select></select></div>
-    <div class="col-sm"><button class="btn btn-primary" id="filter-button">Apply Filter</button></div>
-  </div>
+<div class="row">
+    <div class="col-sm-5 mt-3 mb-3 text-left" style="font-weight: 700;"> Start Date and Time Default:All</div>
+    <div class="col-sm-7 mt-3 mb-3 text-right" style="font-weight: 700;"> End Date and Time Default:All</div>
 </div>
+<div class="row">
+    <div class="col-sm mb-3 ms-3">
+        <input type="date" id="start-date" class="form-control mb-3" />
+        <input type="time" id="start-time" class="form-control mb-3" />
+    </div>
+    <div class="col-sm">
+        <input type="date" id="end-date" class="form-control mb-3" />
+        <input type="time" id="end-time" class="form-control mb-3" />
+    </div>
+    <div class="row">
+    <div class="col-sm mb-3 ms-3">
+    <select class="form-control" id="vehicle-filter" name="vehicle_filter">
+        <option value="">All Vehicles</option>
+        <?php
+        
+        // Fetch vehicle types from the database
+        $vehicleQuery = "SELECT vehicle_id, vehicle_name FROM vehicletype";
+        $vehicleResult = mysqli_query($conn, $vehicleQuery);
+        while ($vehicleRow = mysqli_fetch_assoc($vehicleResult)) {
+            echo "<option value='" . $vehicleRow['vehicle_id'] . "'>" . $vehicleRow['vehicle_name'] . "</option>";
+        }
+        ?>
+    </select>
+</div>
+   <!-- Violations Filter with Search Function -->
+<div class="col-sm mb-3 ms-3" style="max-width:400px;">
+    <div class="input-group input-group-lg mb-3">
+        <label class="input-group-text form-control" for="violations-filter" style="font-size: 1rem; width: 30px;">Violations</label>
+        <select class="form-control select2" id="violations-filter">
+            <option value="">All Violations</option>
+            <?php foreach ($violations as $violation): ?>
+                <option value="<?php echo htmlspecialchars($violation['violation_section']); ?>">
+                    <?php echo htmlspecialchars($violation['violation_name']) . " (" . htmlspecialchars($violation['violation_section']) . ")"; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+</div>
+
+</div>
+</div>
+<div class="row">
+        <div class="col text-center">
+            <button class="btn btn-primary mb-3" id="filter-button">Apply Filter</button>
+        </div>
+    </div>
 </div>
 
 <div class="container mt-1" style="display:none;">
-<div class="container">
+<div class="container" style="margin-top: 100px;">
     <form method="post" target="_blank">
         <input type="hidden" id="filtered-data" name="filtered-data" value="">
+        <input type="hidden" id="violation-filter-value" name="violation_filter" value="">
         <button class="btn btn-light" style="--bs-btn-padding-y: 1.5rem; --bs-btn-padding-x: 8rem; --bs-btn-font-size: 1rem; font-weight: 800; color: #0A157A;" type="submit" name="generate_pdf">
-            <img src="./images/icon file.png">Print Report
+            <img src="./images/alternate_file.png">Print Report
         </button>
     </form>
 </div>
 
 <div class="table-container mb-5">
-<table id="vehicle-violations-table">
-    <thead>
-        <tr>
-            <th>Vehicle Type</th>
-            <th>Number of Violations</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
 <table>
     <thead>
         <tr>
             <th>No.</th>
-            <th>Name</th>
-            <th>License No.</th>
-            <th>Place Occurred</th>
-            <th>Plate</th>
-            <th>Vehicle</th>
+            <th>Ticket No.</th>
             <th>Date Occurred</th>
             <th>Time Occurred</th>
+            <th>Driver's Name</th>
+            <th>Driver's Address</th>
+            <th>License No.</th>
+            <th>Issuing District</th>
+            <th>Vehicle</th>
+            <th>Plate No.</th>
+            <th>Registered Owner</th>
+            <th>Registered Owner's Address</th>
+            <th>Place of Violation</th>
+            <th>Violations</th>
             <th>Account Status</th>
         </tr>
     </thead>
@@ -474,23 +551,27 @@ $visibleTicketCount = 0;
 foreach ($violationTickets as $index => $ticket) {
     // Check if the is_settled value is 0 before making the row clickable
     $visibleTicketCount++; // Increment the visible ticket counter
-    $vehicleId = $ticket['vehicle_type'];
-    $vehicleName = fetchVehicleName($vehicleId, $conn);
-
+    
     // Convert the row data to a JSON string
     $rowData = json_encode($ticket);
 
     echo "<tr class='clickable-row' data-rowdata='$rowData'>";
     // Display the visible ticket count in the "No." column
     echo "<td>" . $visibleTicketCount . "</td>";
+    echo "<td>" . $ticket['control_number'] . "</td>";
     // Add the columns from the fetched data
-    echo "<td>" . $ticket['driver_name'] . "</td>";
-    echo "<td>" . $ticket['driver_license'] . "</td>";
-    echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
-    echo "<td>" . $ticket['plate_no'] . "</td>";
-    echo "<td>" . $vehicleName . "</td>";
     echo "<td>" . $ticket['date_violation'] . "</td>";
     echo "<td>" . $ticket['time_violation'] . "</td>";
+    echo "<td>" . $ticket['driver_name'] . "</td>";
+    echo "<td>" . $ticket['driver_address'] . "</td>";
+    echo "<td>" . $ticket['driver_license'] . "</td>";
+    echo "<td>" . $ticket['issuing_district'] . "</td>";
+    echo "<td>" . $ticket['vehicle_name'] . "</td>";
+    echo "<td>" . $ticket['plate_no'] . "</td>";
+    echo "<td>" . $ticket['reg_owner'] . "</td>";
+    echo "<td>" . $ticket['reg_owner_address'] . "</td>";
+    echo "<td>" . $ticket['place_of_occurrence'] . "</td>";
+    echo "<td>". $ticket['concatenated_sections'] ."</td>";
     echo "<td>" . ($ticket['is_settled'] == 0 ? 'Unsettled' : 'Settled') . "</td>";
     echo "</tr>";
 }
@@ -509,6 +590,13 @@ foreach ($violationTickets as $index => $ticket) {
 <script>
 
 
+$(document).ready(function() {
+          $('.select2').select2({
+              placeholder: "Default: All Violations",
+              allowClear: true,
+              width: '100%' // Adjust as needed
+          });
+      });
 // Global variable to store filtered data
 var filteredData = [];
 
@@ -534,36 +622,6 @@ function mapVehicleType(vehicleType) {
       return 'Unknown Vehicle Type';
   }
 }
-// Function to update the vehicle violations table
-function updateVehicleViolationsTable(data) {
-  var vehicleViolationsTable = document.getElementById('vehicle-violations-table');
-  var tbody = vehicleViolationsTable.querySelector('tbody');
-
-  // Clear existing rows
-  tbody.innerHTML = '';
-
-  // Aggregate counts for each unique vehicle type
-  var vehicleCounts = {};
-  data.forEach(function (row) {
-    var vehicleType = row['vehicle_type']; // Use the vehicle_type directly
-    var vehicleName = mapVehicleType(vehicleType); // Map numeric type to name
-
-    if (vehicleType in vehicleCounts) {
-      vehicleCounts[vehicleType].count++;
-    } else {
-      vehicleCounts[vehicleType] = { name: vehicleName, count: 1 };
-    }
-  });
-
-  // Populate the new table
-  for (var vehicleType in vehicleCounts) {
-    var rowElement = document.createElement('tr');
-    rowElement.innerHTML = `<td>${vehicleCounts[vehicleType].name}</td><td>${vehicleCounts[vehicleType].count}</td>`;
-    tbody.appendChild(rowElement);
-  }
-}
-
-
 
 
 // Add an event listener to the "Apply Filter" button
@@ -594,26 +652,12 @@ function calculateStatusCounts() {
 </script>
 
     <script>
-     const yearSelect = document.getElementById("year");
-        const currentYear = new Date().getFullYear();
-        const yearsPast = 50;
-        const yearsFuture = 50;
-        const startYear = currentYear - yearsPast;
-        const endYear = currentYear + yearsFuture;
-
-        for (let year = startYear; year <= endYear; year++) {
-            const option = document.createElement("option");
-            option.value = year;
-            option.textContent = year;
-            yearSelect.appendChild(option);
-        }
-
-        // Set the default value to the current year
-        yearSelect.value = currentYear;
      
-        document.querySelector('[name="generate_pdf"]').addEventListener('click', function () {
-  // Set the value of the hidden input field
-  document.getElementById('filtered-data').value = JSON.stringify(filteredData);
+     
+     document.querySelector('[name="generate_pdf"]').addEventListener('click', function () {
+ // Set the value of the hidden input field
+ document.getElementById('filtered-data').value = JSON.stringify(filteredData);
+ document.getElementById('violation-filter-value').value = $('#violations-filter').val();
 });
 
 
@@ -632,112 +676,82 @@ function calculateStatusCounts() {
     }
   }
 
+  
+
+  function filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter) {
+   var startDateTime = startDate && startTime ? new Date(startDate + 'T' + startTime) : null;
+   var endDateTime = endDate && endTime ? new Date(endDate + 'T' + endTime) : null;
+
+   var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
+   var dataFound = false;
+
+   // Clear the previous filtered data
+   filteredData.length = 0;
+
+   rows.forEach(function (row) {
+        var rowData = JSON.parse(row.getAttribute('data-rowdata'));
+        var ticketDateTimeStr = rowData['date_violation'] + 'T' + rowData['time_violation'];
+        var ticketDateTime = new Date(ticketDateTimeStr);
+
+        var matchesVehicleType = !vehicleType || rowData['vehicle_type'] == vehicleType;
+        var matchesViolation = true; // Assume true until proven otherwise
+
+        // If a violation filter is set, split the concatenated sections and check for an exact match
+        if (violationFilter) {
+            var sections = rowData['concatenated_sections'].split(', ');
+            matchesViolation = sections.includes(violationFilter);
+        }
+
+        if (
+            (!startDateTime || ticketDateTime >= startDateTime) &&
+            (!endDateTime || ticketDateTime <= endDateTime) &&
+            matchesVehicleType &&
+            matchesViolation
+        ) {
+            row.style.display = ''; // Show the row if it matches the filter
+            dataFound = true; // Data is found
+            filteredData.push(rowData); // Add the filtered row data to the array
+        } else {
+            row.style.display = 'none'; // Hide the row if it doesn't match the filter
+        }
+    });
+    
+   toggleTableAndPDFVisibility(dataFound);
+   // Display alert if no data is found
+   if (!dataFound) {
+       alert('No Tickets found in the specified date and time range.');
+   }
+}
+
+
 // Add an event listener to the "Apply Filter" button
 document.getElementById('filter-button').addEventListener('click', function() {
-  // Get the selected start month, end month, and year
-  var startMonth = document.getElementById('start-month').value;
-  var endMonth = document.getElementById('end-month').value;
-  var year = document.getElementById('year').value;
+   var startDate = document.getElementById('start-date').value;
+   var startTime = document.getElementById('start-time').value;
+   var endDate = document.getElementById('end-date').value;
+   var endTime = document.getElementById('end-time').value;
+   var vehicleType = document.getElementById('vehicle-filter').value;
+   var violationFilter = $('#violations-filter').val();
 
-  // Check if the start month is after the end month
-  if (year == '' || startMonth > endMonth) {
-    alert('Invalid date range. Please select a valid date range.');
-    return; // Exit the function without filtering the table
-  }
-  
-  // Filter the table based on the selected date range
-    filterTableByDate(startMonth, endMonth, year);
-    updateVehicleViolationsTable(filteredData);
-    toggleTableAndPDFVisibility(filteredData.length > 0);
+   var startDateTime = startDate && startTime ? new Date(startDate + 'T' + startTime) : null;
+   var endDateTime = endDate && endTime ? new Date(endDate + 'T' + endTime) : null;
 
-  
-  $.ajax({
-  type: 'POST',
-  url: 'filter_handler.php',
-  data: { filteredData: JSON.stringify(filteredData) },
-  dataType: 'json',  // Specify the expected data type
-  success: function(response) {
+   // Check if the start date and time is after the end date and time
+   if (startDateTime && endDateTime && startDateTime > endDateTime) {
+       alert('Invalid date range. The end date and time must be later than the start date and time.');
+       return; // Exit the function without filtering the table
+   }
 
-    // Handle the server response if needed
-  },
-  error: function(xhr, status, error) {
-    console.error(xhr.responseText);
-    // Handle errors if needed
-  }
-});
+   // Filter the table based on the selected date range
+   filterTableByDate(startDate, startTime, endDate, endTime, vehicleType, violationFilter);
+   toggleTableAndPDFVisibility(filteredData.length > 0);
 });
 
 
 
-function filterTableByDate(startMonth, endMonth, year) {
-  var rows = document.querySelectorAll('#ticket-table-body .clickable-row');
-  var dataFound = false;
-
-  filteredData = []; // Clear the previous filtered data
-
-  rows.forEach(function (row) {
-    var rowData = JSON.parse(row.getAttribute('data-rowdata'));
-    var ticketDateStr = rowData['date_violation'];
-    var ticketDate = new Date(ticketDateStr);
-
-    var ticketMonth = String(ticketDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are zero-based
-    var ticketYear = String(ticketDate.getFullYear());
-
-    if (
-      ticketYear == year &&
-      ticketMonth >= startMonth &&
-      ticketMonth <= endMonth
-    ) {
-      row.style.display = ''; // Show the row if it matches the filter
-      dataFound = true; // Data is found
-
-      // Add the filtered row data to the array
-      filteredData.push(rowData);
-    } else {
-      row.style.display = 'none'; // Hide the row if it doesn't match the filter
-    }
-  });
-
-  
-
-  // Display alert if no data is found
-  if (!dataFound) {
-    alert('No Tickets found in the specified date.');
-  }
-}
+// Add an event listener to the "Apply Filter" button
 toggleTableAndPDFVisibility(initialDataFound);
 
-  // Function to populate the month options
-  function populateMonthOptions() {
-    var startMonthSelect = document.getElementById('start-month');
-    var endMonthSelect = document.getElementById('end-month');
-
-    // Define an array of month names
-    var monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    // Populate start and end month options
-    for (var i = 1; i <= 12; i++) {
-      var monthValue = String(i).padStart(2, '0'); // Add leading zero if needed
-      var monthName = monthNames[i - 1];
-
-      // Create option elements and add them to the selects
-      var startOption = document.createElement('option');
-      startOption.value = monthValue;
-      startOption.textContent = monthName;
-      startMonthSelect.appendChild(startOption);
-
-      var endOption = document.createElement('option');
-      endOption.value = monthValue;
-      endOption.textContent = monthName;
-      endMonthSelect.appendChild(endOption);
-    }
-  }
-
-  // Call the function to populate month options when the page loads
-  window.addEventListener('load', populateMonthOptions);
 
   // Add a click event listener to the logout button
   document.getElementById('logout-button').addEventListener('click', function() {

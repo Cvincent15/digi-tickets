@@ -96,7 +96,7 @@ $violationTickets = fetchViolationTickets();
     .ewan {
         background: white;
         border-radius: 20px;
-        width: 80%;
+        width: 95%;
         max-width: 1900px;
         margin: 0 auto;
         margin-top: 40px;
@@ -216,6 +216,11 @@ $violationTickets = fetchViolationTickets();
     .clickable-row {
         display: table-row;
     }
+    .text-blue {
+    color: #1A3BB1;
+    font-size: 20px;
+    text-align:center;
+}
 </style>
 
 <body style="height: 100vh; background: linear-gradient(to bottom, #1F4EDA, #102077);">
@@ -252,15 +257,15 @@ $violationTickets = fetchViolationTickets();
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
             <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
@@ -322,32 +327,8 @@ $violationTickets = fetchViolationTickets();
             </div>
             </div>
         </nav>
-        <div class="ewan">
-            <div class="table-header">
-                <div class="search-container">
-                    <input type="text" id="search-bar" placeholder="Search...">
-                    <select id="filter-select">
-                        <option value="name">Name</option>
-                        <option value="license">License No.</option>
-                        <option value="vehicle">Vehicle</option>
-                        <option value="place of occurrence">Place of Occurrence</option>
-                    </select>
-                </div>
-                <?php
-                // Check if the user is a Super Administrator
-                if ($_SESSION['role'] === 'Super Administrator') {
-                    // Show the archive button, count, and "records are selected"
-                    echo '<div><span id="checkbox-count">0</span> records are selected</div>';
-                    //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
-                    echo '<button type="button" id="archiveButton" class="btn btn-primary float-end" data-bs-target="#exampleModal"><i class="bx bx-trash"></i></button>';
-                }
-
-
-                ?>
-            </div>
-
-
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -401,7 +382,57 @@ $violationTickets = fetchViolationTickets();
                     </div>
                 </div>
             </div>
+
+        <?php 
+                // Initialize a flag to track if there are any settled tickets
+$hasSettledTickets = false;
+
+// Check if there are any tickets with is_settled value of 1
+foreach ($violationTickets as $ticket) {
+    if ($ticket['is_settled'] == 1) {
+        $hasSettledTickets = true;
+        break;
+    }
+}
+
+// Check if there are no settled tickets
+if (!$hasSettledTickets) {
+    // Display the image in a card
+    echo '<div class="card" style="width: 700px; margin: auto; margin-top: 50px; border: none; height: 600px;">';
+    echo '<img src="images/empty-folder-svg.png" class="card-img-top" alt="No Records" style="width:100%; height:100%;">';
+    echo '<div class="card-body">';
+    echo '<p class="card-text text-blue"><b>No archived data yet.</b></p>';
+    echo '</div>';
+    echo '</div>';
+} else {
+                    
+                ?>
+            <div class="table-header">
+                <div class="search-container">
+                    <input type="text" id="search-bar" placeholder="Search...">
+                    <select id="filter-select">
+                        <option value="name">Name</option>
+                        <option value="license">License No.</option>
+                        <option value="vehicle">Vehicle</option>
+                        <option value="place of occurrence">Place of Occurrence</option>
+                    </select>
+                </div>
+                <?php
+                // Check if the user is a Super Administrator
+                if ($_SESSION['role'] === 'Super Administrator') {
+                    // Show the archive button, count, and "records are selected"
+                    echo '<div><span id="checkbox-count">0</span> records are selected</div>';
+                    //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
+                    echo '<button type="button" id="archiveButton" class="btn btn-primary float-end" data-bs-target="#exampleModal"><i class="bx bx-trash"></i></button>';
+                }
+
+
+                ?>
+            </div>
+
+
             <div class="tableContainer">
+                
                 <table class="mb-5">
                     <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
                     <thead>
@@ -504,6 +535,7 @@ $violationTickets = fetchViolationTickets();
                         ?>
                     </tbody>
                 </table>
+                
             </div>
 
             <!-- Pagination -->
@@ -523,14 +555,16 @@ $violationTickets = fetchViolationTickets();
                     ?>
                 </div>
             </div>
+            <?php } ?>
         </div>
         <script src="js/script.js"></script>
         <script src="js/jquery-3.6.4.js"></script>
         <script>
+            <?php if ($hasSettledTickets) {?>
             // Apply symbol restriction to all text input fields
             const form = document.getElementById('search-bar');
             const inputs = form.querySelectorAll('input[type="text"]');
-
+            
             inputs.forEach(input => {
                 input.addEventListener('input', function (e) {
                     const inputValue = e.target.value;
@@ -616,9 +650,11 @@ $violationTickets = fetchViolationTickets();
                     });
                 });
             });
+            <?php }?>
         </script>
 
         <script>
+            <?php if ($hasSettledTickets) {?>
             function submitForm() {
                 // Trigger form submission
                 document.getElementById('archive-form').submit();
@@ -667,21 +703,7 @@ $violationTickets = fetchViolationTickets();
     });
 });
 
-            // Add a click event listener to the logout button
-            document.getElementById('logout-button').addEventListener('click', function () {
-                // Perform logout actions here, e.g., clearing session, redirecting to logout.php
-                // You can use JavaScript to redirect to the logout.php page.
-                window.location.href = 'php/logout.php';
-            });
-
-            // Check if the user is logged in and update the welcome message
-            <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
-                var role = '<?php echo $_SESSION['role']; ?>';
-                var firstName = '<?php echo $_SESSION['first_name']; ?>';
-                var lastName = '<?php echo $_SESSION['last_name']; ?>';
-
-                document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
-            <?php } ?>
+            
 
             function filterTable() {
                 var filterSelect = document.getElementById('filter-select');
@@ -705,12 +727,6 @@ $violationTickets = fetchViolationTickets();
 
                     // Get the cell value based on the selected column name
                     var cellValue = String(rowData[columnName]).toLowerCase();
-
-                    console.log("Search Input: " + searchInput);
-                    console.log("CellValue: " + cellValue);
-                    console.log("Filter Key: " + filterSelect.value);
-                    console.log("Row Data: ", rowData);
-
                     if (cellValue.startsWith(searchInput)) {
                         row.style.display = '';
                     } else {
@@ -739,10 +755,11 @@ $violationTickets = fetchViolationTickets();
                 // Call the function initially to set the count to the initial state
                 updateCheckboxCount();
             });
+            <?php }?>
         </script>
 
         <script>
-            
+            <?php if ($hasSettledTickets) {?>
             // Add an event listener to the "Yes" button in the "Archive" modal
             document.getElementById('archiveButton').addEventListener('click', function () {
                 // Check if at least one checkbox is selected
@@ -782,6 +799,22 @@ $violationTickets = fetchViolationTickets();
             function refreshPage() {
                 location.reload(true);
             }
+            <?php }?>
+            // Add a click event listener to the logout button
+            document.getElementById('logout-button').addEventListener('click', function () {
+                // Perform logout actions here, e.g., clearing session, redirecting to logout.php
+                // You can use JavaScript to redirect to the logout.php page.
+                window.location.href = 'php/logout.php';
+            });
+
+            // Check if the user is logged in and update the welcome message
+            <?php if (isset($_SESSION['role']) && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) { ?>
+                var role = '<?php echo $_SESSION['role']; ?>';
+                var firstName = '<?php echo $_SESSION['first_name']; ?>';
+                var lastName = '<?php echo $_SESSION['last_name']; ?>';
+
+                document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
+            <?php } ?>
         </script>
         <script src="js/script.js"></script>
         <script src="js/jquery-3.6.4.js"></script>
