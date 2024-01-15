@@ -1,0 +1,4 @@
+body {
+    min-height: 100vh;
+    background: url('../images/mainbg.png') center center / cover no-repeat fixed;
+  }
