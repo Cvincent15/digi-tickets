@@ -98,21 +98,46 @@ if (isset($_SESSION['username'])) {
 </div>
     </div>
 </div>
+    </div>
+
+    <div class="modal fade" id="emptySearchModal" tabindex="-1" aria-labelledby="emptySearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emptySearchModalLabel">Empty Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Please enter a ticket number before clicking the Search button.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     function searchData() {
-        var searchQuery = document.getElementById('search-query').value;
+    var searchQuery = document.getElementById('search-query').value.trim();
 
-        $.ajax({
-            type: 'POST',
-            url: './php/search_ticket.php',
-            data: { search_query: searchQuery },
-            success: function (response) {
-                // Display the search results in a modal
-                $('#searchResultsModalBody').html(response);
-                $('#searchResultsModal').modal('show');
-            }
-        });
+    // Check if the search query is empty
+    if (searchQuery === "") {
+        // Display a modal indicating that there is no input
+        $('#emptySearchModal').modal('show');
+        return;
     }
+
+    $.ajax({
+        type: 'POST',
+        url: './php/search_ticket.php',
+        data: { search_query: searchQuery },
+        success: function (response) {
+            // Display the search results in a modal
+            $('#searchResultsModalBody').html(response);
+            $('#searchResultsModal').modal('show');
+        }
+    });
+}
 </script>
     <script src="js/script.js"></script>
     <script src="js/jquery-3.6.4.js"></script>
