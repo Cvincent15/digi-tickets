@@ -383,11 +383,12 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                         <option value="driver's address">Driver's Address</option>
                         <option value="license">License No.</option>
                         <option value="issuing district">Issuing District</option>
+                        <option value="cor number">CoR Number</option>
                         <option value="vehicle">Type of Vehicle</option>
                         <option value="plate no.">Plate No.</option>
                         <option value="registered owner">Registered Owner</option>
                         <option value="registered owner's address">Registered Owner's Address</option>
-                        <option value="place of occurrence">Place of Violation</option>
+                        <option value="place of occurrence">Place of Apprehension</option>
                         <option value="violations">Violations</option>
                         <option value="status">Status</option>
                         <option value="issued by">Issued by</option>
@@ -482,19 +483,20 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                             <th class="sortable" data-column="5">Driver's Address<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="6">License No.<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="7">Issuing District<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="8">Type of Vehicle<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="9">Plate No.<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="10">Registered Owner<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="11">Registered Owner's Address<span
+                            <th class="sortable" data-column="8">CoR Number<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="9">Type of Vehicle<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="10">Plate No.<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="11">Registered Owner<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="12">Registered Owner's Address<span
                                     class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="12">Place of Violation<span class="sort-arrow"></span>
+                            <th class="sortable" data-column="13">Place of Violation<span class="sort-arrow"></span>
                             </th>
                             
-                            <th class="sortable" data-column="13">Violations<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="14">Violations<span class="sort-arrow"></span></th>
 
-                            <th class="sortable" data-column="14">Status<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="15">Issued by<span class="sort-arrow"><span
+                            <th class="sortable" data-column="15">Status<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="16">Issued by<span class="sort-arrow"><span
                                     class="sort-arrow"></span>
                             </th>
                         </tr>
@@ -545,6 +547,7 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                                     // Wrap the address in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['cor_number'] . "</td>";
                                     // Wrap the address in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_name'] . "</td>";
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['plate_no'] . "    </td>";
@@ -810,6 +813,7 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                 'driver\'s address': 'driver_address',
                 'license': 'driver_license',
                 'issuing district': 'issuing_district',
+                'cor number': 'cor_number',
                 'vehicle': 'vehicle_type',
                 'plate no.': 'plate_no',
                 'registered owner': 'reg_owner',

@@ -415,7 +415,7 @@ if (!$hasSettledTickets) {
                         <option value="name">Name</option>
                         <option value="license">License No.</option>
                         <option value="vehicle">Vehicle</option>
-                        <option value="place of occurrence">Place of Occurrence</option>
+                        <option value="place of occurrence">Place of Apprehension</option>
                     </select>
                 </div>
                 <?php
@@ -452,19 +452,20 @@ if (!$hasSettledTickets) {
                             <th class="sortable" data-column="5">Driver's Address<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="6">License No.<span class="sort-arrow"></span></th>
                             <th class="sortable" data-column="7">Issuing District<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="8">Type of Vehicle<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="9">Plate No.<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="10">Registered Owner<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="11">Registered Owner's Address<span
+                            <th class="sortable" data-column="8">CoR Number<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="9">Type of Vehicle<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="10">Plate No.<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="11">Registered Owner<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="12">Registered Owner's Address<span
                                     class="sort-arrow"></span>
                             </th>
-                            <th class="sortable" data-column="12">Place of Violation<span class="sort-arrow"></span>
+                            <th class="sortable" data-column="13">Place of Violation<span class="sort-arrow"></span>
                             </th>
                             
-                            <th class="sortable" data-column="13">Violations<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="14">Violations<span class="sort-arrow"></span></th>
 
-                            <th class="sortable" data-column="14">Status<span class="sort-arrow"></span></th>
-                            <th class="sortable" data-column="15">Issued by<span class="sort-arrow"><span
+                            <th class="sortable" data-column="15">Status<span class="sort-arrow"></span></th>
+                            <th class="sortable" data-column="16">Issued by<span class="sort-arrow"><span
                                     class="sort-arrow"></span>
                             </th>
                         </tr>
@@ -514,6 +515,7 @@ if (!$hasSettledTickets) {
                                     // Wrap the address in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['driver_license'] . "</td>";
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['issuing_district'] . "</td>";
+                                    echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['cor_number'] . "</td>";
                                     // Wrap the address in a clickable <td>
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['vehicle_name'] . "</td>";
                                     echo "<td class='clickable-cell' data-rowdata='$rowData'>" . $ticket['plate_no'] . "    </td>";
@@ -713,11 +715,23 @@ if (!$hasSettledTickets) {
 
                 // Define an object to map filter keys to column names
                 var columnMap = {
-                    'name': 'driver_name',
-                    'license': 'driver_license',
-                    'vehicle': 'vehicle_type',
-                    'place of occurrence': 'place_of_occurrence'
-                };
+                'ticket number': 'control_number',
+                'date': 'date_violation',
+                'time': 'time_violation',
+                'driver\'s name': 'driver_name',
+                'driver\'s address': 'driver_address',
+                'license': 'driver_license',
+                'issuing district': 'issuing_district',
+                'cor number': 'cor_number',
+                'vehicle': 'vehicle_type',
+                'plate no.': 'plate_no',
+                'registered owner': 'reg_owner',
+                'registered owner\'s address': 'reg_owner_address',
+                'place of occurrence': 'place_of_occurrence',
+                'violations': 'concatenated_sections',
+                'status': 'is_settled',
+                'issued by': 'first_name' // Assuming 'issued by' refers to the first name of the issuer
+            };
 
                 // Get the column name based on the selected filter key
                 var columnName = columnMap[filterSelect.value];

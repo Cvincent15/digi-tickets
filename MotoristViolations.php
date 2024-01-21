@@ -291,8 +291,17 @@ if ($unsettledTicketCount > 0) {
     echo '<th>No.</th>';
     echo '<th>Name</th>';
     echo '<th>License No.</th>';
+    echo '<th>COR No.</th>';
+    echo '<th>Issuing District</th>';
+    echo '<th>Address</th>';
     echo '<th>Vehicle</th>';
     echo '<th>Place of Occurrence</th>';
+    echo '<th>Plate No.</th>';
+    echo '<th>Registered Owner</th>';
+    echo '<th>Registered Owner Address</th>';
+    echo '<th>Date Time of Violation</th>';
+    echo '<th>Remarks</th>';
+    //echo '<th>Violations</th>';
     echo '</tr>';
     echo '</thead>';
     echo '<tbody id="ticket-table-body">';
@@ -304,17 +313,40 @@ if ($unsettledTicketCount > 0) {
             $rowData = json_encode($ticket);
             $visibleTicketCount++; // Decrement the visible ticket counter
 
+            // Get violations for the current ticket
+            $violationsStmt = $conn->prepare("SELECT * FROM violations WHERE ticket_id_violations = ?");
+            $violationsStmt->bind_param("i", $ticket['ticket_id']);
+            $violationsStmt->execute();
+            $violationsResult = $violationsStmt->get_result();
+            $violations = $violationsResult->fetch_all(MYSQLI_ASSOC);
+
+            // Add the violations to the $ticket array
+            $violationTickets[$index]['violations'] = $violations;
+
             echo '<tr>';
             // Display the visible ticket count in the "No." column
-            echo '<td>' . $visibleTicketCount . '</td>';
+            echo '<td>' . $ticket['control_number'] . '</td>';
             // Wrap the name in a clickable <td>
             echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_name'] . '</td>';
             // Wrap the license in a clickable <td>
             echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_license'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['cor_number'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['issuing_district'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_address'] . '</td>';
             // Wrap the address in a clickable <td>
             echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['vehicle_type'] . '</td>';
             // Wrap the district in a clickable <td>
             echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['place_of_occurrence'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['plate_no'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['reg_owner'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['reg_owner_address'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['date_violation'] . ' | ' . $ticket['time_violation'] . '</td>';
+            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['remarks'] . '</td>';
+            // Display violations for the current ticket
+    foreach ($violations as $violation) {
+      //echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $violation['violationlist_id'] . '<br>';
+      // Add other violation information as needed
+  }
             echo '</tr>';
             
         }
@@ -353,43 +385,75 @@ foreach ($violationTickets as $index => $ticket) {
 
 // Check if there are unsettled tickets
 if ($unsettledTicketCount > 0) {
-    echo '<table>';
-    echo '<thead>';
-    echo '<tr>';
-    echo '<th>No.</th>';
-    echo '<th>Name</th>';
-    echo '<th>License No.</th>';
-    echo '<th>Vehicle</th>';
-    echo '<th>Place of Occurrence</th>';
-    echo '</tr>';
-    echo '</thead>';
-    echo '<tbody id="ticket-table-body">';
+  echo '<table>';
+  echo '<thead>';
+  echo '<tr>';
+  echo '<th>No.</th>';
+  echo '<th>Name</th>';
+  echo '<th>License No.</th>';
+  echo '<th>COR No.</th>';
+  echo '<th>Issuing District</th>';
+  echo '<th>Address</th>';
+  echo '<th>Vehicle</th>';
+  echo '<th>Place of Occurrence</th>';
+  echo '<th>Plate No.</th>';
+  echo '<th>Registered Owner</th>';
+  echo '<th>Registered Owner Address</th>';
+  echo '<th>Date Time of Violation</th>';
+  echo '<th>Remarks</th>';
+  //echo '<th>Violations</th>';
+  echo '</tr>';
+  echo '</thead>';
+  echo '<tbody id="ticket-table-body">';
 
-    // Loop through the fetched violation ticket data and populate the table rows for unsettled tickets
-    foreach ($violationTickets as $index => $ticket) {
-        if ($ticket['is_settled'] == 1) {
-            // Convert the row data to a JSON string
-            $rowData = json_encode($ticket);
-            $visibleTicketCount++; // Decrement the visible ticket counter
+  // Loop through the fetched violation ticket data and populate the table rows for unsettled tickets
+  foreach ($violationTickets as $index => $ticket) {
+      if ($ticket['is_settled'] == 1) {
+          // Convert the row data to a JSON string
+          $rowData = json_encode($ticket);
+          $visibleTicketCount++; // Decrement the visible ticket counter
 
-            echo '<tr>';
-            // Display the visible ticket count in the "No." column
-            echo '<td>' . $visibleTicketCount . '</td>';
-            // Wrap the name in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_name'] . '</td>';
-            // Wrap the license in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_license'] . '</td>';
-            // Wrap the address in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['vehicle_type'] . '</td>';
-            // Wrap the district in a clickable <td>
-            echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['place_of_occurrence'] . '</td>';
-            echo '</tr>';
-            
-        }
-    }
+          // Get violations for the current ticket
+          $violationsStmt = $conn->prepare("SELECT * FROM violations WHERE ticket_id_violations = ?");
+          $violationsStmt->bind_param("i", $ticket['ticket_id']);
+          $violationsStmt->execute();
+          $violationsResult = $violationsStmt->get_result();
+          $violations = $violationsResult->fetch_all(MYSQLI_ASSOC);
 
-    echo '</tbody>';
-    echo '</table>';
+          // Add the violations to the $ticket array
+          $violationTickets[$index]['violations'] = $violations;
+
+          echo '<tr>';
+          // Display the visible ticket count in the "No." column
+          echo '<td>' . $ticket['control_number'] . '</td>';
+          // Wrap the name in a clickable <td>
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_name'] . '</td>';
+          // Wrap the license in a clickable <td>
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_license'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['cor_number'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['issuing_district'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['driver_address'] . '</td>';
+          // Wrap the address in a clickable <td>
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['vehicle_type'] . '</td>';
+          // Wrap the district in a clickable <td>
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['place_of_occurrence'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['plate_no'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['reg_owner'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['reg_owner_address'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['date_violation'] . ' | ' . $ticket['time_violation'] . '</td>';
+          echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $ticket['remarks'] . '</td>';
+          // Display violations for the current ticket
+  foreach ($violations as $violation) {
+    //echo '<td class="clickable-cell" data-rowdata="' . $rowData . '">' . $violation['violationlist_id'] . '<br>';
+    // Add other violation information as needed
+}
+          echo '</tr>';
+          
+      }
+  }
+
+  echo '</tbody>';
+  echo '</table>';
 } else {
   // Center the image and link vertically and horizontally
   echo '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px;">';

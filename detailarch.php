@@ -222,7 +222,10 @@ unset($_SESSION['rowData']);
     <!-- Display the row data here -->
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Ticket Details</h5>
+        <div class="d-flex justify-content-between">
+            <h5 class="card-title"><b>Ticket Details</b></h5>
+            <h5 class="card-title" style="color:maroon;"><b>No. <?php echo $rowData['control_number']; ?></b></h5>
+        </div>
             <form id="details" method="POST" action="php/editDetails.php">
                 <input type="hidden" name="ticket_id" value="<?php echo $rowData['ticket_id']; ?>">
                 
@@ -267,7 +270,7 @@ unset($_SESSION['rowData']);
         <tr>
         <tr><td><label for="date_violation">Date of Violation:</label></td>
 <td><?php echo $rowData['date_violation']; ?></td>
-<td><label for="place_of_occurrence">Place of Violation:</label></td>
+<td><label for="place_of_occurrence">Place of Apprehension:</label></td>
 <td><input class="readonly-input" type="text" id="place_of_occurrence" name="place_of_occurrence" minlength="10" maxlength="50" value="<?php echo $rowData['place_of_occurrence']; ?>" readonly required></td>
 </tr>
 
@@ -303,6 +306,11 @@ unset($_SESSION['rowData']);
             echo '<p>' . $enforcerName . '</p>';
             ?>
     </td>
+    <tr>
+    <td><label for="driver_license">CoR Number:</label></td>
+            <td><input class="readonly-input" type="number" id="issuing_district" name="cor_number" minlength="20" maxlength="20" value="<?php echo $rowData['cor_number']; ?>" readonly required></td>
+       
+            </tr>
         </tr>
         <tr>
         <td><label for="violation_names">Violations:</label></td>
@@ -324,7 +332,7 @@ foreach ($violationsList as $violation) {
 echo '</ul>';
 
 // Display the total fines at the bottom
-echo '<p class="total-fines"><b>Total Fines:</b> <span class="fine-right">' . htmlspecialchars(number_format($totalFines, 2)) . '</span></p>';
+echo '<p class="total-fines"><b>Total Fines: </b> <span class="fine-right">' . htmlspecialchars(number_format($totalFines, 2)) . '</span></p>';
 
         ?>
 </td>
@@ -337,7 +345,11 @@ echo '<p class="total-fines"><b>Total Fines:</b> <span class="fine-right">' . ht
             <td></td>
             <td></td>
             <td>
+                <?php if ($_SESSION['role'] === 'Super Administrator') {
+                                        // Do not display the "Create Accounts" link
+                                     ?>
             <button class="btn btn-primary" type="button" id="edit-button" <?php echo ($rowData['is_settled'] == 1) ? 'style="display:none;"' : ''; ?>>Edit Information</button>
+            <?php }?>
                 <button class="btn btn-success"type="submit" id="save-button" style="display: none;background-color:#5CBA13;">Save Changes</button>
             </td>
         </tr>
@@ -351,6 +363,13 @@ echo '<p class="total-fines"><b>Total Fines:</b> <span class="fine-right">' . ht
 
 
 <script>
+
+document.getElementById('details').addEventListener('keydown', function (e) {
+        // Check if the pressed key is "Enter" (key code 13)
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent the default form submission
+        }
+    });
     
   // Add a click event listener to the logout button
 document.getElementById('logout-button').addEventListener('click', function() {

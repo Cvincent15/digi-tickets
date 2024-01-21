@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jan 14, 2024 at 07:32 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1:3306
+-- Generation Time: Jan 21, 2024 at 09:59 AM
+-- Server version: 10.6.14-MariaDB-cll-lve
+-- PHP Version: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ctmeu`
+-- Database: `u919418953_ctmeu`
 --
 
 -- --------------------------------------------------------
@@ -204,7 +204,7 @@ CREATE TABLE `maxaccess` (
 --
 
 INSERT INTO `maxaccess` (`access_id`, `maxITSA`, `maxEncoder`) VALUES
-(1, 4, 8);
+(1, 3, 7);
 
 -- --------------------------------------------------------
 
@@ -261,7 +261,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `currentTicket`, `email`, `employee_id`, `is_activated`, `apiKey`) VALUES
-(2, 'Backdoor', '', 'CTMEU', '', 'devCTMEU', '$2y$10$x8WM5JG8q7lsEjpq9UkmbO4zUJrooQ42WM1iatM/g6aS5ROTNb0sS', 'Backdoor', NULL, NULL, NULL, '', NULL, 0, NULL);
+(2, 'Backdoor', '', 'CTMEU', '', 'devCTMEU', '$2y$10$x8WM5JG8q7lsEjpq9UkmbO4zUJrooQ42WM1iatM/g6aS5ROTNb0sS', 'Backdoor', 1, 50, 29, '', NULL, 0, NULL),
+(7, 'Dominic', '', 'Fernandez', '', 'SrDoms', '$2y$10$SUC3O9bUzrTP7.RBvyfr.ehM7pDEgaCz1JoKOWVTA2fT5ZmyKOrSO', 'Backdoor', NULL, NULL, NULL, '', NULL, 0, NULL),
+(8, 'Nestorio', 'Reyes', 'Desepida', '', 'caravana', '$2y$10$bx00B76BZHXQdqLz7WB/x.9Ck1eT7Ja.dfcqw.zZ7o8sY8IbortDu', 'Enforcer', 1, 50, 1, '', 3, 0, NULL),
+(9, 'eddie', 'alibusan', 'colarina', '', 'eds', '$2y$10$KFJ5lYuKu5Jx6Q3nNElkT.Z6YSsygBPMKv0.ve98tbY.jf3PKlgv6', 'Super Administrator', 1, 50, 3, '', NULL, 0, NULL),
+(15, 'federico', 'lucero', 'capacete', 'jr.', 'fed', '$2y$10$.QmRlGU2rE1oqGKSn93gY.Kc5nRgHUCQ96NFF0nc95wvjQaZvzQ5O', 'IT Administrator', NULL, NULL, NULL, '', NULL, 0, NULL),
+(16, 'Edwardo', 'Tuscano', 'Tapangcp', '', 'lawin', '$2y$10$fy5d0s0lzGYGWBE./zXtiuhjAveZkLY1AmMyJScU.1pOQ20YB4fK6', 'Enforcer', NULL, NULL, NULL, '', NULL, 0, NULL),
+(17, 'Antonio', 'Barashari', 'league', '', 'spider', '$2y$10$JiPyScjvYTM46WESQfPp3Og6Oy4o69yFOBr9S5G.67kCJBQSlNbSa', 'Enforcer', NULL, NULL, NULL, '', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -511,6 +517,7 @@ CREATE TABLE `violation_tickets` (
   `ticket_id` int(11) NOT NULL,
   `driver_name` varchar(50) NOT NULL,
   `driver_license` varchar(50) NOT NULL,
+  `cor_number` int(30) NOT NULL,
   `issuing_district` varchar(20) NOT NULL,
   `driver_address` varchar(50) NOT NULL,
   `vehicle_type` int(11) NOT NULL,
@@ -644,7 +651,7 @@ ALTER TABLE `motorist_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
@@ -656,7 +663,7 @@ ALTER TABLE `users_motorists`
 -- AUTO_INCREMENT for table `vehicletype`
 --
 ALTER TABLE `vehicletype`
-  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `vehicle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `violationlists`

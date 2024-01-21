@@ -100,7 +100,7 @@ $currentTicket = $user['currentTicket'];
 }
 
 #submitBtn:disabled:hover::after {
-   content: "Contact your IT Administrator to generate your Control Number to create a ticket.";
+   content: "Ticket Number cannot be empty.";
    position: absolute;
    top: 100%;
    left: 50%;
@@ -115,6 +115,13 @@ $currentTicket = $user['currentTicket'];
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <?php if (isset($_GET['error']) && $_GET['error'] == 'maxTicketReached'): ?>
 <script>
+
+document.getElementById('ticketmaster').addEventListener('keydown', function (e) {
+        // Check if the pressed key is "Enter" (key code 13)
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent the default form submission
+        }
+    });
     $(document).ready(function() {
         // Show Bootstrap modal with the error message
         $('#maxTicketReachedModal').modal('show');
@@ -264,9 +271,26 @@ $currentTicket = $user['currentTicket'];
         </nav>
 
     <div class="container card p-5 w-75">
+        
+        <form id="ticketmaster" class="form-floating mb-3" method="post" action="./php/submit_ticket.php" id="ticketmaker">
+        
+        <div class="col" style="display: flex; justify-content: flex-end;">
+        <div class="col mt-3">
         <h3>Input Ticket Info</h3>
+        </div>
+   <div class="form-floating mt-3">
+   <h3 style="color:maroon;">No.&nbsp</h3>
+    </div>
+   <div class="form-floating mb-3">
+   
+   <input type="number" class="form-control" id="floatingInputValue1" name="userInputControlNumber" required oninput="limitNumberLength(this, 20)">
+<label for="floatingInputValue1">Ticket Number</label>
 
-        <form class="form-floating mb-3" method="post" action="./php/submit_ticket.php" id="ticketmaker">
+   </div>
+   <div class="form-floating mb-3">
+      <input type="number" class="form-control" id="floatingInputValue1" style="width:70px;" placeholder="Control Number" name="currentTicket" oninput="limitNumberLength(this, 2)">
+   </div>
+   </div>
             <!-- Add a hidden input field for user_ctmeu_id -->
             <input type="hidden" name="user_ctmeu_id" value="<?php echo $user_ctmeu_id; ?>">
             <div class="row">
@@ -285,18 +309,12 @@ $currentTicket = $user['currentTicket'];
                 
             </div>
             <div class="row">
+            
             <div class="col">
-                <div class="form-floating mb-3">
-                    <input type="number" class="form-control" id="floatingInputValue1"
-                        maxlength="30" placeholder="Driver's Name" name="currentTicket" value="<?php echo $currentTicket; ?>" required readonly>
-                    <label for="floatingInputValue1">Control Number</label>
-                </div>
-                </div>
-                <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" minlength="10" maxlength="30"
-                            placeholder="Email" name="email">
-                        <label for="floatingInputValue1">Email</label>
+                        <input type="number" class="form-control" id="floatingInputValue1" minlength="8" maxlength="30"
+                            placeholder="Certificate of Registration" name="cor_number">
+                        <label for="floatingInputValue1">Certificate of Registration</label>
                     </div>
                 </div>
             </div>
@@ -348,7 +366,7 @@ $currentTicket = $user['currentTicket'];
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
+                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
                             maxlength="30" placeholder="Issuing District" name="issuing_district" reg_owner>
                         <label for="floatingInputValue1">Issuing District</label>
                     </div>
@@ -383,7 +401,7 @@ $currentTicket = $user['currentTicket'];
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
+                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
                             maxlength="30" placeholder="Plate Number" name="plate_no" required>
                         <label for="floatingInputValue1">Plate Number</label>
                     </div>
@@ -393,14 +411,14 @@ $currentTicket = $user['currentTicket'];
             <div class="row">
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
+                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
                             maxlength="30" placeholder="Registered Owner" name="reg_owner" required>
                         <label for="floatingInputValue1">Registered Owner</label>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue3" minlength="10" maxlength="30"
+                        <input type="text" class="form-control" id="floatingInputValue3" minlength="5" maxlength="30"
                             placeholder="Registered Owner's Address" name="reg_owner_address" required>
                         <label for="floatingInputValue3">Registered Owner's Address</label>
                     </div>
@@ -410,9 +428,9 @@ $currentTicket = $user['currentTicket'];
             <div class="row">
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
+                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="2"
                             maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence">
-                        <label for="floatingInputValue1">Place of Violation</label>
+                        <label for="floatingInputValue1">Place of Apprehension</label>
                     </div>
                 </div>
                 <div class="col">
@@ -462,7 +480,7 @@ $currentTicket = $user['currentTicket'];
 
                                     data.forEach((violation) => {
                                         dropdownContent.append(
-                                            `<a href="#" data-id="${violation.violation_list_ids}" onclick="selectOption(${violation.violation_list_ids}, '${violation.violation_name}', '${violation.violation_section}')">${violation.violation_name} - ${violation.violation_section}</a>`
+                                            `<a href="#selectedOptionsTable" data-id="${violation.violation_list_ids}" onclick="selectOption(${violation.violation_list_ids}, '${violation.violation_name}', '${violation.violation_section}')">${violation.violation_name} - ${violation.violation_section}</a>`
                                         );
                                     });
                                 },
@@ -473,6 +491,7 @@ $currentTicket = $user['currentTicket'];
                         }
 
                         function selectOption(violationListId, violationName, violationSection) {
+                            
                             const selectedOptionsTable = $('#selectedOptionsTable');
                             const selectedOptionsBody = $('#selectedOptions');
                             const selectedViolationsInput = $('#selectedViolationsInput');
@@ -566,11 +585,17 @@ $currentTicket = $user['currentTicket'];
             </div>
 
             <button type="submit" class="btn btn-primary mt-3" id="submitBtn">Submit</button>
-<span id="controlNumberMessage" style="display: none; margin-left: 10px; color: red;">Contact your IT Administrator to generate your Control Number to create a ticket.</span>
+<span id="controlNumberMessage" style="display: none; margin-left: 10px; color: red;">Ticket Number cannot be empty.</span>
         </form>
     </div>
 
-
+    <script>
+function limitNumberLength(element, maxLength) {
+    if (element.value.length > maxLength) {
+        element.value = element.value.slice(0, maxLength);
+    }
+}
+</script>
     <script src="js/script.js"></script>
     <script src="js/jquery-3.6.4.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -624,18 +649,6 @@ window.onload = function() {
             time_24hr: false // Use 12-hour format with AM/PM
         });
         
-        // Apply symbol restriction to all text input fields
-        const form = document.getElementById('ticketmaker');
-        const inputs = form.querySelectorAll('input[type="text"]');
-
-        inputs.forEach(input => {
-            input.addEventListener('input', function (e) {
-                const inputValue = e.target.value;
-                const sanitizedValue = inputValue.replace(/[^A-Za-z0-9@.\-: ]/g,
-                    ''); // Allow letters, numbers, spaces, @ symbol, and hyphens
-                e.target.value = sanitizedValue;
-            });
-        });
 
         // Custom JavaScript to show/hide the dropdown
         function toggleDropdown() {
@@ -657,43 +670,6 @@ window.onload = function() {
             }
         });
 
-        $(document).ready(function () {
-            // Add a click event listener to the Change Password button
-            $('#changePasswordButton').click(function (e) {
-                e.preventDefault(); // Prevent the form from submitting normally
-
-                // Get the form data
-                var currentPassword = $('#currentPassword').val();
-                var newPassword = $('#newPassword').val();
-                var confirmPassword = $('#confirmPassword').val();
-
-                // Send an AJAX request to password_change.php
-                $.ajax({
-                    type: 'POST',
-                    url: 'php/password_change.php',
-                    data: {
-                        currentPassword: currentPassword,
-                        newPassword: newPassword,
-                        confirmPassword: confirmPassword
-                    },
-                    success: function (response) {
-                        if (response === "success") {
-                            // Password updated successfully
-                            alert('Password updated successfully!');
-                        } else if (response === "PasswordMismatch") {
-                            alert('New password and confirm password do not match!');
-                        } else if (response === "InvalidPassword") {
-                            alert('Current password is incorrect');
-                        } else {
-                            alert('An error occurred: ' + response);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        alert('AJAX error: ' + error);
-                    }
-                });
-            });
-        });
 
         $(document).ready(function () {
             // Display user data in placeholders
@@ -702,6 +678,19 @@ window.onload = function() {
             $('#stat-text').text("Role: " + '<?php echo $status; ?>');
 
         });
+        
+        // Event listener for the "Enter" key press
+    $(document).on('keypress', function (e) {
+        if (e.which === 13) {
+            // Prevent the default behavior for "Enter" key
+            e.preventDefault();
+
+            // Additional logic if needed
+
+            // Example: Trigger a click on the submit button
+            $('#submitBtn').click();
+        }
+    });
 
         // Add a click event listener to the logout button
         document.getElementById('logout-button').addEventListener('click', function () {

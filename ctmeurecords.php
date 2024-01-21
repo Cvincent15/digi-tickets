@@ -168,7 +168,7 @@ $tbl .= '<th width="7%">Vehicle</th>';
 $tbl .= '<th width="5%">Plate No.</th>';
 $tbl .= '<th width="10%">Registered Owner</th>';
 $tbl .= '<th width="10%">Registered Owner\'s Address</th>';
-$tbl .= '<th width="5%">Place of Violation</th>';
+$tbl .= '<th width="5%">Place of Apprehension</th>';
 $tbl .= '<th width="5%">Violations</th>';
 $tbl .= '<th width="6%">Account Status</th>';
 $tbl .= '</tr>';
@@ -459,8 +459,8 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
 <div class="card">
 <div class="date-filter-container mx-auto">
 <div class="row">
-    <div class="col-sm-5 mt-3 mb-3 text-left" style="font-weight: 700;"> Start Date and Time Default:All</div>
-    <div class="col-sm-7 mt-3 mb-3 text-right" style="font-weight: 700;"> End Date and Time Default:All</div>
+    <div class="col-sm-5 mt-3 mb-3 text-left" style="font-weight: 700;"> Start Date and Time</div>
+    <div class="col-sm-7 mt-3 mb-3 text-right" style="font-weight: 700;"> End Date and Time</div>
 </div>
 <div class="row">
     <div class="col-sm mb-3 ms-3">
@@ -546,7 +546,7 @@ echo '<script>var initialDataFound = ' . ($dataFound ? 'true' : 'false') . ';</s
             <th>Plate No.</th>
             <th>Registered Owner</th>
             <th>Registered Owner's Address</th>
-            <th>Place of Violation</th>
+            <th>Place of Apprehension</th>
             <th>Violations</th>
             <th>Account Status</th>
         </tr>
@@ -759,6 +759,30 @@ document.getElementById('filter-button').addEventListener('click', function() {
 });
 
 
+// Function to check if date and time fields are filled
+function checkDateTimeFields() {
+    var startDate = document.getElementById('start-date').value;
+    var startTime = document.getElementById('start-time').value;
+    var endDate = document.getElementById('end-date').value;
+    var endTime = document.getElementById('end-time').value;
+    var filterButton = document.getElementById('filter-button');
+
+    // Disable the filter button if any of the date or time fields are empty
+    if (!startDate || !startTime || !endDate || !endTime) {
+        filterButton.disabled = true;
+    } else {
+        filterButton.disabled = false;
+    }
+}
+
+// Add event listeners to date and time fields to check when they are changed
+document.getElementById('start-date').addEventListener('change', checkDateTimeFields);
+document.getElementById('start-time').addEventListener('change', checkDateTimeFields);
+document.getElementById('end-date').addEventListener('change', checkDateTimeFields);
+document.getElementById('end-time').addEventListener('change', checkDateTimeFields);
+
+// Initial check on page load
+document.addEventListener('DOMContentLoaded', checkDateTimeFields);
 
 // Add an event listener to the "Apply Filter" button
 toggleTableAndPDFVisibility(initialDataFound);

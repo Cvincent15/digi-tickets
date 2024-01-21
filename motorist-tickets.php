@@ -1,13 +1,6 @@
 <?php
 session_start();
-//include 'php/database_connect.php';
-
-// Check if the user is already logged in
-if (isset($_SESSION['username'])) {
-    // Redirect the user to the greeting page if they are already logged in
-    header("Location: ctmeupage.php");
-    exit();
-}
+include 'php/database_connect.php';
 
 ?>
 
@@ -20,20 +13,61 @@ if (isset($_SESSION['username'])) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
 <link rel="stylesheet" href="css/ticketStyle.css"/>
+<script src="js/bootstrap.bundle.min.js"></script>
     <title>CTMEU Login</title>
 
+
+    <script>
+        // Explicitly declare showAlert in the global scope
+        window.showAlert = function (message) {
+            const modal = new bootstrap.Modal(document.getElementById('customModal'));
+            document.getElementById('modalMessage').innerText = message;
+            modal.show();
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Apply symbol restriction to all text input fields
+            const form = document.getElementById('login-form');
+            const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function (e) {
+                    const inputValue = e.target.value;
+                    const sanitizedValue = inputValue.replace(/[^A-Za-z0-9 @.\-]/g, '');
+                    e.target.value = sanitizedValue;
+                });
+            });
+        });
+    </script>
 </head>
 
 <body class="sidebar-collapse fixed" style="height: auto;">
+<div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="wrapper">
         <div class="content-wrapper" style="min-height: 658px;">
             <div class="bgslider" id="bgslider">
                 <div class="container d-flex align-items-center justify-content-center pt-5">
                     <div class="col" style="width: 98%; height: 90vh; background: white; box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.50); border-radius: 1.25rem">
                         <div class="row" style="width: 100%; height: 40%; background: linear-gradient(180deg, #062690 0%, #00105A 100%); border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem; border-bottom-right-radius: 2.5rem; border-bottom-left-radius: 2.5rem; margin: .3px;">
-                        <h1 class="d-flex align-items-center justify-content-center mb-0"><img src="./images/ctmeu-small.png"></h1>
+                        <h1 class="d-flex align-items-center justify-content-center mb-0"><img src="./images/ctmeusmall.png"></h1>
                         <h1 class="d-flex align-items-center justify-content-center mt-0" style="color: #FFF; text-align: center;font-family: Inter;font-size: 2.5rem; font-style: normal; font-weight: 600; line-height: normal;">Check a Violation Ticket Status</h1>
 <form class="d-flex mx-auto mb-5" style=" width: 50%;" id="search-form">
     <div class="input-group">
@@ -42,30 +76,41 @@ if (isset($_SESSION['username'])) {
     </div>
 </form>
                     </div>
-                        <div class="row d-flex align-items-center justify-content-center">
+                    <?php 
+                    
+// Check if the user is already logged in
+if (isset($_SESSION['email'])) {
+    ?>
+    <button type="button" class="btn btn-primary mx-auto d-block mt-3" style="margin: 0;" onclick="redirectToDashboard()">Back to Dashboard</button>
+
+    <?php
+} else {
+                    ?>
+                        <div class="row d-flex align-items-center justify-content-center" style="max-width: 100%; max-height: 100%; overflow: hidden;">
                             <div class="col d-flex align-items-center justify-content-center mx-auto">
                             <h1 class="d-flex align-items-center justify-content-center mt-5 pt-5"><img src="./images/search-placeholder.png"></h1>
                             </div>
                             <div class="col pt-5">
                                 <h1>Log In</h1>
                                 <h6>Manage Violations and More</h6>
-                                <form class="form-floating mb-3 me-5" method="POST" action="php/login.php" accept-charset="utf-8" id="login-form">
+                                <form class="form-floating mb-3 me-5" method="POST" action="./php/motoristlogin.php" accept-charset="utf-8" id="login-form">
               <div class="form-floating mb-3">
-                <input type="text" name="username" value="" id="username" placeholder="User Name" maxlength="20" size="50" autocomplete="off" class="form-control" required="">
-                <label for="username" class="form-label">Username</label>
+                <input type="text" name="email" value="" id="username" placeholder="User Name" maxlength="30" size="50" autocomplete="off" class="form-control" required="">
+                <label for="username" class="form-label">E-Mail</label>
               </div>
               <div class="form-floating">
-                <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-2" maxlength="20" required="">
+                <input type="password" name="password" value="" id="password" autocomplete="off" placeholder="Password" class="form-control mb-2" maxlength="30" required="">
                 <label for="password" class="form-label">Password</label>
             </div>
-            <p class="text-end mt-0"><a href="#" style="text-decoration: none;">Forgot your password?</a></p>
+            <!-- <p class="text-end mt-0"><a href="#" style="text-decoration: none;">Forgot your password?</a></p> -->
             <div class="d-grid gap-2 col-12 mx-auto">
-  <button class="btn btn-primary" type="button">Log In</button>
+  <button class="btn btn-primary" type="submit">Log In</button>
 </div>
             </form>
-            <p class="text-center mt-0">Don't have an account? Sign Up</p>
+            <p class="text-center mt-0">Don't have an account? <a href="motoristSignup.php">Sign Up</a></p>
                             </div>
                         </div>
+                        <?php } ?>
                         <div class="row text-center pt-3">
                         <p>
       <a href="#terms-of-service" style="text-decoration: none;">Terms of Service</a> •
@@ -83,10 +128,6 @@ if (isset($_SESSION['username'])) {
     <div class="modal fade" id="searchResultsModal" tabindex="-1" aria-labelledby="searchResultsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
-            <div class="modal-header mx-5">
-                <h3 class="modal-title mt-3" id="searchResultsModalLabel" style="color: #1A3BB1; font-weight: 700;">Ticket Details</h3>
-                <h3 class="modal-title mt-3" id="searchResultsModalLabel" style="color: #1A3BB1; font-weight: 400;">No. 400078</h3>
-            </div>
             <div class="modal-body pb-0" id="searchResultsModalBody">
                 <!-- Search results will be displayed here -->
             </div>
@@ -138,11 +179,26 @@ if (isset($_SESSION['username'])) {
         }
     });
 }
+
+function redirectToDashboard() {
+      window.location.href = 'motoristMain.php';
+    }
 </script>
     <script src="js/script.js"></script>
     <script src="js/jquery-3.6.4.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
+    </script>
     
+    <?php
+// Check if there is a login error message
+if (isset($_SESSION['login_errorM'])) {
+  $loginErrorM = $_SESSION['login_errorM'];
+  // Clear the login error session variable
+  unset($_SESSION['login_errorM']);
+  // You can use $loginError to display the error message in your popup
+  echo "<script>showAlert('$loginErrorM');</script>";
+} 
+  ?>
 </body>
 </html>

@@ -51,7 +51,7 @@ if (isset($_SESSION['email'])) {
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="motorist-tickets.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;">Motorist Portal</span>
 </a>
@@ -65,7 +65,7 @@ if (isset($_SESSION['email'])) {
           </li>
         </ul>
         <button type="button" class="btn class=btn btn-primary active" style="margin-right: 20px;" onclick="redirectToRegister()">Register</button>
-        <button type="button" class="btn transparent-btn btn-outline-primary" onclick="redirectToLogin()">Log In</button>
+        <button type="button" class="btn transparent-btn btn-outline-primary" onclick="redirectToLogin()">Log In and Search</button>
     </div>
     </div>
   </div>
@@ -319,7 +319,7 @@ if (isset($_SESSION['email'])) {
     }
 
     function redirectToLogin() {
-      window.location.href = 'motorist_login.php';
+      window.location.href = 'motorist-tickets.php';
     }
   </script>
   

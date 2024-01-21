@@ -31,7 +31,7 @@ if (isset($_SESSION['email'])) {
   $stmt->close();
 } else {
   // Redirect the user to the login page if not logged in
-  header("Location: ./motoristlogin.php");
+  header("Location: ./motorist-tickets.php");
   exit();
 }
 ?>
@@ -71,6 +71,7 @@ if (isset($_SESSION['email'])) {
             <!-- <a class="nav-link" href="motoristlogin.php">Dashboard</a> -->
           </li>
         </ul>
+        <button type="button" class="btn btn-primary" style="margin-right:20px;" onclick="redirectToSearchTicket()">Search Ticket</button>
       <div class="dropstart">
   <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <img src="./images/Icon.png" style="margin-right: 10px;"><?php echo "".$driverFirstName;  ?>
@@ -80,6 +81,7 @@ if (isset($_SESSION['email'])) {
   <li><a class="dropdown-item" href="php/logoutM.php" id="logout-button"><img src="./images/icon _logout_.png"> Log Out</a></li>
   </ul>
 </div>
+
     </div>
     </div>
   </div>
@@ -102,6 +104,9 @@ if (isset($_SESSION['email'])) {
 </div>
 
     <script>
+      function redirectToSearchTicket() {
+      window.location.href = 'motorist-tickets.php';
+    }
     function redirectToRegister() {
       window.location.href = 'motoristSignup.php';
     }

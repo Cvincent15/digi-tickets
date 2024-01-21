@@ -29,7 +29,7 @@ if (isset($_SESSION['email'])) {
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motoristlogin.php">
+  <a class="navbar-brand" href="motorist-ticket.php">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-top">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> Motorist Portal
 </a>
