@@ -95,6 +95,10 @@ $currentTicket = $user['currentTicket'];
         /* Adjust the padding as needed */
     }
 
+    .hidden {
+        display: none;
+    }
+
     #submitBtn:disabled {
    cursor: not-allowed;
 }
@@ -445,7 +449,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
 
             <div class="row">
                 <div class="col">
-                    <button type="button" onclick="removeSelected()" style="margin-top:20px;">Remove
+                    <button type="button" id="removeAllButton" class="hidden" onclick="removeSelected()" style="margin-top:20px;">Remove
                         All</button>
                     <table id="selectedOptionsTable" style="margin-top:20px; margin-bottom:20px;">
                         <thead>
@@ -519,6 +523,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                             alert(`Violation "${violationName} - ${violationSection}" is already selected.`);
                             }
 
+                            $("#removeAllButton").removeClass("hidden");
                         }
 
 
@@ -526,11 +531,17 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                         // Function to remove a selected option
                         function removeOption(violationListId) {
                             $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).remove();
+
+                            if($('#selectedOptions').children().length == 0) {
+                                $("#removeAllButton").addClass("hidden");
+                            }
                         }
 
                         // Function to remove all selected options
                         function removeSelected() {
                             $('#selectedOptions').empty();
+
+                            $("#removeAllButton").addClass("hidden");
                         }
 
                         // Document ready function
