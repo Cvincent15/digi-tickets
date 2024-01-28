@@ -402,6 +402,8 @@ tr:hover {
                 <div class="masterlistForm">
 
                     <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
+
+                  
                         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an
                             account</h1>
                         <div class="form-floating mx-5">
@@ -679,6 +681,7 @@ tr:hover {
                 </tbody>
             </table>
 
+
         </div>
     </div>
 
@@ -761,7 +764,6 @@ if (isset($_SESSION['success_message'])) {
             e.target.value = sanitizedValue;
         });
     });
-
 
     document.getElementById('reset-button').addEventListener('click', function() {
         // Reload the current page when the Clear button is clicked
@@ -882,8 +884,6 @@ if (isset($_SESSION['success_message'])) {
                 break;
             }
         }
-
-
 
     }
 
