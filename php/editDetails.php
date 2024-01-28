@@ -9,9 +9,14 @@ if (!isset($_SESSION['username'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $driverName = filter_input(INPUT_POST, 'driver_name', FILTER_SANITIZE_STRING);
+    $driverAddress = filter_input(INPUT_POST, 'driver_address', FILTER_SANITIZE_STRING);
     $driverLicense = filter_input(INPUT_POST, 'driver_license', FILTER_SANITIZE_STRING);
+    $issuingDistrict = filter_input(INPUT_POST, 'issuing_district', FILTER_SANITIZE_STRING);
     $plateNo = filter_input(INPUT_POST, 'plate_no', FILTER_SANITIZE_STRING);
-    $dateTimeViolation = filter_input(INPUT_POST, 'date_time_violation', FILTER_SANITIZE_STRING);
+    $regOwner = filter_input(INPUT_POST, 'reg_owner', FILTER_SANITIZE_STRING);
+    $regOwnerAddress = filter_input(INPUT_POST, 'reg_owner_address', FILTER_SANITIZE_STRING);
+    $corNo = filter_input(INPUT_POST, 'cor_number', FILTER_SANITIZE_NUMBER_INT);
+  
     $placeOfOccurrence = filter_input(INPUT_POST, 'place_of_occurrence', FILTER_SANITIZE_STRING);
     $ticketId = intval($_POST['ticket_id']);
 
@@ -21,10 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $sql = "UPDATE violation_tickets 
-            SET driver_name = ?, 
-                driver_license = ?,
-                plate_no = ?,
-                date_time_violation = ?,
+            SET driver_name = ?, driver_address = ?, 
+                driver_license = ?, issuing_district = ?,
+                plate_no = ?, reg_owner = ?, reg_owner_address = ?, cor_number = ?,
                 place_of_occurrence = ?
             WHERE ticket_id = ?";
 
@@ -32,11 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt) {
         $params = [
-            "sssssi",
+            "sssssssisi",
             &$driverName,
+            &$driverAddress,
             &$driverLicense,
+            &$issuingDistrict,
             &$plateNo,
-            &$dateTimeViolation,
+            &$regOwner,
+            &$regOwnerAddress,
+            &$corNo,
             &$placeOfOccurrence,
             &$ticketId,
         ];

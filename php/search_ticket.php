@@ -5,11 +5,12 @@ include 'database_connect.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve data based on the search input
     $search_query = $_POST['search_query'];
+    $unique_code = $_POST['unique_code'];
     // Modify the SQL query to include a JOIN clause
     $sql = "SELECT violation_tickets.*, vehicletype.vehicle_name
             FROM violation_tickets
             LEFT JOIN vehicletype ON violation_tickets.vehicle_type = vehicletype.vehicle_id
-            WHERE violation_tickets.control_number LIKE '%$search_query%'";
+            WHERE violation_tickets.control_number LIKE '%$search_query%' AND violation_tickets.uniqueCode = '$unique_code'";
     $result = $conn->query($sql);
 
     // Process and display the data (you can customize this part)

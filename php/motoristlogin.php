@@ -32,13 +32,13 @@ if ($user) {
     } else {
         // Password is incorrect, display an error message
         $_SESSION['login_errorM'] = "Invalid username or password";
-        header('Location: ../motorist-tickets.php');
+        header('Location: ../search-tickets');
         exit();
     }
 } else {
     // Password is incorrect, display an error message
     $_SESSION['login_errorM'] = "User not found";
-    header('Location: ../motorist-tickets.php');
+    header('Location: ../search-tickets');
     exit();
 }
 ?>

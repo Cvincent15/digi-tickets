@@ -84,3 +84,8 @@ Stack trace:
 [02-Jan-2024 16:15:47 UTC] Violation ID not found for: "Illegal transfer of plates"
 [02-Jan-2024 16:15:47 UTC] Violation ID not found for: "tags or stickers"
 [02-Jan-2024 16:38:44 UTC] Violation ID not found for: Driving without license, TRUCK BAN, Illegal transfer of plates, tags or stickers
+[23-Jan-2024 11:00:41 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Column count doesn't match value count at row 1 in C:\xampp2\htdocs\digi-tickets-version-15\php\submit_ticket.php:68
+Stack trace:
+#0 C:\xampp2\htdocs\digi-tickets-version-15\php\submit_ticket.php(68): mysqli_prepare(Object(mysqli), 'INSERT INTO vio...')
+#1 {main}
+  thrown in C:\xampp2\htdocs\digi-tickets-version-15\php\submit_ticket.php on line 68

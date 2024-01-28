@@ -9,6 +9,21 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+
+require '../phpmailer/src/Exception.php';
+require '../phpmailer/src/PHPMailer.php';
+require '../phpmailer/src/SMTP.php';
+
+
+$mail = new PHPMailer(true);
+
+ini_set('log_errors', '1');
+ini_set('error_log', './error.log');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize and validate user inputs
     $selectedViolations = isset($_POST['violations']) ? $_POST['violations'] : [];
@@ -22,9 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $regOwnerAddress = filter_var($_POST['reg_owner_address'], FILTER_SANITIZE_STRING);
     $placeOfOccurrence = filter_var($_POST['place_of_occurrence'], FILTER_SANITIZE_STRING);
     $remarks = filter_var($_POST['remarks'], FILTER_SANITIZE_STRING);
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
     $date = filter_var($_POST['date_violation'], FILTER_SANITIZE_STRING);
     $time = filter_var($_POST['time_violation'], FILTER_SANITIZE_STRING);
+    $userInput = $_POST['userInputControlNumber'];
     $currentTicket = $_POST['currentTicket'];
+    $cor_number = $_POST['cor_number'];
+    
     $user_ctmeu_id = $_POST['user_ctmeu_id']; // Assuming this is an integer
 
     // Check if the currentTicket is less than or equal to endTicket
@@ -35,7 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_stmt_bind_result($stmtCheckTicketRange, $currentTicketValue, $endTicketValue);
     mysqli_stmt_fetch($stmtCheckTicketRange);
     mysqli_stmt_close($stmtCheckTicketRange);
-
+    $combinedTicket = $userInput . $currentTicket;
+    
     if ($currentTicketValue >= $endTicketValue) {
         // Redirect back to ticket-creation with an error message
         header("Location: ../ticket-creation?error=maxTicketReached");
@@ -43,14 +63,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert the form data into the violation_tickets table using prepared statements
-    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, remarks, control_number)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $insertTicketQuery = "INSERT INTO violation_tickets (user_ctmeu_id, driver_name, driver_address, driver_license, issuing_district, vehicle_type, plate_no, reg_owner, reg_owner_address, date_violation, time_violation, place_of_occurrence, remarks, control_number, cor_number, uniqueCode, email)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $insertTicketQuery);
 
     if ($stmt) {
         // Bind parameters and execute the statement
-        mysqli_stmt_bind_param($stmt, "issssssssssssi", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date, $time, $placeOfOccurrence, $remarks, $currentTicket);
+        $uniqueCode = uniqid();
+        mysqli_stmt_bind_param($stmt, "isssssssssssssiss", $user_ctmeu_id, $driverName, $driverAddress, $licenseNo, $issuingDistrict, $vehicleType, $plateNo, $regOwner, $regOwnerAddress, $date, $time, $placeOfOccurrence, $remarks, $combinedTicket, $cor_number, $uniqueCode, $email);
+
+                
+        try {
+            //Server settings
+            $mail->SMTPDebug = 2;                                 
+            $mail->isSMTP();                                      
+            $mail->Host = 'smtp.gmail.com';  
+            $mail->SMTPAuth = true;                               
+            $mail->Username = 'projectctmeu@gmail.com';                 
+            $mail->Password = 'pjviupysohjkginv';                           
+            $mail->SMTPSecure = 'tls';                            
+            $mail->Port = 587;                                    
+
+            //Recipients
+            $mail->setFrom('projectctmeu@gmail.com', 'City Traffic Management and Enforcement Unit - City of Santa Rosa');
+            $mail->addAddress($email);     
+
+            //Content
+            $mail->isHTML(true);                                  
+            $mail->Subject = 'CTMEU Traffic Violation E-Receipt';
+            $mail->Body    = '
+            <title>This serves as your online receipt</title>
+            <p>Your ticket number is ' . $combinedTicket . ' and unique code ' . $uniqueCode . '. If you wish to view your traffic ticket you can head to <a>ctmeu-hub.net/search-ticket</a></p>';
+
+            $mail->send();
+            echo 'Message has been sent';
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
 
         if (mysqli_stmt_execute($stmt)) {
             // Check if any rows were affected by the insertion
@@ -99,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             // Insert the fetched data into the violator_info table
                             $insertViolatorInfoQuery = "INSERT INTO violator_info (TCT_NUMBER, DRIVER_NAME, VIOLATION_NAME, VIOLATION_DATE, VIOLATION_TIME, VIOLATION_FINE, VIOLATION_SECTION, violationL_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                             $stmtInsertViolatorInfo = mysqli_prepare($conn, $insertViolatorInfoQuery);
-                            mysqli_stmt_bind_param($stmtInsertViolatorInfo, "issssssi", $currentTicket, $driverName, $violationName, $date, $time, $violationFine, $violationSection, $violationId);
+                            mysqli_stmt_bind_param($stmtInsertViolatorInfo, "sssssssi", $combinedTicket, $driverName, $violationName, $date, $time, $violationFine, $violationSection, $violationId);
                             mysqli_stmt_execute($stmtInsertViolatorInfo);
                             mysqli_stmt_close($stmtInsertViolatorInfo);
                      
