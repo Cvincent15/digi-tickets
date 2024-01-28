@@ -31,7 +31,7 @@ if (isset($_SESSION['email'])) {
   $stmt->close();
 } else {
   // Redirect the user to the login page if not logged in
-  header("Location: ./motorist-tickets.php");
+  header("Location: ./search-tickets");
   exit();
 }
 ?>
@@ -105,7 +105,7 @@ if (isset($_SESSION['email'])) {
 
     <script>
       function redirectToSearchTicket() {
-      window.location.href = 'motorist-tickets.php';
+      window.location.href = 'search-tickets';
     }
     function redirectToRegister() {
       window.location.href = 'motoristSignup.php';

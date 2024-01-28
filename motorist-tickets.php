@@ -72,6 +72,7 @@ include 'php/database_connect.php';
 <form class="d-flex mx-auto mb-5" style=" width: 50%;" id="search-form">
     <div class="input-group">
         <input class="form-control" type="search" id="search-query" placeholder="Search" aria-label="Search">
+        <input class="form-control" type="search" id="search-unique-code" placeholder="Unique Code" aria-label="Unique Code">
         <button class="btn btn-primary" type="button" onclick="searchData()">Search</button>
     </div>
 </form>
@@ -160,9 +161,10 @@ if (isset($_SESSION['email'])) {
 <script>
     function searchData() {
     var searchQuery = document.getElementById('search-query').value.trim();
+    var uniqueCode = document.getElementById('search-unique-code').value.trim();
 
     // Check if the search query is empty
-    if (searchQuery === "") {
+    if (searchQuery === "" || uniqueCode === "") {
         // Display a modal indicating that there is no input
         $('#emptySearchModal').modal('show');
         return;
@@ -171,7 +173,7 @@ if (isset($_SESSION['email'])) {
     $.ajax({
         type: 'POST',
         url: './php/search_ticket.php',
-        data: { search_query: searchQuery },
+        data: { search_query: searchQuery, unique_code: uniqueCode },
         success: function (response) {
             // Display the search results in a modal
             $('#searchResultsModalBody').html(response);

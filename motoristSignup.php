@@ -51,7 +51,7 @@ if (isset($_SESSION['email'])) {
 
 <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #FFFFFF">
   <div class="container-fluid">
-  <a class="navbar-brand" href="motorist-tickets.php">
+  <a class="navbar-brand" href="search-tickets">
   <img src="./images/ctmeusmall.png" class="d-inline-block align-text-middle">
   <span style="color: #1D3DD1; font-weight: bold;">CTMEU</span> <span style="font-weight: 600;">Motorist Portal</span>
 </a>
@@ -319,7 +319,7 @@ if (isset($_SESSION['email'])) {
     }
 
     function redirectToLogin() {
-      window.location.href = 'motorist-tickets.php';
+      window.location.href = 'search-tickets';
     }
   </script>
   

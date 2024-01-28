@@ -287,7 +287,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
     </div>
    <div class="form-floating mb-3">
    
-   <input type="number" class="form-control" id="floatingInputValue1" name="userInputControlNumber" required oninput="limitNumberLength(this, 20)">
+   <input type="text" class="form-control" id="floatingInputValue1" name="userInputControlNumber" required oninput="limitNumberLength(this, 20)" onkeypress="return isNumberKey(event)">
 <label for="floatingInputValue1">Ticket Number</label>
 
    </div>
@@ -313,7 +313,13 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                 
             </div>
             <div class="row">
-            
+            <div class="col">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="floatingInputValue1" minlength="8" maxlength="40"
+                            placeholder="E-Mail" name="email">
+                        <label for="floatingInputValue1">E-Mail</label>
+                    </div>
+                </div>
             <div class="col">
                     <div class="form-floating mb-3">
                         <input type="number" class="form-control" id="floatingInputValue1" minlength="8" maxlength="30"
@@ -365,6 +371,12 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                           // Update the input value
                           input.value = formattedValue;
                       }
+                      function isNumberKey(evt){
+                            var charCode = (evt.which) ? evt.which : event.keyCode
+                            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                                return false;
+                            return true;
+                        }
             </script>
                     </div>
                 </div>

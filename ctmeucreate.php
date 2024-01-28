@@ -36,6 +36,7 @@ $access = mysqli_fetch_assoc($result);
 $maxITSA = $access['maxITSA'];
 $maxEncoder = $access['maxEncoder'];
 
+
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -53,6 +54,10 @@ $maxEncoder = $access['maxEncoder'];
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <script src="./js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS (make sure it's included after jQuery) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>CTMEU Data Hub</title>
 </head>
 <style>
@@ -396,7 +401,7 @@ tr:hover {
             <div class="col">
                 <div class="masterlistForm">
 
-                    <form method=" POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
+                    <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
                         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an
                             account</h1>
                         <div class="form-floating mx-5">
@@ -677,7 +682,70 @@ tr:hover {
         </div>
     </div>
 
+<?php 
 
+
+// Check for error message
+if (isset($_SESSION['error_message'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="errorModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['error_message'] . '</p>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $("#errorModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['error_message']); // Clear the message
+}
+
+// Check for success message
+if (isset($_SESSION['success_message'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="successModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['success_message'] . '</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $("#successModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['success_message']); // Clear the message
+}
+
+?>
 
 
     <script>

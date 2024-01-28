@@ -1,4 +1,6 @@
+
 <?php
+session_start();
 // Include your database connection code here
 include 'php/database_connect.php';
 
@@ -27,6 +29,20 @@ function userExists($firstName, $lastName) {
     return $count > 0;
 }
 
+// Function to check if a username already exists
+function usernameExists($username) {
+    global $conn;
+    $usernameLower = strtolower($username); // Convert the username to lowercase
+    $stmt = $conn->prepare("SELECT user_ctmeu_id FROM users WHERE LOWER(username) = ?");
+    $stmt->bind_param("s", $usernameLower);
+    $stmt->execute();
+    $stmt->store_result();
+    $count = $stmt->num_rows;
+    $stmt->close();
+    return $count > 0;
+}
+
+
 // Check if the form data has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve user input from the form and trim it
@@ -54,11 +70,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    // Count the number of existing users with the selected role
    $existingCount = countUsersWithRole($role);
 
-    // Check if a user with the same first name and last name already exists
-    if (userExists($firstName, $lastName)) {
-        // Display an alert message
-        echo "<script>alert('A user with the same first name and last name already exists. Please try with a different name.');</script>";
+   if (userExists($firstName, $lastName)) {
+    $_SESSION['error_message'] = 'A user with the same first name and last name already exists. Please try with a different name.';
+    header('Location: user-creation');
+    exit();
+    } elseif (usernameExists($username)) {
+        $_SESSION['error_message'] = 'This username is already taken. Please choose a different username.';
         header('Location: user-creation');
+        exit();
     } else {
         // Initialize the count variable
         $count = 0;
@@ -79,8 +98,9 @@ if (empty($masterlist)) {
  }
             // Execute the statement
             if ($stmt->execute()) {
-                // Registration successful
+                $_SESSION['success_message'] = 'Registration successful.';
                 header('Location: user-creation');
+                exit();
             } else {
                 // Registration failed
                 echo "Error: " . $stmt->error;
