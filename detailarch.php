@@ -138,29 +138,32 @@ unset($_SESSION['rowData']);
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
-                                    echo '<li class="nav-item"> <a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
+                                    echo '<li class="nav-item"> <a href="reports" class="nav-link" style="font-weight: 600;">Reports</a> </li>';
                                 } else {
                                     // Display the "Create Accounts" link
-                                    //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
+                                    //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
-                                    echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
+                                     echo '<li class="nav-item">
+          <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
+          </li>';
+                                    echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+         </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -170,9 +173,8 @@ unset($_SESSION['rowData']);
                                 // Uncomment this line to show "Activity Logs" to other roles
                                 // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
-          </li>';
-
+                                <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
+                              </li>';
                             }
                         }
                         ?>
@@ -200,7 +202,6 @@ unset($_SESSION['rowData']);
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';

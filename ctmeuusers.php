@@ -86,13 +86,13 @@ $status = $user['role'];
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -102,13 +102,17 @@ $status = $user['role'];
                                     //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
+                                    echo '<li class="nav-item">
+            <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
+          </li>';
+
                                     echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
-          <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
+          </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -148,7 +152,6 @@ $status = $user['role'];
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -210,7 +213,7 @@ $status = $user['role'];
 </div>
 <div class="modal fade" id="passwordModal">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content rounded-5">
+        <div class="modal-content modal-content-full rounded-5">
             <div class="container">
                 <div class="row">
                 <div class="col-md-6 d-flex justify-content-center"> <!-- Centered the column content -->
@@ -275,14 +278,28 @@ $status = $user['role'];
 
 <div class="modal fade" id="successModal">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content modal-content-full">
             <div class="modal-body d-flex align-items-center justify-content-center">
                 <div class="text-center">
                     <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
                     <h5 class="modal-title mb-3" style="font-weight: 800;">Password Changed!</h5>
                     <p class="mb-3" style="font-weight: 500;">Your password has been changed successfully.</p>
-                    <button type="button" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal" style="background-color: #0A157A;">Close</button>
+                    <button type="button" class="btn btn-primary mb-3" id="okButton" data-bs-dismiss="modal" style="background-color: #0A157A;">Close</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-full">
+            <div class="modal-body">
+                <h5 class="modal-title">Error</h5>
+                <p id="errorMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
@@ -335,7 +352,7 @@ $status = $user['role'];
 
         $(document).ready(function () {
         // Add a click event listener to the Change Password button
-        $('#changePasswordButton').click(function (e) {
+$('#changePasswordButton').click(function (e) {
     e.preventDefault(); // Prevent the form from submitting normally
 
     // Get the form data
@@ -343,41 +360,96 @@ $status = $user['role'];
     var newPassword = $('#newPassword').val();
     var confirmPassword = $('#confirmPassword').val();
 
-    // Send an AJAX request to password_change.php
-    $.ajax({
-        type: 'POST',
-        url: 'php/password_change.php',
-        data: {
-            currentPassword: currentPassword,
-            newPassword: newPassword,
-            confirmPassword: confirmPassword
-        },
-        success: function (response) {
-            if (response === "success") {
-                // Password updated successfully
-                // Close the first modal (passwordModal)
-                $('#passwordModal').modal('hide');
-                
-                // Show the success modal (successModal)
-                $('#successModal').modal('show');
-                
-                // You can also clear the form fields if needed
-                $('#currentPassword').val('');
-                $('#newPassword').val('');
-                $('#confirmPassword').val('');
-            } else if (response === "PasswordMismatch") {
-                alert('New password and confirm password do not match!');
-            } else if (response === "InvalidPassword") {
-                alert('Current password is incorrect');
-            } else {
-                alert('An error occurred: ' + response);
+    // Check if new password matches the confirm password
+    if (newPassword !== confirmPassword) {
+        // Set the error message
+        var errorMessage = 'New password and confirm password do not match!';
+        // Display the error modal
+        displayErrorModal(errorMessage);
+        return; // Stop further execution
+    }
+
+    // Perform client-side validation
+    if (validatePassword(newPassword)) {
+        // Send an AJAX request to password_change.php
+        $.ajax({
+            type: 'POST',
+            url: 'php/password_change.php',
+            data: {
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            },
+            success: function (response) {
+                if (response === "success") {
+                    // Password updated successfully
+                    // Close the first modal (passwordModal)
+                    $('#passwordModal').modal('hide');
+                    
+                    // Show the success modal (successModal)
+                    $('#successModal').modal('show');
+                    
+                    // You can also clear the form fields if needed
+                    $('#currentPassword').val('');
+                    $('#newPassword').val('');
+                    $('#confirmPassword').val('');
+                } else if (response === "InvalidPassword") {
+                    // Set the error message
+                    var errorMessage = 'Current password is incorrect';
+                    // Display the error modal
+                    displayErrorModal(errorMessage);
+                } else {
+                    // Set the error message
+                    var errorMessage = 'An error occurred: ' + response;
+                    // Display the error modal
+                    displayErrorModal(errorMessage);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Set the error message
+                var errorMessage = 'AJAX error: ' + error;
+                // Display the error modal
+                displayErrorModal(errorMessage);
             }
-        },
-        error: function (xhr, status, error) {
-            alert('AJAX error: ' + error);
-        }
-    });
+        });
+    } else {
+        // Set the error message
+        var errorMessage = 'Password does not meet the requirements!';
+        // Display the error modal
+        displayErrorModal(errorMessage);
+    }
 });
+
+// Function to display the error modal with the specified message
+function displayErrorModal(errorMessage) {
+    // Set the error message in the modal
+    $('#errorMessage').text(errorMessage);
+    // Display the error modal
+    $('#errorModal').modal('show');
+}
+
+
+// Function to validate password
+function validatePassword(password) {
+    // Define regular expressions for each requirement
+    var lengthRegex = /^.{8,20}$/;
+    var uppercaseRegex = /[A-Z]/;
+    var numberRegex = /\d/;
+    var specialCharRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\\/\-|=]/;
+
+    // Check if all requirements are met
+    if (
+        lengthRegex.test(password) &&
+        uppercaseRegex.test(password) &&
+        numberRegex.test(password) &&
+        specialCharRegex.test(password)
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
         // Add a click event listener to the "OK" button in the success modal
         $('#okButton').click(function () {
@@ -480,14 +552,6 @@ document.getElementById('logout-button').addEventListener('click', function() {
             }
         }
 
-        const specialChars = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\\/\-|=]/;
-    if (specialChars.test(password)) {
-        specialCharIndicator.classList.remove('red-circle');
-        specialCharIndicator.classList.add('green-circle');
-    } else {
-        specialCharIndicator.classList.remove('green-circle');
-        specialCharIndicator.classList.add('red-circle');
-    }
 </script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 </body>

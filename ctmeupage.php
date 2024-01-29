@@ -120,6 +120,12 @@ $violationTickets = fetchViolationTickets();
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+    .rowContainer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -132,6 +138,7 @@ $violationTickets = fetchViolationTickets();
         max-width: 1900px;
         margin: 0 auto;
         margin-top: 40px;
+        padding: 20px;
     }
 
     .tableContainer {
@@ -139,6 +146,7 @@ $violationTickets = fetchViolationTickets();
         overflow-x: scroll;
         background-color: white;
         padding: 2px;
+        margin-top: 15px;
     }
 
     /* width */
@@ -239,7 +247,6 @@ $violationTickets = fetchViolationTickets();
 
     .table-header {
         width: 100%;
-        padding: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -279,13 +286,13 @@ $violationTickets = fetchViolationTickets();
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -295,13 +302,16 @@ $violationTickets = fetchViolationTickets();
                                     //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
+          </li>';
+                                     echo '<li class="nav-item">
+          <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
           </li>';
                                     echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+         </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -311,9 +321,8 @@ $violationTickets = fetchViolationTickets();
                                 // Uncomment this line to show "Activity Logs" to other roles
                                 // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
-          </li>';
-
+                                <a class="nav-link" href="records" style="font-weight: 600; ">Records</a>
+                              </li>';
                             }
                         }
                         ?>
@@ -341,7 +350,6 @@ $violationTickets = fetchViolationTickets();
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -397,8 +405,6 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                 <?php
                 // Check if the user is a Super Administrator
                 if ($_SESSION['role'] === 'Super Administrator') {
-                    // Show the archive button, count, and "records are selected"
-                    echo '<div><span id="checkbox-count">0</span> records are selected</div>';
                     //echo '<button type="submit" class="btn btn-primary mb-3 float-end" id="archive-button"><i class="bx bx-archive-in"></i></button>';
                     echo '<button type="button" id="archiveButton" class="btn btn-primary float-end" data-bs-target="#exampleModal"><i class="bx bx-archive-in"></i></button>';
                 }
@@ -463,8 +469,20 @@ if (empty($violatorInfo) && empty($violationTickets)) {
                 </div>
             </div>
             <!-- Button to switch between tables -->
-<button type="button" id="switch-tables-button" class="btn btn-primary mb-3">Switch to Violator Info</button>
-            <div class="tableContainer">
+<div class="rowContainer">
+            <div class="btn-group" id="switch-tables-button">
+                <a href="#" class="btn btn-outline-primary active">Violator Info</a>
+                <a href="#" class="btn btn-outline-primary">Ticket Table</a>
+            </div>
+                <?php
+                // Check if the user is a Super Administrator
+                if ($_SESSION['role'] === 'Super Administrator') {
+                    // Show the archive button, count, and "records are selected"
+                    echo '<div><span id="checkbox-count">0</span> records are selected</div>';
+                }
+
+                ?></div>
+            <div class="tableContainer hidden">
                 <table class="mb-5">
                     <!-- pagination works but needs to search for database and not on the screen only (enter key for submission)-->
                     <thead>
@@ -573,7 +591,7 @@ if (empty($violatorInfo) && empty($violationTickets)) {
             </div>
 
 <!-- Container for the new violator info table -->
-<div id="violator-info-container" class="tableContainer hidden">
+<div id="violator-info-container" class="tableContainer">
     <table class="mb-5">
         <thead>
             <tr class="align-items-center">
@@ -626,21 +644,29 @@ if (empty($violatorInfo) && empty($violationTickets)) {
         <script src="js/script.js"></script>
         <script src="js/jquery-3.6.4.js"></script>
         <script>
-            <?php if (!empty($violatorInfo) && !empty($violationTickets)) { ?>
-            document.getElementById('switch-tables-button').addEventListener('click', function() {
+            <?php if (true) { ?>
+            document.getElementById('switch-tables-button').addEventListener('click', function(e) {
     var ticketTableContainer = document.querySelector('.tableContainer');
     var violatorInfoContainer = document.getElementById('violator-info-container');
-    var switchButton = document.getElementById('switch-tables-button');
 
-    // Toggle visibility of the tables
-    ticketTableContainer.classList.toggle('hidden');
-    violatorInfoContainer.classList.toggle('hidden');
+    var buttons = [...document.getElementById('switch-tables-button').children];
+    
 
-    // Update the button text based on which table is currently visible
-    if (ticketTableContainer.classList.contains('hidden')) {
-        switchButton.textContent = 'Switch to Ticket Table';
+
+    console.log(e.target.textContent === 'Violator Info')
+
+    if(e.target.textContent === 'Violator Info') {
+        violatorInfoContainer.classList.remove("hidden");
+        ticketTableContainer.classList.add('hidden');
+
+        buttons.find(el => el.textContent === 'Violator Info')?.classList.add("active");
+        buttons.find(el => el.textContent === 'Ticket Table')?.classList.remove("active");
     } else {
-        switchButton.textContent = 'Switch to Violator Info';
+        violatorInfoContainer.classList.add("hidden");
+        ticketTableContainer.classList.remove('hidden');
+
+        buttons.find(el => el.textContent === 'Violator Info')?.classList.remove("active");
+        buttons.find(el => el.textContent === 'Ticket Table')?.classList.add("active");
     }
 });
 

@@ -263,13 +263,17 @@ $violationTickets = fetchViolationTickets();
                                     //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
+                                     echo '<li class="nav-item">
+          <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
+          </li>';
+
                                     echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+          </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -309,7 +313,6 @@ $violationTickets = fetchViolationTickets();
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -331,7 +334,7 @@ $violationTickets = fetchViolationTickets();
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
+                    <div class="modal-content modal-content-full">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Delete</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -352,7 +355,7 @@ $violationTickets = fetchViolationTickets();
 
             <div class="modal fade" id="successModal">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
+                    <div class="modal-content modal-content-full">
                         <div class="modal-body d-flex align-items-center justify-content-center">
                             <div class="text-center">
                                 <i><img class="m-3" src="./images/check.png"></i> <!-- Check icon -->
@@ -360,7 +363,7 @@ $violationTickets = fetchViolationTickets();
                                 <p class="mb-3" style="font-weight: 500;">Selected tickets have been deleted
                                     permanently.
                                 </p>
-                                <button type="submit" class="btn btn-primary mb-3" id="okButton" data-dismiss="modal"
+                                <button type="submit" class="btn btn-primary mb-3" id="okButton" data-bs-dismiss="modal"
                                     onclick="submitForm()" style="background-color: #0A157A;">Close</button>
                             </div>
                         </div>
@@ -369,7 +372,7 @@ $violationTickets = fetchViolationTickets();
             </div>
             <div class="modal fade" id="noSelectionModal">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
+                    <div class="modal-content modal-content-full">
                         <div class="modal-body d-flex align-items-center justify-content-center">
                             <div class="text-center">
                                 <h5 class="modal-title mb-3" style="font-weight: 800;">No Selection</h5>

@@ -126,7 +126,7 @@ button[type="submit"] {
 }
 
 button[type="reset"] {
-    background-color: #f44336;
+    background-color: #0D6EFD;
 }
 
 div[style*="overflow-x:auto; overflow-y:auto;"] {
@@ -222,6 +222,17 @@ tr:hover {
     border-radius: 20px;
     max-width: 100%;
 }
+
+.button-grid {
+    width: 100%:
+}
+
+.button-grid > button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+
 </style>
 
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
@@ -232,7 +243,7 @@ tr:hover {
     echo '
   <div class="modal fade" id="limitReachedModal" tabindex="-1" aria-labelledby="limitReachedModalLabel" aria-hidden="true">
       <div class="modal-dialog">
-          <div class="modal-content">
+          <div class="modal-content modal-content-full">
               <div class="modal-header">
                   <h5 class="modal-title" id="limitReachedModalLabel">User Limit Reached</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -272,13 +283,13 @@ tr:hover {
             // Show the "User Account" link only for Enforcer users
             if ($userRole === 'Enforcer') {
               echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Add Ticket</a>
           </li>';
             } else {
               // For other roles, show the other links
               if ($_SESSION['role'] === 'IT Administrator') {
                 echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Add Ticket</a>
           </li>';
                 //Reports page temporary but only super admin has permission
           
@@ -286,10 +297,13 @@ tr:hover {
               } else {
                 // Display the "Create Accounts" link
                 //    echo '<a href="ctmeurecords.php" class="nav-link">Reports</a>';
-          
                 echo '<li class="nav-item">
-            <a class="nav-link" href="ctmeuticket.php" style="font-weight: 600;">Ticket</a>
-          </li>';
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
+        </li>';
+                echo '<li class="nav-item">
+            <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
+        </li>';
+
                 echo '<a href="ctmeurecords.php" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                 echo '<li class="nav-item">
@@ -334,7 +348,6 @@ tr:hover {
                   // Do not display the "Create Accounts" link
                 } else {
                   echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                  echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                 }
                 // Uncomment this line to show "Activity Logs" to other roles
                 // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -402,8 +415,6 @@ tr:hover {
                 <div class="masterlistForm">
 
                     <form method="POST" action="register.php" id="registration-form" onsubmit="return validateForm()">
-
-                  
                         <h1 style="font-size: 30px; font-weight: 800; color: #1A3BB1;" class="ms-5 mt-5 mb-3">Create an
                             account</h1>
                         <div class="form-floating mx-5">
@@ -472,15 +483,14 @@ tr:hover {
 
                             <label for="role">Role</label>
                         </div>
-                        <div class="d-grid mx-5 mb-3">
+                        <div class="button-grid">
 
                             <button class="btn btn-success" id="create-button" type="submit">Create Account</button>
                             <button type="submit" id="update-button" class="btn btn-success">Update Account</button><br>
                             <?php
               // Check if the logged-in user has the "Super Administrator" role to display the "Delete Account" button
               if ($_SESSION['role'] === 'Super Administrator') {
-                echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>
-    <br>';
+                echo '<button type="button" id="delete-button" style="display:none;" class="btn btn-danger">Delete Account</button>';
               }
               ?>
                             <button type="reset" id="reset-button" class="btn btn-secondary">Clear</button>
@@ -681,7 +691,6 @@ tr:hover {
                 </tbody>
             </table>
 
-
         </div>
     </div>
 
@@ -693,10 +702,10 @@ if (isset($_SESSION['error_message'])) {
     echo '
     <div class="modal" tabindex="-1" role="dialog" id="errorModal">
       <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content modal-content-full">
           <div class="modal-header">
             <h5 class="modal-title">Error</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -723,10 +732,10 @@ if (isset($_SESSION['success_message'])) {
     echo '
     <div class="modal" tabindex="-1" role="dialog" id="successModal">
       <div class="modal-dialog" role="document">
-        <div class="modal-content">
+      <div class="modal-content modal-content-full">
           <div class="modal-header">
             <h5 class="modal-title">Success</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -764,6 +773,7 @@ if (isset($_SESSION['success_message'])) {
             e.target.value = sanitizedValue;
         });
     });
+
 
     document.getElementById('reset-button').addEventListener('click', function() {
         // Reload the current page when the Clear button is clicked
@@ -884,6 +894,8 @@ if (isset($_SESSION['success_message'])) {
                 break;
             }
         }
+
+
 
     }
 

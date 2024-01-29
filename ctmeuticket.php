@@ -26,6 +26,9 @@ $lastName = $user['last_name'];
 $status = $user['role'];
 $user_ctmeu_id = $user['user_ctmeu_id'];
 $currentTicket = $user['currentTicket'];
+
+
+    
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -43,6 +46,7 @@ $currentTicket = $user['currentTicket'];
     <title>CTMEU Data Hub</title>
 </head>
 <style>
+    
     /* Add custom CSS for styling the dropdown with checkboxes */
     .dropdown {
         position: relative;
@@ -95,13 +99,37 @@ $currentTicket = $user['currentTicket'];
         /* Adjust the padding as needed */
     }
 
-    .hidden {
-        display: none;
-    }
 
     #submitBtn:disabled {
    cursor: not-allowed;
-}
+    }
+
+    #removeAllButton,
+    .row-remove
+    {
+        background-color: transparent;
+        color: maroon;
+        height: 30px;
+        border: 2px solid maroon;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #removeAllButton:hover,
+    .row-remove:hover {
+      background-color: maroon;
+      color: #fff;
+    }
+
+        
+    .hidden {
+        display: none  !important;
+    }
+
 
 #submitBtn:disabled:hover::after {
    content: "Ticket Number cannot be empty.";
@@ -133,7 +161,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
 </script>
 <div class="modal fade" id="maxTicketReachedModal" tabindex="-1" aria-labelledby="maxTicketReachedModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content modal-content-full">
             <div class="modal-header">
                 <h5 class="modal-title" id="maxTicketReachedModalLabel">Ticket Submission Error</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -193,13 +221,13 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                             // Show the "User Account" link only for Enforcer users
                             if ($userRole === 'Enforcer') {
                                 echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                             } else {
                                 // For other roles, show the other links
                                 if ($_SESSION['role'] === 'IT Administrator') {
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
           </li>';
                                     //Reports page temporary but only super admin has permission
                                     
@@ -209,13 +237,16 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                                     //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
+          </li>';
+                                     echo '<li class="nav-item">
+          <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
           </li>';
                                     echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+          </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -255,7 +286,6 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -296,7 +326,20 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
    </div>
    </div>
             <!-- Add a hidden input field for user_ctmeu_id -->
-            <input type="hidden" name="user_ctmeu_id" value="<?php echo $user_ctmeu_id; ?>">
+            <?php
+            if ($_SESSION['role'] === 'Super Administrator' || $_SESSION['role'] === 'IT Administrator') {
+                // Fetch users from the database
+                $result = mysqli_query($conn, "SELECT * FROM users");
+                
+                echo '<select class="form-control mb-3" name="user_ctmeu_id">';
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<option value="'.$row['user_ctmeu_id'].'">'.$row['username'].'</option>';
+                }
+                echo '</select>';
+            } else {
+                echo '<input type="hidden" name="user_ctmeu_id" value="'.$user_ctmeu_id.'">';
+            }
+            ?>
             <div class="row">
             <div class="col">
         <div class="form-floating mb-3">
@@ -306,7 +349,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
     </div>
     <div class="col">
         <div class="form-floating">
-            <input type="text" class="form-control" id="timeInput" placeholder="Time" name="time_violation">
+        <input type="time" class="form-control" placeholder="Time" name="time_violation" pattern="^(0?[1-9]|1[0-2]):([0-5]?[0-9]) [APap][mM]$" title="Please enter a valid time in 12-hour format">
             <label for="timeInput">Time</label>
         </div>
     </div>
@@ -321,26 +364,28 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                     </div>
                 </div>
             <div class="col">
-                    <div class="form-floating mb-3">
-                        <input type="number" class="form-control" id="floatingInputValue1" minlength="8" maxlength="30"
-                            placeholder="Certificate of Registration" name="cor_number">
-                        <label for="floatingInputValue1">Certificate of Registration</label>
-                    </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="corInput" placeholder="Certificate of Registration"
+                    name="cor_number" maxlength="9">
+                <label for="corInput">Certificate of Registration No.</label>
+            </div>
                 </div>
             </div>
             
             <div class="row">
                 <div class="col">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
-                            maxlength="30" placeholder="Driver's Name" name="driver_name" required>
+                    <input type="text" class="form-control" id="floatingInputValue1" required minlength="10"
+                    maxlength="30" placeholder="Driver's Name" name="driver_name" required
+                    onkeypress="return allowLettersAndSpecialChars(event)">
+                    
                         <label for="floatingInputValue1">Driver's Name</label>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue3" minlength="10" maxlength="30"
-                            placeholder="Driver's Adress" name="driver_address" required>
+                            placeholder="Driver's Adress" name="driver_address" onkeypress="return allowLettersAndSpecialChars(event)" required>
                         <label for="floatingInputValue3">Driver's Address</label>
                     </div>
                 </div>
@@ -377,13 +422,29 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                                 return false;
                             return true;
                         }
+
+                        document.getElementById('corInput').addEventListener('input', function (e) {
+                            document.getElementById('corInput').addEventListener('input', function (e) {
+                            let inputValue = e.target.value.replace(/[^0-9-]/g, ''); // Remove non-numeric characters except '-'
+                            let strippedValue = inputValue.replace(/-/g, ''); // Remove '-' for length validation
+                            if (strippedValue.length > 10) {
+                                strippedValue = strippedValue.slice(0, 10); // Limit to maximum 10 digits
+                            }
+                            if (strippedValue.length >= 9) {
+                                // Insert '-' at the second to the last position if it's not already present
+                                if (strippedValue.charAt(strippedValue.length - 2) !== '-') {
+                                    strippedValue = strippedValue.slice(0, -1) + '-' + strippedValue.slice(-1);
+                                }
+                            }
+                            e.target.value = strippedValue;
+                        });
             </script>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
-                            maxlength="30" placeholder="Issuing District" name="issuing_district" reg_owner>
+                            maxlength="30" placeholder="Issuing District" name="issuing_district" onkeypress="return allowLettersAndSpecialChars(event)">
                         <label for="floatingInputValue1">Issuing District</label>
                     </div>
                 </div>
@@ -418,7 +479,7 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
-                            maxlength="30" placeholder="Plate Number" name="plate_no" required>
+                            maxlength="30" placeholder="Plate Number" name="plate_no" onkeypress="return allowLettersAndSpecialChars(event)" required>
                         <label for="floatingInputValue1">Plate Number</label>
                     </div>
                 </div>
@@ -428,14 +489,14 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="5"
-                            maxlength="30" placeholder="Registered Owner" name="reg_owner" required>
+                            maxlength="30" placeholder="Registered Owner" name="reg_owner" onkeypress="return allowLettersAndSpecialChars(event)" required>
                         <label for="floatingInputValue1">Registered Owner</label>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue3" minlength="5" maxlength="30"
-                            placeholder="Registered Owner's Address" name="reg_owner_address" required>
+                            placeholder="Registered Owner's Address" name="reg_owner_address" onkeypress="return allowLettersAndSpecialChars(event)" required>
                         <label for="floatingInputValue3">Registered Owner's Address</label>
                     </div>
                 </div>
@@ -445,14 +506,14 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required minlength="2"
-                            maxlength="30" placeholder="Place of Occurrence" name="place_of_occurrence">
+                            maxlength="30" placeholder="Place of Occurrence" onkeypress="return allowLettersAndSpecialChars(event)" name="place_of_occurrence">
                         <label for="floatingInputValue1">Place of Apprehension</label>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="floatingInputValue1" required
-                            maxlength="30" placeholder="Remarks" name="remarks">
+                            maxlength="30" placeholder="Remarks" onkeypress="return allowLettersAndSpecialChars(event)" name="remarks">
                         <label for="floatingInputValue1">Remarks</label>
                     </div>
                 </div>
@@ -477,6 +538,8 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                         </tbody>
                     </table>
                     <script>
+
+
                         // Event listener for the search input
                         $('#searchInput').on('input', function () {
                             const searchTerm = $(this).val();
@@ -507,37 +570,31 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
                         }
 
                         function selectOption(violationListId, violationName, violationSection) {
-                            
-                            const selectedOptionsTable = $('#selectedOptionsTable');
-                            const selectedOptionsBody = $('#selectedOptions');
-                            const selectedViolationsInput = $('#selectedViolationsInput');
-                            
-                            // Check if the option is already selected
-                            const isOptionSelected = $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
+    // Check if the option is already selected
+    const isOptionSelected = $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).length > 0;
 
-                            if (!isOptionSelected) {
-                            // Remove any existing hidden input fields for the same violation
-                            $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"] td input[name="violations[]"]`).detach();
+    if (!isOptionSelected) {
+        // Remove any existing hidden input fields for the same violation
+        $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"] td input[name="violations[]"]`).detach();
 
-                            // Add a new row to the table
-                            selectedOptionsBody.append(`<tr data-id="${violationListId}">
-                                <td>${violationName} - ${violationSection}</td>
-                                <td><button onclick="removeOption(${violationListId})">Remove</button></td>
-                                <!-- Hidden input field for violations[] -->
-                                <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
-                            </tr>`);
-                           
-                            // Show the table row
-                            $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
+        // Add a new row to the table
+        $('#selectedOptions').append(`<tr data-id="${violationListId}">
+            <td>${violationName} - ${violationSection}</td>
+            <td><button onclick="removeOption(${violationListId})" class='row-remove'>Remove</button></td>
+            <!-- Hidden input field for violations[] -->
+            <td style="display: none;"><input type="hidden" name="violations[]" value="${violationListId}"></td>
+        </tr>`);
 
-                            } else {
-                            // Provide a visual indication or alert that the option is already selected
-                            alert(`Violation "${violationName} - ${violationSection}" is already selected.`);
-                            }
+        // Show the table row
+        $(`#selectedOptionsTable tbody tr[data-id="${violationListId}"]`).show();
 
-                            $("#removeAllButton").removeClass("hidden");
-                        }
+    } else {
+        // Display the error message in the Bootstrap modal
+        $('#errorModal2').modal('show');
+    }
 
+    $("#removeAllButton").removeClass("hidden");
+}
 
 
                         // Function to remove a selected option
@@ -612,7 +669,114 @@ document.getElementById('ticketmaster').addEventListener('keydown', function (e)
         </form>
     </div>
 
+
+    <?php 
+
+echo '
+    <div class="modal" tabindex="-1" role="dialog" id="errorModal2">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content modal-content-full">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Warning! You cannot add the same violation twice.</p>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>';
+    unset($_SESSION['error_message2']); // Clear the message
+
+
+?>
+    <?php 
+
+
+// Check for error message
+if (isset($_SESSION['error_message'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="errorModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content modal-content-full">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['error_message'] . '</p>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
+    $(document).ready(function(){
+        $("#errorModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['error_message']); // Clear the message
+}
+
+// Check for success message
+if (isset($_SESSION['success_message'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="successModal">
+      <div class="modal-dialog" role="document">
+      <div class="modal-content modal-content-full">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['success_message'] . '</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $("#successModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['success_message']); // Clear the message
+}
+
+?>
+
+    <script>
+                        function allowLettersAndSpecialChars(event) {
+                            const charCode = event.which || event.keyCode;
+                            // Allow letters (A-Z, a-z), numbers (0-9), space (32), period (46), hyphen (45), and apostrophe (39)
+                            if ((charCode >= 65 && charCode <= 90) || // A-Z
+                                (charCode >= 97 && charCode <= 122) || // a-z
+                                (charCode >= 48 && charCode <= 57) || // 0-9
+                                charCode === 32 || // space
+                                charCode === 46 || // period
+                                charCode === 45 || // hyphen
+                                charCode === 39) { // apostrophe
+                                return true;
+                            }
+                            // Block other characters
+                            return false;
+                        }
+
 function limitNumberLength(element, maxLength) {
     if (element.value.length > maxLength) {
         element.value = element.value.slice(0, maxLength);
@@ -665,12 +829,23 @@ window.onload = function() {
         });
 
         // Initialize flatpickr for the time input
-        flatpickr('#timeInput', {
-            enableTime: true, // Enable time picker
-            noCalendar: true, // Hide the calendar
-            dateFormat: 'h:i K', // Set the desired time format
-            time_24hr: false // Use 12-hour format with AM/PM
-        });
+flatpickr('#timeInput', {
+    enableTime: true, // Enable time picker
+    noCalendar: true, // Hide the calendar
+    dateFormat: 'h:i K', // Set the desired time format
+    time_24hr: false, // Use 12-hour format with AM/PM
+    onClose: function(selectedDates, dateStr, instance) {
+        // Validate the input field to accept only numbers
+        const timeInput = document.getElementById('timeInput');
+        if (!/^\d+$/.test(timeInput.value)) {
+            // Clear the input field or display an error message
+            timeInput.value = ''; // Clear the input field
+            // You can also display an error message to the user
+            // Example: alert('Please enter only numbers in the time field.');
+        }
+    }
+});
+
         
 
         // Custom JavaScript to show/hide the dropdown

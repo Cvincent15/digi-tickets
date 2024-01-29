@@ -102,8 +102,9 @@ if (empty($masterlist)) {
                 header('Location: user-creation');
                 exit();
             } else {
-                // Registration failed
-                echo "Error: " . $stmt->error;
+                $_SESSION['error_message'] = 'Error creating account. Please try again later';
+                header('Location: user-creation');
+                exit();
             }
 
             // Close the statement and database connection

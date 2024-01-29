@@ -33,6 +33,7 @@ if (!$result) {
    die("Database query failed: " . mysqli_error($conn));
 }
 $access = mysqli_fetch_assoc($result);
+
 ?>
 <!DOCTYPE html>
 <html lang="en" style="height: auto;">
@@ -44,7 +45,7 @@ $access = mysqli_fetch_assoc($result);
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css"/>
     <title>CTMEU Data Hub</title>
@@ -56,10 +57,97 @@ $access = mysqli_fetch_assoc($result);
         height: auto; /* Adjust the height as needed */
         text-align: left;
     }
+    
     button.Change {
         font-size: 18px; /* Adjust the font size as needed */
         padding: 12px 30px; /* Adjust the padding as needed */
     }
+    .remove-button {
+      background-color: transparent;
+      color: maroon;;
+      height: 30px;
+      border: 2px solid maroon;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+    .remove-button:hover {
+      background-color: maroon;
+      color: #fff;
+    }
+
+    .edit-button {
+      background-color: transparent;
+      color: #0D6EFD;;
+      height: 30px;
+      border: 2px solid #0D6EFD;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+    .edit-button:hover {
+      background-color: #0D6EFD;
+      color: #fff;
+    }
+    .form-button {
+      background-color: #0D6EFD;
+      color: #fff;
+      height: 30px;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 200px;
+    }
+    .form-button:hover {
+      background-color: #1930A0;
+    }
+
+    .form-buttonContainer {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    #updateMaxPersonnelButton  {
+      background-color: #0D6EFD;
+      color: #fff;
+      height: 30px;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      width: 100px;
+      margin: 0 auto;
+    }
+    #updateMaxPersonnelButton:hover {
+      background-color: #1930A0;
+    }
+    
+    .table-container{
+      display:flex;
+      flex-direction: column;
+    }
+
 </style>
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <?php
@@ -127,13 +215,16 @@ $status = $user['role'];
                                     //    echo '<a href="reports" class="nav-link">Reports</a>';
                         
                                     echo '<li class="nav-item">
-            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
+            <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Add Ticket</a>
+          </li>';
+                                     echo '<li class="nav-item">
+          <a class="nav-link" href="settings" style="font-weight: 600; ">Ticket Form</a>
           </li>';
                                     echo '<a href="reports" class="nav-link" style="font-weight: 600;">Reports</a>';
 
                                     echo '<li class="nav-item">
           <a class="nav-link" href="archives" style="font-weight: 600;">Archive</a>
-        </li>';
+          </li>';
 
                                     /* echo '<li class="nav-item">
                                          <a class="nav-link" href="ticket-creation" style="font-weight: 600;">Ticket</a>
@@ -173,7 +264,6 @@ $status = $user['role'];
                                         // Do not display the "Create Accounts" link
                                     } else {
                                         echo '<li><a class="dropdown-item" href="user-creation">Create Account</a></li>';
-                                        echo '<li><a class="dropdown-item" href="settings">Ticket Form</a></li>';
                                     }
                                     // Uncomment this line to show "Activity Logs" to other roles
                                     // echo '<a href="ctmeuactlogs.php" class="link">Activity Logs</a>';
@@ -191,6 +281,32 @@ $status = $user['role'];
             </div>
             </div>
         </nav>
+
+<!-- Modal -->
+<div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
+ <div class="modal-dialog" role="document">
+    <div class="modal-content modal-content-full">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editVehicleModalTitle">Edit Vehicle</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editVehicleForm" method="POST" action="./php/edit_vehicle.php">
+          <input type="hidden" name="vehicleId2" id="vehicleId2">
+          <div class="form-group">
+            <label for="vehicleNameE">Vehicle Name</label>
+            <input type="text" class="form-control" id="vehicleNameE" name="vehicleNameE">
+          </div>
+          <!-- Add more fields as needed -->
+          <button type="submit" class="btn btn-primary" id="saveChangesButton">Save changes</button>
+        </form>
+      </div>
+    </div>
+ </div>
+</div>
+
 <div class="container justify-content-center align-items-center mx-auto">
     <div class="row">
 
@@ -210,16 +326,18 @@ $status = $user['role'];
       <thead>
         <tr>
           <th>Vehicle Name</th>
+          <th>Edit</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>";
     while ($row = $result->fetch_assoc()) {
       echo "
-                  <tr>
-                    <td>" . $row["vehicle_name"] . "</td>
-                    <td><button onclick='removeVehicle(this)'>Remove</button></td>
-                  </tr>
+      <tr>
+        <td>" . $row["vehicle_name"] . "</td>
+        <td><button type='button' class='edit-button' onclick='editVehicle(\"" . $row["vehicle_id"] . "\")'>Edit</button></td>
+        <td><button class='remove-button' onclick='removeVehicle(this)'>Remove</button></td>
+      </tr>
                 "; 
     
 
@@ -234,10 +352,12 @@ $status = $user['role'];
   ?>
 
 
-<div>
+<div class="form-buttonContainer">
+<form id="addVehicleForm" method="POST" action="./php/addvehicles.php">
   <label for="vehicleName">Vehicle Name:</label>
   <input type="text" id="vehicleName" name="vehicleName">
-  <button onclick="addVehicle()">Add Vehicle</button>
+  <button type="submit" class="form-button">Add Vehicle</button>
+</form>
 </div>
             </div>
         </div>
@@ -347,7 +467,70 @@ document.getElementById('updateMaxPersonnelButton').addEventListener('click', fu
     </table>
     </div>
 
-    
+    <?php 
+
+
+// Check for error message
+if (isset($_SESSION['vehicle_update_failure'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="errorModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content modal-content-full">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['vehicle_update_failure'] . '</p>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $("#errorModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['vehicle_update_failure']); // Clear the message
+}
+
+// Check for success message
+if (isset($_SESSION['vehicle_update_success'])) {
+    echo '
+    <div class="modal" tabindex="-1" role="dialog" id="successModal">
+      <div class="modal-dialog" role="document">
+      <div class="modal-content modal-content-full">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>' . $_SESSION['vehicle_update_success'] . '</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $("#successModal").modal("show");
+    });
+    </script>
+    ';
+    unset($_SESSION['vehicle_update_success']); // Clear the message
+}
+
+?>  
 <script src="js/script.js"></script>
 <script src="js/jquery-3.6.4.js"></script>
 <script>
@@ -372,46 +555,16 @@ document.getElementById('updateMaxPersonnelButton').addEventListener('click', fu
         }
     }
 }
-    function addVehicle() {
-      var vehicleNameInput = document.getElementById("vehicleName");
-      var vehicleName = vehicleNameInput.value.trim();
 
-      if (vehicleName !== "") {
-        // Assuming you have a server-side PHP script to handle adding data to the database
-        // Replace 'add_vehicle.php' with the actual filename of your PHP script
-        fetch('php/addvehicles.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ vehicleName }),
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // If the server operation is successful, add the data to the table
-            var table = document.getElementById("vehicleTable").getElementsByTagName('tbody')[0];
-            var newRow = table.insertRow(table.rows.length);
-            var cell1 = newRow.insertCell(0);
-            var cell2 = newRow.insertCell(1);
+    function editVehicle(vehicleId2) {
+ // Assuming you have a server-side PHP script to handle fetching data from the database
+ // Replace 'get_vehicle.php' with the actual filename of your PHP script
+ document.getElementById('vehicleId2').value = vehicleId2;
 
-            cell1.innerHTML = vehicleName;
-            cell2.innerHTML = '<button onclick="removeVehicle(this)">Remove</button>';
+ $('#editVehicleModal').modal('show');
+ 
+}
 
-            // Clear the input field
-            vehicleNameInput.value = "";
-          } else {
-            alert("Failed to add vehicle. Please try again.");
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert("An error occurred. Please try again.");
-        });
-      } else {
-        alert("Please enter a valid vehicle name.");
-      }
-    }
 
     function removeVehicle(button) {
       var row = button.parentNode.parentNode;
