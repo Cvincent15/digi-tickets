@@ -2,6 +2,214 @@
   z-index: 999;
 }
 
+.CTMEU-e-receipt {
+  display: flex;
+  flex-direction: column;
+  width: 388px;
+  align-items: center;
+  gap: var(--spacing-l);
+  padding: var(--spacing-l) 0px var(--spacing-l) 0px;
+  position: relative;
+  background-color: var(--colors-light-grey);
+}
+
+.CTMEU-e-receipt .header {
+  position: relative;
+  align-self: stretch;
+  min-width: 320px;
+  width: 100%;
+  height: 40px;
+  background-color: transparent;
+}
+
+.CTMEU-e-receipt .logo {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  left: 174px;
+}
+
+.CTMEU-e-receipt .logo-ctmeu {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: -5px;
+  left: -5px;
+  object-fit: cover;
+}
+
+.CTMEU-e-receipt .main {
+  display: flex;
+  flex-direction: column;
+  width: 364px;
+  align-items: center;
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
+  position: relative;
+  flex: 0 0 auto;
+  background-color: var(--colors-white);
+  border-radius: 20px;
+  border: 1px solid;
+  border-color: var(--colors-grey);
+}
+
+.CTMEU-e-receipt .paragraph-text {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.CTMEU-e-receipt .div {
+  position: relative;
+  flex: 1;
+  margin-top: -1px;
+  font-family: "Inter-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--colors-black);
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 20px;
+}
+
+.CTMEU-e-receipt .text-wrapper {
+  font-family: "Inter-Regular", Helvetica;
+  font-weight: 400;
+  color: #161f33;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 20px;
+}
+
+.CTMEU-e-receipt .span {
+  font-family: "Inter-SemiBold", Helvetica;
+  font-weight: 600;
+}
+
+.CTMEU-e-receipt .website {
+  position: relative;
+  flex: 1;
+  margin-top: -1px;
+  font-family: "Inter-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--colors-black);
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.CTMEU-e-receipt .text-wrapper-2 {
+  color: #161f33;
+}
+
+.CTMEU-e-receipt .text-wrapper-3 {
+  font-family: "Inter-Bold", Helvetica;
+  font-weight: 700;
+  color: #0867ec;
+}
+
+.CTMEU-e-receipt .unique-code-button {
+  display: flex;
+  width: 143px;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.CTMEU-e-receipt .button {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  width: 282px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  padding: 12px var(--spacing-l) 12px var(--spacing-l);
+  position: relative;
+  margin-left: -69.5px;
+  margin-right: -69.5px;
+  background-color: var(--colors-blue);
+  border-radius: var(--spacing-button-border-radius);
+}
+
+.CTMEU-e-receipt .label {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: "Inter-Bold", Helvetica;
+  font-weight: 700;
+  color: var(--white);
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.CTMEU-e-receipt .footer {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  height: 112px;
+  align-items: center;
+  gap: var(--spacing-s);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  background-color: transparent;
+}
+
+.CTMEU-e-receipt .CTMEU-name {
+  position: relative;
+  width: 266px;
+  margin-top: -1px;
+  font-family: "Inter-SemiBold", Helvetica;
+  font-weight: 400;
+  color: #787d88;
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 18px;
+}
+
+.CTMEU-e-receipt .text-wrapper-4 {
+  font-weight: 600;
+}
+
+.CTMEU-e-receipt .text-wrapper-5 {
+  font-family: "Inter-Regular", Helvetica;
+}
+
+.CTMEU-e-receipt .contacts {
+  position: relative;
+  width: 175px;
+  height: 18px;
+}
+
+.CTMEU-e-receipt .powered-by-htmlemail {
+  position: absolute;
+  width: 235px;
+  top: -1px;
+  left: -30px;
+  font-family: "Inter-Regular", Helvetica;
+  font-weight: 400;
+  color: #787d88;
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 18px;
+}
+
+
+.modal-content-full{
+  width: 100%;
+}
+
 .frost {
   min-height: 100vh;
   padding: 10vh 0 0 0;
