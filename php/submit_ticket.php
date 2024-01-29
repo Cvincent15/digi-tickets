@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
         try {
             //Server settings
-            $mail->SMTPDebug = 2;                                 
+            $mail->SMTPDebug = 0;                                 
             $mail->isSMTP();                                      
             $mail->Host = 'smtp.gmail.com';  
             $mail->SMTPAuth = true;                               
@@ -92,14 +92,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             //Content
             $mail->isHTML(true);                                  
             $mail->Subject = 'CTMEU Traffic Violation E-Receipt';
-            $mail->Body    = '
-            <title>This serves as your online receipt</title>
-            <p>Your ticket number is ' . $combinedTicket . ' and unique code ' . $uniqueCode . '. If you wish to view your traffic ticket you can head to <a>ctmeu-hub.net/search-ticket</a></p>';
+            $mail->Body    = '<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body>
+            
+            <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td align="center" bgcolor="#F4F5F6" style="padding: 24px 0;">
+                        <table cellspacing="0" cellpadding="0" border="0" width="388" style="background: #F4F5F6;">
+                            <!-- Header -->
+                            <tr>
+                                <td align="center">
+                                    <img src="https://ctmeu-hub.net/images/ctmeusmall.png" width="50" height="50" style="display: block;">
+                                </td>
+                            </tr>
+                            <!-- Main Content -->
+                            <tr>
+                                <td align="center" bgcolor="#FFFFFF" style="padding: 16px; border-radius: 20px; border: 1px solid #EAEBED;">
+                                    <!-- Ticket Number -->
+                                    <div style="color: #161F33; font-size: 16px; font-family: Inter; font-weight: 400; line-height: 20px; margin-bottom: 16px;">
+                                        Your ticket number is <strong>' . $combinedTicket . '</strong>
+                                    </div>
+                                    <!-- Website -->
+                                    <div style="color: #161F33; font-size: 16px; font-family: Inter; font-weight: 400; line-height: 22px; margin-bottom: 16px;">
+                                        If you wish to view your traffic ticket you can head to
+                                        <strong style="color: #0867EC;">ctmeu-hub.net/search-ticket</strong>
+                                    </div>
+                                    <!-- Unique Code -->
+                                    <div style="color: #161F33; font-size: 16px; font-family: Inter; font-weight: 400; line-height: 20px; margin-bottom: 16px;">
+                                        Please use the following unique code:
+                                    </div>
+                                    <!-- Unique Code Button -->
+                                    <div align="center" style="margin-bottom: 16px;">
+                                        <table cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td bgcolor="#0867EC" align="center" style="border-radius: 4px;">
+                                                    <div style="color: #FFFFFF; font-size: 20px; font-family: Inter; font-weight: 700; padding: 12px 24px;">
+                                                    ' . $uniqueCode . '
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Footer -->
+                            <tr>
+                                <td align="center" style="padding: 0 16px;">
+                                    <div style="color: #787D88; font-size: 12px; font-family: Inter; font-weight: 600; line-height: 18px; margin-bottom: 8px;">
+                                        CITY TRAFFIC MANAGEMENT AND ENFORCEMENT UNIT
+                                    </div>
+                                    <div style="color: #787D88; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 18px;">
+                                        CTMEU Office, F. Gomez St., Brgy. Kanluran,<br>
+                                        Santa Rosa, Laguna, Philippines, 4026
+                                    </div>
+                                    <div style="color: #787D88; font-size: 12px; font-family: Inter; font-weight: 400; line-height: 18px; margin-top: 8px;">
+                                        Contact Number: 09487448484<br>
+                                        Operating Hours: 8 AM - 5 PM
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            
+            </body>
+            </html>
+            ';
 
             $mail->send();
-            echo 'Message has been sent';
+            $_SESSION['success_message'] = 'Ticket sent successfully.';
         } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            $_SESSION['error_message'] = 'Message could not be sent. Mailer Error: {$mail->ErrorInfo}';
         }
 
         if (mysqli_stmt_execute($stmt)) {
@@ -108,13 +177,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Get the ID of the newly inserted ticket
                 $ticketID = mysqli_insert_id($conn);
 
-
+                /*
                 // Increment the currentTicket for the user
                 $incrementTicketQuery = "UPDATE users SET currentTicket = currentTicket + 1 WHERE user_ctmeu_id = ?";
                 $stmtIncrement = mysqli_prepare($conn, $incrementTicketQuery);
                 mysqli_stmt_bind_param($stmtIncrement, "i", $user_ctmeu_id);
                 mysqli_stmt_execute($stmtIncrement);
                 mysqli_stmt_close($stmtIncrement);
+                */
 
                 // Insert each selected violation into the violations table with the ticket_id_violations foreign key using prepared statements
                 $insertViolationQuery = "INSERT INTO violations (violationlist_id, ticket_id_violations) VALUES (?, ?)";
@@ -167,25 +237,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_close($stmtViolation);
 
                     // Redirect to a success page or perform any other actions as needed
-                    header("Location: ../ticket-creation");
+                    $_SESSION['success_message'] = 'Ticket sent successfully.';
+                    //header("Location: ../ticket-creation");
+                    echo '<script>window.location.href = "../ticket-creation";</script>';
                     exit();
                 } else {
-                    // Handle the prepared statement error for violation insertion
+                    $_SESSION['error_message'] = 'Error preparing violations statement.';
+                    //header('Location: user-creation');
+                    echo '<script>window.location.href = "../ticket-creation";</script>';
+                    exit();
                     echo "Error preparing violations statement: " . mysqli_error($conn);
                 }
             } else {
-                // No rows were affected, indicating a failed insertion
+                $_SESSION['error_message'] = 'Error inserting ticket: Ticket insertion failed.';
+                    //header('Location: user-creation');
+                    echo '<script>window.location.href = "../ticket-creation";</script>';
+                    exit();
                 echo "Error inserting ticket: Ticket insertion failed.";
             }
         } else {
-            // Handle the prepared statement error for ticket insertion
+            $_SESSION['error_message'] = 'Error inserting ticket: Ticket insertion failed.';
+                    //header('Location: user-creation');
+                    echo '<script>window.location.href = "../ticket-creation";</script>';
+                    exit();
             echo "Error inserting ticket: " . mysqli_error($conn);
         }
 
         // Close the prepared statement
         mysqli_stmt_close($stmt);
     } else {
-        // Handle the prepared statement error for ticket insertion
+        $_SESSION['error_message'] = 'Error preparing ticket insertion: Ticket insertion failed.';
+                    //header('Location: user-creation');
+                    echo '<script>window.location.href = "../ticket-creation";</script>';
+                    exit();
         echo "Error preparing ticket insertion: " . mysqli_error($conn);
     }
 }

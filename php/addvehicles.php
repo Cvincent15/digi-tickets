@@ -3,22 +3,22 @@ header('Content-Type: application/json');
 session_start();
 include 'database_connect.php';
 
-
-$data = json_decode(file_get_contents('php://input'), true);
-
-if (isset($data['vehicleName'])) {
-    $vehicleName = mysqli_real_escape_string($conn, $data['vehicleName']);
+if (isset($_POST['vehicleName'])) {
+    $vehicleName = mysqli_real_escape_string($conn, $_POST['vehicleName']);
 
     // Assuming you have a 'vehicles' table with a 'name' column
     $query = "INSERT INTO vehicletype (vehicle_name) VALUES ('$vehicleName')";
 
     if (mysqli_query($conn, $query)) {
-        echo json_encode(['success' => true]);
+        $_SESSION['vehicle_update_success'] = "Vehicle successfully added.";
+           header('Location: ../settings');
     } else {
-        echo json_encode(['success' => false]);
+        $_SESSION['vehicle_update_failure'] = "Error! Cannot add vehicle. Please try again later.";
+    header('Location: ../settings');
     }
 } else {
-    echo json_encode(['success' => false]);
+    $_SESSION['vehicle_update_failure'] = "Error! Unknown command.";
+    header('Location: ../settings');
 }
 
 // Close the database connection
