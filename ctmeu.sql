@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Jan 21, 2024 at 09:59 AM
--- Server version: 10.6.14-MariaDB-cll-lve
--- PHP Version: 7.2.34
+-- Host: 127.0.0.1
+-- Generation Time: Jan 24, 2024 at 02:12 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u919418953_ctmeu`
+-- Database: `ctmeu`
 --
 
 -- --------------------------------------------------------
@@ -261,7 +261,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_ctmeu_id`, `first_name`, `middle_name`, `last_name`, `affixes`, `username`, `password`, `role`, `startTicket`, `endTicket`, `currentTicket`, `email`, `employee_id`, `is_activated`, `apiKey`) VALUES
-(2, 'Backdoor', '', 'CTMEU', '', 'devCTMEU', '$2y$10$x8WM5JG8q7lsEjpq9UkmbO4zUJrooQ42WM1iatM/g6aS5ROTNb0sS', 'Backdoor', 1, 50, 29, '', NULL, 0, NULL),
+(2, 'Developer', '', 'CTMEU', '', 'devCTMEU', '$2y$10$x8WM5JG8q7lsEjpq9UkmbO4zUJrooQ42WM1iatM/g6aS5ROTNb0sS', 'Super Administrator', 1, 50, 44, '', NULL, 0, NULL),
 (7, 'Dominic', '', 'Fernandez', '', 'SrDoms', '$2y$10$SUC3O9bUzrTP7.RBvyfr.ehM7pDEgaCz1JoKOWVTA2fT5ZmyKOrSO', 'Backdoor', NULL, NULL, NULL, '', NULL, 0, NULL),
 (8, 'Nestorio', 'Reyes', 'Desepida', '', 'caravana', '$2y$10$bx00B76BZHXQdqLz7WB/x.9Ck1eT7Ja.dfcqw.zZ7o8sY8IbortDu', 'Enforcer', 1, 50, 1, '', 3, 0, NULL),
 (9, 'eddie', 'alibusan', 'colarina', '', 'eds', '$2y$10$KFJ5lYuKu5Jx6Q3nNElkT.Z6YSsygBPMKv0.ve98tbY.jf3PKlgv6', 'Super Administrator', 1, 50, 3, '', NULL, 0, NULL),
@@ -294,6 +294,13 @@ CREATE TABLE `users_motorists` (
   `is_filipino` tinyint(1) NOT NULL,
   `is_activated` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users_motorists`
+--
+
+INSERT INTO `users_motorists` (`user_id`, `driver_last_name`, `driver_first_name`, `driver_middle_name`, `driver_birthday`, `driver_gender`, `mother_last_name`, `mother_first_name`, `mother_middle_name`, `driver_email`, `driver_phone`, `driver_password`, `driver_license`, `driver_license_expiry`, `driver_license_serial`, `is_filipino`, `is_activated`) VALUES
+(1, 'Cosio', 'Vincent Andre', 'Murcia', '2006-12-08', 'Male', 'Cosio', 'Vincent', 'Andrei M.', 'vincent.cosio69@gmail.com', '+639954558875', '$2y$10$ZfqdgaWnZ6r7K6SFWA4iuuPead6fIfaBNysyiM1g9Eq7kXaeZVHLC', 'TL3-33-333', '2024-01-21', '111111111', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -507,6 +514,14 @@ CREATE TABLE `violations` (
   `ticket_id_violations` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `violations`
+--
+
+INSERT INTO `violations` (`violation_id`, `violationlist_id`, `ticket_id_violations`) VALUES
+(29, 20, 17),
+(30, 25, 17);
+
 -- --------------------------------------------------------
 
 --
@@ -530,10 +545,30 @@ CREATE TABLE `violation_tickets` (
   `place_of_occurrence` varchar(50) NOT NULL,
   `control_number` varchar(255) DEFAULT NULL,
   `remarks` varchar(255) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `uniqueCode` varchar(255) NOT NULL,
   `user_ctmeu_id` int(11) DEFAULT NULL,
   `user_id_motorists` int(11) DEFAULT NULL,
   `is_settled` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `violation_tickets`
+--
+
+INSERT INTO `violation_tickets` (`ticket_id`, `driver_name`, `driver_license`, `cor_number`, `issuing_district`, `driver_address`, `vehicle_type`, `plate_no`, `reg_owner`, `reg_owner_address`, `date_violation`, `time_violation`, `date_time_violation_edit`, `place_of_occurrence`, `control_number`, `remarks`, `email`, `uniqueCode`, `user_ctmeu_id`, `user_id_motorists`, `is_settled`) VALUES
+(16, 'Vincent Andrei Cosio', 'N03-24-456288', 112345674, '112345674', 'Marcopolo', 1, 'XCD 345', 'Juan Dela Cruz', 'Marcopolo', '2024-01-24', '04:21:00', '2024-01-24 00:23:42', 'SM', '023456', 'brokenhead light', 'vincent.andrei15@gmail.com', '65b0c90b34de5', 2, NULL, 0),
+(17, 'Dan Carlo Ramirez', 'A03-24-756388', 122545674, '112385674', 'Golden City', 2, 'GAF 246', 'Dan Carlo Ramses', 'Golden City', '2024-01-24', '06:21:00', '2024-01-24 09:51:50', 'Centennial', '023458', '-', '', '65b0c90434de5', 2, NULL, 0),
+(18, 'Eva Martinez', 'F03-12-345678', 543210987, '112385674', 'Cedar Lane', 1, 'PQR 123', 'Eva Martinez', 'Cedar Lane', '2024-01-29', '08:15:00', '2024-01-24 09:11:19', 'Green Avenue', '234567', '-', 'eva.martinez@example.com', '1a2b3c4d5e6f7', 2, NULL, 0),
+(19, 'David Brown', 'G06-34-567890', 678901234, '112385674', 'Maple Street', 4, 'XYZ 456', 'David Brown', 'Maple Street', '2024-01-30', '13:40:00', '2024-01-24 09:11:36', 'Sunset Boulevard', '345678', 'No Seatbelt', 'david.brown@example.com', '8e9f0a1b2c3d4', 2, NULL, 0),
+(20, 'Grace Turner', 'H09-78-901234', 890123456, '112385674', 'Elm Road', 2, 'ABC 789', 'Grace Turner', 'Elm Road', '2024-01-31', '19:20:00', '2024-01-24 09:12:21', 'Ocean Drive', '456789', '-', 'grace.turner@example.com', 'f1g2h3i4j5k6', 2, NULL, 0),
+(21, 'Frank Williams', 'I12-56-789012', 901234567, '112385674', 'Birch Lane', 3, 'JKL 012', 'Frank Williams', 'Birch Lane', '2024-02-01', '10:05:00', '2024-01-24 09:12:21', 'Mountain View', '567890', 'Speeding', 'frank.williams@example.com', 'a1b2c3d4e5f6', 2, NULL, 1),
+(22, 'Holly Davis', 'J15-89-012345', 123456789, '112385674', 'Willow Avenue', 1, 'MNO 345', 'Holly Davis', 'Willow Avenue', '2024-02-02', '15:30:00', '2024-01-24 09:12:21', 'Valley Road', '678901', '-', 'holly.davis@example.com', '1q2w3e4r5t6y', 2, NULL, 0),
+(23, 'Gary Thompson', 'K18-23-456789', 234567890, '112385674', 'Sycamore Lane', 4, 'PQR 678', 'Gary Thompson', 'Sycamore Lane', '2024-02-03', '18:45:00', '2024-01-24 09:12:21', 'Meadow Street', '789012', 'Running Red Light', 'gary.thompson@example.com', 'zxcvbnmasdfghj', 2, NULL, 1),
+(24, 'Isabel Rodriguez', 'L21-45-678901', 345678901, '112385674', 'Cherry Road', 2, 'XYZ 901', 'Isabel Rodriguez', 'Cherry Road', '2024-02-04', '22:10:00', '2024-01-24 09:12:21', 'Park Lane', '890123', '-', 'isabel.rodriguez@example.com', 'plkjhgfdsaytrew', 2, NULL, 0),
+(25, 'Jackie White', 'M24-67-890123', 456789012, '112385674', 'Hickory Avenue', 3, 'ABC 234', 'Jackie White', 'Hickory Avenue', '2024-02-05', '07:35:00', '2024-01-24 09:12:21', 'Main Avenue', '901234', 'No Parking', 'jackie.white@example.com', 'mnbvcxzlkjhgfds', 2, NULL, 1),
+(26, 'Alice Johnson', 'D01-67-987654', 876543210, '112385674', 'Oak Street', 3, 'JKL 567', 'Alice Johnson', 'Oak Street', '2024-01-27', '11:30:00', '2024-01-24 09:12:21', 'Hillside Drive', '123456', '-', 'alice.johnson@example.com', '7b8dfe92a6c41', 2, NULL, 0),
+(27, 'Bob Anderson', 'E05-89-654321', 345678901, '112385674', 'Pine Avenue', 2, 'MNO 890', 'Bob Anderson', 'Pine Avenue', '2024-01-28', '16:55:00', '2024-01-24 09:12:21', 'River Road', '567890', 'Expired License', 'bob.anderson@example.com', '4fbdce1e932a7', 2, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -543,7 +578,7 @@ CREATE TABLE `violation_tickets` (
 
 CREATE TABLE `violator_info` (
   `violator_id` int(11) NOT NULL,
-  `TCT_NUMBER` int(50) NOT NULL,
+  `TCT_NUMBER` varchar(50) NOT NULL,
   `DRIVER_NAME` varchar(100) NOT NULL,
   `VIOLATION_NAME` varchar(100) NOT NULL,
   `VIOLATION_DATE` date NOT NULL,
@@ -552,6 +587,13 @@ CREATE TABLE `violator_info` (
   `VIOLATION_SECTION` varchar(50) NOT NULL,
   `violationL_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `violator_info`
+--
+
+INSERT INTO `violator_info` (`violator_id`, `TCT_NUMBER`, `DRIVER_NAME`, `VIOLATION_NAME`, `VIOLATION_DATE`, `VIOLATION_TIME`, `VIOLATION_FINE`, `VIOLATION_SECTION`, `violationL_id`) VALUES
+(28, '02145686', 'ABC 123', 'Driving with a delinquent, invalid, suspended ineffectual or revoked license', '2024-01-24', '01:00:00', '200', '2', 2);
 
 --
 -- Indexes for dumped tables
@@ -651,13 +693,13 @@ ALTER TABLE `motorist_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `user_ctmeu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `users_motorists`
 --
 ALTER TABLE `users_motorists`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `vehicletype`
@@ -675,19 +717,19 @@ ALTER TABLE `violationlists`
 -- AUTO_INCREMENT for table `violations`
 --
 ALTER TABLE `violations`
-  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `violation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `violation_tickets`
 --
 ALTER TABLE `violation_tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `violator_info`
 --
 ALTER TABLE `violator_info`
-  MODIFY `violator_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `violator_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables
