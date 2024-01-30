@@ -67,7 +67,7 @@ include 'php/database_connect.php';
                 <div class="container d-flex align-items-center justify-content-center pt-5">
                     <div class="col" style="width: 98%; height: 90vh; background: white; box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.50); border-radius: 1.25rem">
                         <div class="row" style="width: 100%; height: 40%; background: linear-gradient(180deg, #062690 0%, #00105A 100%); border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem; border-bottom-right-radius: 2.5rem; border-bottom-left-radius: 2.5rem; margin: .3px;">
-                        <h1 class="d-flex align-items-center justify-content-center mb-0"><img src="./images/ctmeusmall.png"></h1>
+                        <h1 class="d-flex align-items-center justify-content-center mb-0"><img src="./images/logo-ctmeu.png"></h1>
                         <h1 class="d-flex align-items-center justify-content-center mt-0" style="color: #FFF; text-align: center;font-family: Inter;font-size: 2.5rem; font-style: normal; font-weight: 600; line-height: normal;">Check a Violation Ticket Status</h1>
 <form class="d-flex mx-auto mb-5" style=" width: 50%;" id="search-form">
     <div class="input-group">
