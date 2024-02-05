@@ -148,6 +148,31 @@ $access = mysqli_fetch_assoc($result);
       flex-direction: column;
     }
 
+
+    .list-group-item {
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+    .list-group-item .btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .list-group-item button {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.1s ease;
+    }
+    .list-group-item:hover button {
+        opacity: 1;
+    }
+
+    
 </style>
 <body style="height: auto; background: linear-gradient(to bottom, #1F4EDA, #102077);">
 <?php
@@ -281,7 +306,131 @@ $status = $user['role'];
             </div>
             </div>
         </nav>
+        <div class="container ticket-details">
+  <div class="card w-100">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-4 border-end">
+          <h1 class="card-title m-4" style="color: #1A3BB1; font-weight: 1000;">Ticket Settings</h1>
+          <div class="row">
+            <div class="list-group ms-5 fw-medium" id="list-tab" role="tablist" style="width: calc(100% - 80px);"> <!-- Adjust width to make it shorter -->
+              <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Violations</a>
+              <a class="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Vehicle List</a>
+              <a class="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Max Personnel</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-8" style="overflow-y: auto;">
+          <style>
+            @media (min-width: 992px) {
+              .col-8 {
+                max-height: 600px;
+              }
+            }
+            @media (max-width: 991.98px) {
+              .col-8 {
+                max-height: 400px; /* Adjust as needed */
+              }
+            }
+          </style>
+          <div class="tab-content mt-5 ms-5 pt-4" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+              <h5 class="fw-bold">
+                <img class="me-2" src="images/highlight.png">Violations 
+              </h5>
+              <form class="d-flex mt-5 mb-3">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              </form>
+              <?php
+              // Assuming you have already established a MySQL database connection
+              include 'php/database_connect.php';
+              // Query to retrieve data from the database
+              $query = "SELECT violation_name FROM violationlists";
+              $result = mysqli_query($conn, $query);
 
+              // Check if query was successful
+              if ($result) {
+                  echo '<ul class="list-group">';
+                  // Loop through each row in the result set
+                  while ($row = mysqli_fetch_assoc($result)) {
+                      // Output each row as a list item
+                      echo '<li class="list-group-item border-bottom mx-3">' . htmlspecialchars($row['violation_name']) . '</li>';
+                  }
+                  echo '</ul>';
+              } else {
+                  echo "Error: " . mysqli_error($conn);
+              }
+
+              ?>
+            </div>
+            <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+              <h5 class="fw-bold"><img class="me-2" src="images/highlight.png">Vehicle List</h5>
+              <div class="list-group rounded-4 mt-3 me-5 mb-5 border"> <!-- Added border class -->
+                <div class="input-group">
+                  <input type="text" class="form-control border-0 border-top-3 rounded-4" placeholder="Add Vehicle Type">
+                  <button class="btn border-start-0" type="button"><img src="images/addbutton.png"></button>
+                </div>
+                <a href="#" class="list-group-item list-group-item-action border" data-item="1">A second button item<button class="btn btn-primary border-0 bg-transparent"><img src="images/menu.png"></button></a>
+                <a href="#" class="list-group-item list-group-item-action border" data-item="2">A third button item<button class="btn btn-primary border-0 bg-transparent"><img src="images/menu.png"></button></a>
+                <a href="#" class="list-group-item list-group-item-action border" data-item="3">A fourth button item<button class="btn btn-primary border-0 bg-transparent"><img src="images/menu.png"></button></a>
+              </div>
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-danger">Cancel</button>
+                <button type="button" class="btn btn-success">Save Changes</button>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+              <h5 class="fw-bold"><img class="me-2" src="images/highlight.png">Max Personnel</h5>
+              <h8>Maximum IT Admin/Super Admin: </h8>
+              <h8>Maximum Encoder: </h8>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-primary">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-remove-modal" tabindex="-1" aria-labelledby="edit-remove-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="edit-remove-modal-label">Edit/Remove Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to edit or remove this item?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="edit-btn" data-bs-toggle="modal" data-bs-target="#edit-modal">Edit</button>
+        <button type="button" class="btn btn-danger" id="remove-btn">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-modal" tabindex="-1" aria-labelledby="edit-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="edit-modal-label">Edit Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add input fields for editing here -->
+        <input type="text" id="edited-text" class="form-control" placeholder="Enter edited text">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="save-edit-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal -->
 <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
  <div class="modal-dialog" role="document">
@@ -611,6 +760,31 @@ document.getElementById('logout-button').addEventListener('click', function() {
         document.getElementById('welcome-text').textContent = firstName + ' ' + lastName;
     <?php } ?>
 
+</script>
+
+<script>
+  $(document).ready(function() {
+  $('.list-group-item button').click(function(e) {
+    e.preventDefault();
+    var listItem = $(this).closest('.list-group-item');
+    var itemNumber = listItem.data('item');
+    
+    // Display a popup/modal
+    $('#edit-remove-modal').modal('show');
+    
+    // Set data attribute for identification of the selected list item
+    $('#edit-remove-modal').data('selected-item', itemNumber);
+  });
+  
+  
+  // Handle remove button click
+  $('#remove-btn').click(function() {
+    var selectedItem = $('#edit-remove-modal').data('selected-item');
+    alert('Remove item ' + selectedItem);
+    $('#edit-remove-modal').modal('hide');
+    // Add your remove functionality here
+  });
+});
 </script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 </body>
